@@ -1380,6 +1380,116 @@ input:checked+.toggle-switch::after {
 }
 
 /* ============================================
+   PROOF & SUBMISSION SYSTEM
+   ============================================ */
+.proof-page {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.proof-summary-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+}
+
+.step-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.step-indicator {
+    padding: var(--space-sm);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: var(--font-size-xs);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.step-indicator--completed {
+    border-left: 4px solid #1E8E3E;
+    background: #F6FBFA;
+}
+
+.step-indicator--pending {
+    border-left: 4px solid #F1F3F4;
+    background: #F9F9F8;
+    color: #5F6368;
+}
+
+.submission-status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: var(--space-sm);
+}
+
+.status-badge--not-started {
+    background: #F1F3F4;
+    color: #5F6368;
+}
+
+.status-badge--in-progress {
+    background: #FFF4E5;
+    color: #B06000;
+}
+
+.status-badge--shipped {
+    background: #E6F4EA;
+    color: #1E8E3E;
+}
+
+.input-feedback {
+    display: block;
+    font-size: 11px;
+    margin-top: 4px;
+    color: #D93025;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.form-input:invalid {
+    border-color: #D93025;
+}
+
+.form-input:invalid+.input-feedback {
+    opacity: 1;
+}
+
+.ship-confirmation {
+    text-align: center;
+    padding: var(--space-lg);
+    background: #F6FBFA;
+    border: 1px solid #1E8E3E;
+    color: #1E8E3E;
+    border-radius: 4px;
+    margin-top: var(--space-xl);
+    animation: fade-in 0.5s ease-out;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
    PLACEHOLDER PAGE
    ============================================ */
 .placeholder-page {
