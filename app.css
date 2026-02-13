@@ -848,6 +848,162 @@ body {
 }
 
 /* ============================================
+   MATCH SCORE BADGES
+   ============================================ */
+.job-score {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: var(--space-xs);
+    display: inline-flex;
+    align-items: center;
+}
+
+.job-score--high {
+    background-color: #E6F4EA;
+    color: #1E8E3E;
+}
+
+.job-score--mid {
+    background-color: #FEF7E0;
+    color: #F9AB00;
+}
+
+.job-score--neutral {
+    background-color: #F1F3F4;
+    color: #5F6368;
+}
+
+.job-score--low {
+    background-color: #F8F9FA;
+    color: #9AA0A6;
+}
+
+/* ============================================
+   PREFERENCE BANNER
+   ============================================ */
+.pref-banner {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-accent);
+    border-left: 4px solid var(--color-accent);
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+    border-radius: var(--border-radius);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pref-banner__text {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+}
+
+/* ============================================
+   FORM ENHANCEMENTS
+   ============================================ */
+.form-check-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin-top: var(--space-xs);
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+}
+
+.form-check input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-accent);
+}
+
+.form-range {
+    width: 100%;
+    accent-color: var(--color-accent);
+    margin-top: var(--space-sm);
+}
+
+.form-range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-top: 4px;
+}
+
+.form-multi-select {
+    min-height: 100px;
+}
+
+/* ============================================
+   DASHBOARD TOGGLE
+   ============================================ */
+.dashboard-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--space-md);
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-switch {
+    width: 40px;
+    height: 20px;
+    background-color: var(--color-border);
+    border-radius: 10px;
+    position: relative;
+    transition: background-color var(--transition-speed);
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: var(--color-white);
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform var(--transition-speed);
+}
+
+input:checked+.toggle-switch {
+    background-color: var(--color-accent);
+}
+
+input:checked+.toggle-switch::after {
+    transform: translateX(20px);
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* ============================================
    PLACEHOLDER PAGE
    ============================================ */
 .placeholder-page {
