@@ -1,6 +1,13 @@
+import { useState, useEffect } from 'react';
 import { User, Mail, Shield, Award, Settings, LogOut } from 'lucide-react';
 
 export default function Profile() {
+    useEffect(() => {
+        const progress = JSON.parse(localStorage.getItem('prp_steps_progress') || '{}');
+        progress[6] = true;
+        localStorage.setItem('prp_steps_progress', JSON.stringify(progress));
+    }, []);
+
     return (
         <div className="space-y-10">
             <div className="flex items-center justify-between border-b border-border pb-6">

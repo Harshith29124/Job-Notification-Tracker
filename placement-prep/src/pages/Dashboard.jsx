@@ -39,6 +39,12 @@ const assessments = [
 ];
 
 export default function Dashboard() {
+    React.useEffect(() => {
+        const progress = JSON.parse(localStorage.getItem('prp_steps_progress') || '{}');
+        progress[1] = true;
+        localStorage.setItem('prp_steps_progress', JSON.stringify(progress));
+    }, []);
+
     return (
         <div className="space-y-8">
             {/* Main Grid */}

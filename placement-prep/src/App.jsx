@@ -26,6 +26,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/test-checklist" element={<TestChecklist />} />
           <Route path="/shipping-verification" element={<ShipReady />} />
+          <Route path="/prp/proof" element={<ShipReady />} />
         </Route>
       </Routes>
     </Router>

@@ -11,6 +11,7 @@ const STEPS = [
     { path: '/profile', label: 'Profile', step: 6 },
     { path: '/test-checklist', label: 'QA Center', step: 7 },
     { path: '/shipping-verification', label: 'Ship Gate', step: 8 },
+    { path: '/prp/proof', label: 'Proof', step: 8 },
 ];
 
 export default function Layout() {
@@ -22,6 +23,18 @@ export default function Layout() {
         const saved = localStorage.getItem('prp_proof_footer');
         return saved ? JSON.parse(saved) : { ui: false, logic: false, test: false, deploy: false };
     });
+
+    useEffect(() => {
+        const syncStatus = () => {
+            const saved = localStorage.getItem('prp_proof_footer');
+            if (saved) setQaStatus(JSON.parse(saved));
+        };
+
+        window.addEventListener('storage', syncStatus);
+        syncStatus(); // Initial sync
+
+        return () => window.removeEventListener('storage', syncStatus);
+    }, []);
 
     useEffect(() => {
         localStorage.setItem('prp_proof_footer', JSON.stringify(qaStatus));
@@ -126,7 +139,7 @@ function getHeaderTitle(path) {
     if (path === '/resources') return 'Knowledge Base';
     if (path === '/profile') return 'Candidate Profile';
     if (path === '/test-checklist') return 'Quality Assurance';
-    if (path === '/shipping-verification') return 'Shipment Protocol';
+    if (path === '/shipping-verification' || path === '/prp/proof') return 'Shipment Protocol';
     return 'Placement Prep';
 }
 

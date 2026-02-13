@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BookOpen, FileText, ExternalLink, Video, Download, Search } from 'lucide-react';
 
 const libraries = [
@@ -20,6 +21,12 @@ const libraries = [
 ];
 
 export default function Resources() {
+    useEffect(() => {
+        const progress = JSON.parse(localStorage.getItem('prp_steps_progress') || '{}');
+        progress[5] = true;
+        localStorage.setItem('prp_steps_progress', JSON.stringify(progress));
+    }, []);
+
     return (
         <div className="space-y-10">
             <div className="flex items-center justify-between border-b border-border pb-6">

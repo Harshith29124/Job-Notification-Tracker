@@ -4,6 +4,12 @@ import { ClipboardCheck, Sparkles, Building2, UserCircle2, Send, AlertCircle } f
 import { analyzeJD, saveToHistory } from '../utils/analysisEngine';
 
 export default function Assessments() {
+    useEffect(() => {
+        const progress = JSON.parse(localStorage.getItem('prp_steps_progress') || '{}');
+        progress[3] = true;
+        localStorage.setItem('prp_steps_progress', JSON.stringify(progress));
+    }, []);
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [formData, setFormData] = useState({

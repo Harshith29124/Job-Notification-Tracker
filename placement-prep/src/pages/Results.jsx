@@ -24,6 +24,11 @@ export default function Results() {
     const id = searchParams.get('id');
 
     useEffect(() => {
+        // Track step 3 completion
+        const progress = JSON.parse(localStorage.getItem('prp_steps_progress') || '{}');
+        progress[3] = true;
+        localStorage.setItem('prp_steps_progress', JSON.stringify(progress));
+
         const analysis = id ? getAnalysisById(id) : getLastAnalysis();
         if (!analysis) {
             navigate('/assessments');

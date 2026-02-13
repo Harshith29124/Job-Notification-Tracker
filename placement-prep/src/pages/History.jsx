@@ -1,9 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 import { getHistory } from '../utils/analysisEngine';
 import { History as HistoryIcon, ArrowRight, Calendar, Building2, BarChart3, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function History() {
+    useEffect(() => {
+        const progress = JSON.parse(localStorage.getItem('prp_steps_progress') || '{}');
+        progress[4] = true;
+        localStorage.setItem('prp_steps_progress', JSON.stringify(progress));
+    }, []);
+
     const [analyses, setAnalyses] = useState(getHistory());
     const navigate = useNavigate();
 
