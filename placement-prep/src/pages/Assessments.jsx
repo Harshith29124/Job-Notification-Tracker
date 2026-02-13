@@ -10,6 +10,8 @@ export default function Assessments() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const navigate = useNavigate();
 
+    const isJdTooShort = jdText.trim().length > 0 && jdText.trim().length < 200;
+
     const handleAnalyze = (e) => {
         e.preventDefault();
         if (!jdText.trim()) return;
@@ -42,7 +44,7 @@ export default function Assessments() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <Building2 size={14} /> Company Name
+                                <Building2 size={14} /> Company Name (Optional)
                             </label>
                             <input
                                 type="text"
@@ -54,7 +56,7 @@ export default function Assessments() {
                         </div>
                         <div className="space-y-2">
                             <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <UserCircle2 size={14} /> Job Role
+                                <UserCircle2 size={14} /> Job Role (Optional)
                             </label>
                             <input
                                 type="text"
@@ -67,17 +69,30 @@ export default function Assessments() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                            <FileText size={14} /> Job Description
-                        </label>
+                        <div className="flex justify-between items-center">
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                                <FileText size={14} /> Job Description
+                            </label>
+                            {isJdTooShort && (
+                                <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest animate-pulse">
+                                    Calm Warning: Input too short
+                                </span>
+                            )}
+                        </div>
                         <textarea
                             value={jdText}
                             onChange={(e) => setJdText(e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-[2rem] p-8 min-h-[300px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all resize-none font-medium leading-relaxed"
+                            className={`w-full bg-slate-50 border ${isJdTooShort ? 'border-amber-200' : 'border-slate-200'} rounded-[2rem] p-8 min-h-[300px] focus:ring-4 ${isJdTooShort ? 'focus:ring-amber-500/5 focus:border-amber-400' : 'focus:ring-primary/10 focus:border-primary'} outline-none transition-all resize-none font-medium leading-relaxed`}
                             placeholder="Paste the full job description here..."
                             required
                         />
-                        <p className="text-xs text-slate-400 font-bold italic">Heuristic analysis for skills, tech stack, and core CS fundamentals.</p>
+                        {isJdTooShort ? (
+                            <p className="text-[11px] text-amber-600 font-bold italic">
+                                This JD is too short to analyze deeply. Paste full JD for better output.
+                            </p>
+                        ) : (
+                            <p className="text-xs text-slate-400 font-bold italic">Heuristic analysis for skills, tech stack, and core CS fundamentals.</p>
+                        )}
                     </div>
 
                     <button
@@ -85,7 +100,7 @@ export default function Assessments() {
                         disabled={isAnalyzing || !jdText.trim()}
                         className={`w-full py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 transition-all ${isAnalyzing
                             ? 'bg-primary/20 text-primary cursor-wait'
-                            : 'bg-primary text-white hover:bg-primary/90 hover:scale-[1.01] shadow-xl shadow-primary/25 active:scale-[0.99]'
+                            : 'bg-primary text-white hover:bg-primary/90 hover:scale-[1.01] shadow-xl shadow-primary/25 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed'
                             }`}
                     >
                         {isAnalyzing ? (
@@ -96,7 +111,7 @@ export default function Assessments() {
                         ) : (
                             <>
                                 <Send size={20} />
-                                Generate Preparation Roadmap
+                                {jdText.trim() ? 'Generate Preparation Roadmap' : 'Paste JD to Begin'}
                             </>
                         )}
                     </button>

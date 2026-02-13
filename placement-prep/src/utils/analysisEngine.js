@@ -39,20 +39,42 @@ const INDUSTRY_KEYWORDS = {
 
 export function analyzeJD(company, role, jdText) {
     const text = jdText.toLowerCase();
-    const companyLower = company.toLowerCase();
-    const extractedSkills = {};
-    let totalCategories = 0;
+    const companyLower = (company || "").toLowerCase();
 
+    // 1) Initialize Schema Structure
+    const extractedSkills = {
+        coreCS: [],
+        languages: [],
+        web: [],
+        data: [],
+        cloud: [],
+        testing: [],
+        other: []
+    };
+
+    // 2) Extraction with Category Mapping
+    let foundAny = false;
     Object.entries(SKILL_MAP).forEach(([category, keywords]) => {
         const found = keywords.filter(kw => text.includes(kw.toLowerCase()));
         if (found.length > 0) {
-            extractedSkills[category] = found;
-            totalCategories++;
+            foundAny = true;
+            // Map SKILL_MAP keys to our strict schema keys
+            const keyMap = {
+                "Core CS": "coreCS",
+                "Languages": "languages",
+                "Web": "web",
+                "Data": "data",
+                "Cloud/DevOps": "cloud",
+                "Testing": "testing"
+            };
+            const targetKey = keyMap[category] || "other";
+            extractedSkills[targetKey] = [...new Set([...(extractedSkills[targetKey] || []), ...found])];
         }
     });
 
-    if (Object.keys(extractedSkills).length === 0) {
-        extractedSkills["General"] = ["General Software Engineering"];
+    // 3) Default behavior if no skills detected
+    if (!foundAny) {
+        extractedSkills.other = ["Communication", "Problem solving", "Basic coding", "Projects"];
     }
 
     // Advanced Industry Inference
@@ -64,89 +86,79 @@ export function analyzeJD(company, role, jdText) {
         }
     }
 
-    // Company Intel Heuristics
-    const companyIntel = {
-        name: company || "Strategic Enterprise",
-        industry: inferredIndustry,
-        sizeCategory: "Startup (<200)",
-        hiringFocus: "Practical problem solving + tech stack depth",
-        type: "startup"
-    };
+    // Company Type Heuristic
+    const companyType = ENTERPRISE_COMPANIES.some(c => companyLower.includes(c)) ? "enterprise" :
+        (MIDSIZE_COMPANIES.some(c => companyLower.includes(c)) ? "midsize" : "startup");
 
-    if (ENTERPRISE_COMPANIES.some(c => companyLower.includes(c))) {
-        companyIntel.sizeCategory = "Enterprise (2000+)";
-        companyIntel.hiringFocus = "Highly structured DSA + core fundamentals + scale understanding. Focus on optimization and system reliability.";
-        companyIntel.type = "enterprise";
-    } else if (MIDSIZE_COMPANIES.some(c => companyLower.includes(c))) {
-        companyIntel.sizeCategory = "Mid-size (200-2000)";
-        companyIntel.hiringFocus = "Hybrid focus: Product thinking + strong DS fundamentals. Rapid feature development and ownership.";
-        companyIntel.type = "midsize";
-    }
+    const hasWeb = extractedSkills.web.length > 0 || text.includes("web");
+    const hasDSA = extractedSkills.coreCS.length > 0 || text.includes("dsa");
 
-    // Round Mapping Logic
-    const allSkills = Object.values(extractedSkills).flat();
-    const hasWeb = extractedSkills["Web"] || text.includes("web") || text.includes("react") || text.includes("node");
-    const hasData = extractedSkills["Data"] || text.includes("data") || text.includes("sql");
-    const hasDSA = extractedSkills["Core CS"] || text.includes("dsa") || text.includes("algorithm");
-
+    // 4) Round Mapping & Checklist standardizing
     let roundMapping = [];
-    if (companyIntel.type === "enterprise") {
+    if (companyType === "enterprise") {
         roundMapping = [
-            { name: "Online Assessment", focus: hasDSA ? "DSA + Aptitude" : "Technical Literacy", importance: "Elimination round focusing on speed and accuracy. Essential to pass benchmark scores." },
-            { name: "Technical Round 1", focus: "DSA + Core CS", importance: "Deep dive into data structures and operating system fundamentals. Testing peak logical capacity." },
-            { name: "Technical Round 2", focus: "System Design / Projects", importance: "Verification of your practical application. Can you connect code to real-world impact?" },
-            { name: "HR / Values", focus: "Culture & Alignment", importance: "Long-term alignment with company values. Are you a high-potential culture add?" }
-        ];
-    } else if (companyIntel.type === "midsize") {
-        roundMapping = [
-            { name: "Coding Assignment", focus: hasWeb ? "Fullstack Task" : "Core Problem", importance: "Focus on writing clean, production-ready code with good architecture." },
-            { name: "Product Engineering", focus: "System Discussion", importance: "Testing how you think about product trade-offs and user-centric engineering." },
-            { name: "Cultural Fit / Bar Raiser", focus: "Ownership + Mindset", importance: "Critical for high-growth environments. Testing grit and problem-solving speed." }
+            { roundTitle: "Online Assessment", focusAreas: [hasDSA ? "DSA" : "Tech Literacy", "Aptitude"], whyItMatters: "Elimination round focusing on speed and accuracy point benchmark." },
+            { roundTitle: "Technical Round 1", focusAreas: ["DSA", "Core CS"], whyItMatters: "Deep dive into data structures and OS fundamentals." },
+            { roundTitle: "Technical Round 2", focusAreas: ["System Design", "Projects"], whyItMatters: "Verification of practical application and impact." },
+            { roundTitle: "HR / Values", focusAreas: ["Behavioral", "Culture"], whyItMatters: "Long-term alignment with leadership principles." }
         ];
     } else {
         roundMapping = [
-            { name: "Practical Coding", focus: hasWeb ? "Web Feature Task" : "Logic Task", importance: "Hands-on session to see if you can ship features independently." },
-            { name: "Technical Discussion", focus: "Tech Stack Depth", importance: "Ensuring you know the 'why' behind the libraries and frameworks you use." },
-            { name: "Founder / Cultural Round", focus: "Mission Alignment", importance: "Ensuring you believe in the startup's vision and can work in ambiguity." }
+            { roundTitle: "Coding Assignment", focusAreas: [hasWeb ? "Fullstack Task" : "Logic"], whyItMatters: "Testing if you can ship clean, production-ready features." },
+            { roundTitle: "Technical Interview", focusAreas: ["Stack Depth", "Architecture"], whyItMatters: "Ensuring you know the 'why' behind your tools." },
+            { roundTitle: "Founder Round", focusAreas: ["Mission", "Grit"], whyItMatters: "Alignment with high-growth startup culture." }
         ];
     }
 
-    // Readiness Score
-    let score = 35;
-    score += Math.min(totalCategories * 5, 30);
-    if (company.trim()) score += 10;
-    if (role.trim()) score += 10;
-    if (jdText.length > 800) score += 10;
-    score = Math.min(score, 100);
+    const checklist = roundMapping.map(r => ({
+        roundTitle: r.roundTitle,
+        items: ["Review " + r.focusAreas[0], "Practice mock for " + r.roundTitle, "Revise relevant projects"]
+    }));
 
+    // Company Intel (Heuristics)
+    const companyIntel = {
+        industry: inferredIndustry,
+        sizeCategory: companyType === "enterprise" ? "Enterprise (2000+)" : (companyType === "midsize" ? "Mid-size (200-2000)" : "Startup (<200)"),
+        hiringFocus: companyType === "enterprise" ? "Scale, Reliability, Optimization" : (companyType === "midsize" ? "Product thinking, Stack ownership" : "Speed, Grit, Adaptability")
+    };
+
+    // 5) Readiness Score (Base)
+    let baseScore = 40;
+    const catCount = Object.values(extractedSkills).filter(arr => arr.length > 0).length;
+    baseScore += Math.min(catCount * 8, 40);
+    if (jdText.length > 500) baseScore += 10;
+    if (company) baseScore += 5;
+    if (role) baseScore += 5;
+    baseScore = Math.min(baseScore, 95);
+
+    const allExtracted = Object.values(extractedSkills).flat();
+
+    // 6) Build Final Entry
     return {
         id: Date.now(),
         createdAt: new Date().toISOString(),
-        company,
-        role,
+        updatedAt: new Date().toISOString(),
+        company: company || "",
+        role: role || "",
         jdText,
         extractedSkills,
         companyIntel,
         roundMapping,
-        plan: [
-            { day: "Day 1-2", focus: "Core CS Fundamentals", tasks: ["Revise OS Concepts", "Revise DBMS & SQL"] },
-            { day: "Day 3-4", focus: "DSA Practice", tasks: ["Arrays & Strings", "Trees & Graphs"] },
-            { day: "Day 5", focus: "Stack & Projects", tasks: [hasWeb ? "Web deep dive" : "Core internals", "Project walkthrough"] },
-            { day: "Day 6", focus: "Mock Interviews", tasks: ["Behavioral prep", "Technical mock"] },
-            { day: "Day 7", focus: "Revision", tasks: ["Weak area review"] }
+        checklist,
+        plan7Days: [
+            { day: "Day 1-2", focus: "Foundation", tasks: ["Revise " + (extractedSkills.coreCS[0] || "Foundations"), "Setup dev environment"] },
+            { day: "Day 3-5", focus: "Deep Dive", tasks: ["Practice " + (allExtracted[0] || "Core coding"), "Build small prototype"] },
+            { day: "Day 6-7", focus: "Optimization", tasks: ["Mock interviews", "Final review of " + (company || "Target Role")] }
         ],
-        checklist: {
-            "Preparation Milestones": ["Core CS Mastery", "Projects Polished", "Behavioral Ready"]
-        },
-        questions: allSkills.map(s => SPECIFIC_QUESTIONS[s]).filter(Boolean).slice(0, 10),
-        baseReadinessScore: score,
-        readinessScore: score,
-        skillConfidenceMap: {}
+        questions: allExtracted.map(s => SPECIFIC_QUESTIONS[s]).filter(Boolean).slice(0, 10),
+        baseScore: baseScore,
+        skillConfidenceMap: {},
+        finalScore: baseScore
     };
 }
 
 export function saveToHistory(analysis) {
-    const history = JSON.parse(localStorage.getItem('prepHistory') || '[]');
+    const history = getHistory();
     const index = history.findIndex(a => a.id === analysis.id);
     if (index !== -1) history[index] = analysis;
     else history.unshift(analysis);
@@ -158,13 +170,52 @@ export function updateAnalysis(id, updates) {
     const history = getHistory();
     const index = history.findIndex(a => a.id === Number(id));
     if (index !== -1) {
-        history[index] = { ...history[index], ...updates };
+        const entry = { ...history[index], ...updates };
+
+        // Final score stability rule: derived from baseScore + confidence map
+        if (updates.skillConfidenceMap || updates.baseScore !== undefined) {
+            const allSkills = Object.values(entry.extractedSkills).flat();
+            const knowCount = Object.values(entry.skillConfidenceMap).filter(v => v === 'know').length;
+            const practiceCount = allSkills.length - knowCount;
+
+            let newScore = entry.baseScore + (knowCount * 2) - (practiceCount * 1);
+            entry.finalScore = Math.max(0, Math.min(100, Math.round(newScore)));
+            entry.updatedAt = new Date().toISOString();
+        }
+
+        history[index] = entry;
         localStorage.setItem('prepHistory', JSON.stringify(history));
-        return history[index];
+        return entry;
     }
     return null;
 }
 
-export function getHistory() { return JSON.parse(localStorage.getItem('prepHistory') || '[]'); }
-export function getAnalysisById(id) { return getHistory().find(a => a.id === Number(id)); }
-export function getLastAnalysis() { const h = getHistory(); return h.length > 0 ? h[0] : null; }
+export function getHistory() {
+    try {
+        const raw = localStorage.getItem('prepHistory');
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+
+        // Robustness: Filter invalid entries
+        return parsed.filter(entry => {
+            const isValid = entry && typeof entry === 'object' && entry.id && entry.jdText;
+            if (!isValid && entry) {
+                console.warn("Skipping corrupted history entry:", entry.id);
+            }
+            return isValid;
+        });
+    } catch (e) {
+        console.error("Critical: prepHistory corrupted", e);
+        return [];
+    }
+}
+
+export function getAnalysisById(id) {
+    return getHistory().find(a => a.id === Number(id));
+}
+
+export function getLastAnalysis() {
+    const h = getHistory();
+    return h.length > 0 ? h[0] : null;
+}

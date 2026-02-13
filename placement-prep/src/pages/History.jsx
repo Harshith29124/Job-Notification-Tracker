@@ -55,7 +55,7 @@ export default function History() {
                         >
                             <div className="flex-shrink-0 w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center border border-slate-100 group-hover:bg-primary/5 group-hover:border-primary/20 transition-all">
                                 <div className="text-center">
-                                    <span className="text-2xl font-black text-slate-900 block leading-tight">{entry.readinessScore}</span>
+                                    <span className="text-2xl font-black text-slate-900 block leading-tight">{entry.finalScore || entry.readinessScore}</span>
                                     <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Score</span>
                                 </div>
                             </div>
@@ -75,7 +75,7 @@ export default function History() {
                                         {new Date(entry.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                     </div>
                                     <div className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter">
-                                        {Object.keys(entry.extractedSkills).length} Skill Categories
+                                        {Object.values(entry.extractedSkills).filter(arr => Array.isArray(arr) && arr.length > 0).length} Focus Areas
                                     </div>
                                 </div>
                             </div>
