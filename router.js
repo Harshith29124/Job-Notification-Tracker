@@ -24,6 +24,20 @@ let currentJobModal = null;
 //   minMatchScore: number
 // }
 
+// Test Checklist Definition
+const testItems = [
+    { id: 't1', label: 'Preferences persist after refresh', hint: 'Change settings, refresh, and confirm they remain.' },
+    { id: 't2', label: 'Match score calculates correctly', hint: 'Verify weightings (+25 Title, +15 Desc, etc.) are applied.' },
+    { id: 't3', label: '"Show only matches" toggle works', hint: 'Enable toggle on dashboard and check if low scores disappear.' },
+    { id: 't4', label: 'Save job persists after refresh', hint: 'Save a job, refresh, and find it still saved in Dashboard and Saved pages.' },
+    { id: 't5', label: 'Apply opens in new tab', hint: 'Click Apply on any card and confirm a new window opens.' },
+    { id: 't6', label: 'Status update persists after refresh', hint: 'Change a job to "Applied", refresh, and confirm it stays blue.' },
+    { id: 't7', label: 'Status filter works correctly', hint: 'Select "Applied" in the filter dropdown and verify only those show.' },
+    { id: 't8', label: 'Digest generates top 10 by score', hint: 'Generate digest and confirm the highest % matches are at the top.' },
+    { id: 't9', label: 'Digest persists for the day', hint: 'Generate digest, refresh, and confirm it doesn\'t ask to regenerate.' },
+    { id: 't10', label: 'No console errors on main pages', hint: 'Check the browser console (F12) for any red error text.' }
+];
+
 // Initialize preferences
 const defaultPrefs = {
     roleKeywords: [],
@@ -59,6 +73,14 @@ const routes = {
     '/proof': {
         title: 'Proof',
         render: () => renderProofPage()
+    },
+    '/jt/07-test': {
+        title: 'Testing Checklist',
+        render: () => renderTestingPage()
+    },
+    '/jt/08-ship': {
+        title: 'Ship Application',
+        render: () => renderShipPage()
     }
 };
 
@@ -120,7 +142,6 @@ function saveUpdateHistory(job, status) {
         date: new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
     });
 
-    // Keep last 5 updates
     localStorage.setItem('jobUpdateHistory', JSON.stringify(history.slice(0, 5)));
 }
 
@@ -141,10 +162,36 @@ function showToast(message) {
     container.appendChild(toast);
 
     setTimeout(() => {
-        if (container.contains(toast)) container.removeChild(toast);
-        if (container.children.length === 0) document.body.removeChild(container);
+        if (container && container.contains(toast)) container.removeChild(toast);
     }, 3000);
 }
+
+/**
+ * Test Management Logic
+ */
+function getTestsPassed() {
+    return JSON.parse(localStorage.getItem('jobTrackerTests') || '[]');
+}
+
+function setTestStatus(id, checked) {
+    let passed = getTestsPassed();
+    if (checked) {
+        if (!passed.includes(id)) passed.push(id);
+    } else {
+        passed = passed.filter(t => t !== id);
+    }
+    localStorage.setItem('jobTrackerTests', JSON.stringify(passed));
+    renderRoute();
+}
+window.setTestStatus = setTestStatus;
+
+function resetTestStatus() {
+    if (confirm("Reset all test progress?")) {
+        localStorage.removeItem('jobTrackerTests');
+        renderRoute();
+    }
+}
+window.resetTestStatus = resetTestStatus;
 
 /**
  * Calculate match score for a job based on the exact rules
@@ -220,20 +267,14 @@ function calculateMatchScore(job) {
  */
 function parseSalary(salaryStr) {
     if (!salaryStr) return 0;
-
-    // Extract numbers from strings like "10–18 LPA" or "₹25k–₹40k/month"
     const numbers = salaryStr.match(/\d+(\.\d+)?/g);
     if (!numbers) return 0;
-
     const avg = numbers.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) / numbers.length;
-
-    // Handle units
     if (salaryStr.toLowerCase().includes('lpa')) {
         return avg * 100000;
     } else if (salaryStr.toLowerCase().includes('k/month') || salaryStr.toLowerCase().includes('k-')) {
         return avg * 1000 * 12;
     }
-
     return avg;
 }
 
@@ -249,17 +290,14 @@ function getFilteredJobs() {
 
     const prefs = getPreferences();
 
-    // Apply "Show only matches" toggle
     if (currentFilters.showOnlyMatches) {
         filtered = filtered.filter(job => job.matchScore >= prefs.minMatchScore);
     }
 
-    // Apply status filter
     if (currentFilters.status) {
         filtered = filtered.filter(job => job.status === currentFilters.status);
     }
 
-    // Apply keyword filter (search title, company, skills)
     if (currentFilters.keyword) {
         const keyword = currentFilters.keyword.toLowerCase();
         filtered = filtered.filter(job =>
@@ -269,7 +307,6 @@ function getFilteredJobs() {
         );
     }
 
-    // Apply dimension filters (AND logic)
     if (currentFilters.location) {
         filtered = filtered.filter(job => job.location.toLowerCase() === currentFilters.location.toLowerCase());
     }
@@ -286,7 +323,6 @@ function getFilteredJobs() {
         filtered = filtered.filter(job => job.source.toLowerCase() === currentFilters.source.toLowerCase());
     }
 
-    // Apply sorting
     if (currentFilters.sort === 'latest') {
         filtered.sort((a, b) => a.postedDaysAgo - b.postedDaysAgo);
     } else if (currentFilters.sort === 'oldest') {
@@ -322,13 +358,11 @@ function isJobSaved(jobId) {
  */
 function toggleSaveJob(jobId) {
     let saved = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-
     if (saved.includes(jobId)) {
         saved = saved.filter(id => id !== jobId);
     } else {
         saved.push(jobId);
     }
-
     localStorage.setItem('savedJobs', JSON.stringify(saved));
     renderRoute();
 }
@@ -523,8 +557,6 @@ function renderDashboardPage() {
  */
 function renderSettingsPage() {
     const prefs = getPreferences();
-
-    // Unique values for multi-select
     const locations = [...new Set(jobsData.map(j => j.location))].sort();
     const modes = ['Remote', 'Hybrid', 'Onsite'];
     const experienceLevels = [...new Set(jobsData.map(j => j.experience))].sort();
@@ -602,22 +634,10 @@ function renderSettingsPage() {
 }
 
 /**
- * Reset preferences
- */
-function resetPreferences() {
-    if (confirm("Reset preferences to default?")) {
-        savePreferences(defaultPrefs);
-        renderRoute();
-    }
-}
-window.resetPreferences = resetPreferences;
-
-/**
  * Handle settings form submission
  */
 function handlePrefsSubmit(e) {
     e.preventDefault();
-
     const keywordsVal = document.getElementById('pref-keywords').value;
     const skillsVal = document.getElementById('pref-skills').value;
     const locationsSelect = document.getElementById('pref-locations');
@@ -632,7 +652,6 @@ function handlePrefsSubmit(e) {
         experienceLevel: document.getElementById('pref-experience').value,
         minMatchScore: parseInt(thresholdVal)
     };
-
     savePreferences(newPrefs);
     alert("Preferences saved successfully!");
     navigateTo('/dashboard');
@@ -648,23 +667,15 @@ function renderSavedPage() {
         matchScore: calculateMatchScore(job),
         status: getJobStatus(job.id)
     }));
-
     return `
         <div class="page-container page-container--wide">
             <div class="page-header">
                 <h1 class="page-header__title">Saved Jobs</h1>
                 <p class="page-header__subtitle">${savedJobs.length} bookmarked roles</p>
             </div>
-            
             ${savedJobs.length > 0
             ? `<div class="jobs-grid">${savedJobs.map(job => renderJobCard(job)).join('')}</div>`
-            : `
-                    <div class="empty-state">
-                        <h2 class="empty-state__title">No saved jobs</h2>
-                        <p class="empty-state__description">Jobs you bookmark will appear here for easy access.</p>
-                        <a href="#/dashboard" class="btn btn--secondary">Browse Jobs</a>
-                    </div>
-                `
+            : `<div class="empty-state"><h2 class="empty-state__title">No saved jobs</h2><p class="empty-state__description">Bookmark jobs to see them here.</p><a href="#/dashboard" class="btn btn--secondary">Browse Jobs</a></div>`
         }
         </div>
     `;
@@ -676,21 +687,8 @@ function renderSavedPage() {
 function renderDigestPage() {
     const prefsSet = arePreferencesSet();
     if (!prefsSet) {
-        return `
-            <div class="page-container">
-                <div class="page-header">
-                    <h1 class="page-header__title">Daily Digest</h1>
-                    <p class="page-header__subtitle">Set preferences to generate a personalized digest.</p>
-                </div>
-                <div class="empty-state">
-                    <h2 class="empty-state__title">Preferences Required</h2>
-                    <p class="empty-state__description">Set your preferences to activate the intelligent digest matching engine.</p>
-                    <a href="#/settings" class="btn btn--primary">Configure Settings</a>
-                </div>
-            </div>
-        `;
+        return `<div class="page-container"><div class="page-header"><h1 class="page-header__title">Daily Digest</h1></div><div class="empty-state"><h2 class="empty-state__title">Preferences Required</h2><a href="#/settings" class="btn btn--primary">Configure Settings</a></div></div>`;
     }
-
     const today = new Date().toISOString().split('T')[0];
     const digestKey = `jobTrackerDigest_${today}`;
     const storedDigest = localStorage.getItem(digestKey);
@@ -699,165 +697,134 @@ function renderDigestPage() {
 
     return `
         <div class="page-container page-container--wide">
-            <div class="page-header">
-                <h1 class="page-header__title">Daily Digest</h1>
-                <p class="page-header__subtitle">Your personalized 9AM summary of the best roles for you.</p>
-            </div>
-
+            <div class="page-header"><h1 class="page-header__title">Daily Digest</h1></div>
             <div class="digest-container">
                 ${!digestJobs ? `
-                    <div class="empty-state">
-                        <h2 class="empty-state__title">Today's Digest Ready</h2>
-                        <p class="empty-state__description">Simulate the 9AM automated trigger to see your top 10 matches for today.</p>
-                        <button class="btn btn--primary" onclick="generateTodayDigest()">Generate Today's 9AM Digest (Simulated)</button>
-                    </div>
+                    <div class="empty-state"><h2>Today's Digest Ready</h2><button class="btn btn--primary" onclick="generateTodayDigest()">Generate Digest</button></div>
                 ` : `
-                    <div class="digest-actions-top">
-                        <button class="btn btn--secondary btn--small" onclick="copyDigestToClipboard()">Copy Digest to Clipboard</button>
-                        <button class="btn btn--secondary btn--small" onclick="createEmailDraft()">Create Email Draft</button>
+                    <div class="digest-actions-top"><button class="btn btn--secondary btn--small" onclick="copyDigestToClipboard()">Copy</button><button class="btn btn--secondary btn--small" onclick="createEmailDraft()">Email</button></div>
+                    <div class="newsletter">
+                        <div class="newsletter__header"><h2 class="newsletter__title">Top 10 Jobs For You</h2></div>
+                        <div class="newsletter__content">${digestJobs.map(job => `<div class="newsletter__item"><div><h3 class="newsletter__job-title">${job.title}</h3><p>${job.company} • ${job.location} • ${job.matchScore}% Match</p></div><button class="btn btn--small btn--primary" onclick="window.open('${job.applyUrl}', '_blank')">Apply</button></div>`).join('')}</div>
                     </div>
-                    <div class="newsletter" id="digest-newsletter">
-                        <div class="newsletter__header">
-                            <h2 class="newsletter__title">Top 10 Jobs For You — 9AM Digest</h2>
-                            <p class="newsletter__date">${new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                        </div>
-                        
-                        <div class="newsletter__content">
-                            ${digestJobs.map(job => `
-                                <div class="newsletter__item">
-                                    <div class="newsletter__job-info">
-                                        <h3 class="newsletter__job-title">${job.title}</h3>
-                                        <div class="newsletter__job-meta">
-                                            <span>${job.company}</span> • <span>${job.location}</span> • <span>${job.experience}</span>
-                                            <span class="newsletter__job-score" style="color: ${getScoreColor(job.matchScore)}">${job.matchScore}% Match</span>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn--small btn--primary" onclick="window.open('${job.applyUrl}', '_blank')">Apply</button>
-                                </div>
-                            `).join('')}
-                        </div>
-
-                        <div class="newsletter__footer">
-                            <p>This digest was generated based on your preferences.</p>
-                        </div>
-                    </div>
-                    <p class="digest-note">Demo Mode: Daily 9AM trigger simulated manually.</p>
                 `}
-
                 ${history.length > 0 ? `
-                    <div class="updates-section">
-                        <h2 class="form-section__title">Recent Status Updates</h2>
-                        <ul class="update-list">
-                            ${history.map(update => `
-                                <li class="update-item">
-                                    <div class="update-info">
-                                        <span class="update-title">${update.title} @ ${update.company}</span>
-                                        <span class="update-meta">Changed to <strong style="color: var(--color-accent)">${update.status}</strong> on ${update.date}</span>
-                                    </div>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
+                    <div class="updates-section"><h2>Recent Status Updates</h2><ul class="update-list">${history.map(u => `<li class="update-item"><div><strong>${u.title} @ ${u.company}</strong><br>${u.status} on ${u.date}</div></li>`).join('')}</ul></div>
                 ` : ''}
             </div>
         </div>
     `;
 }
 
-function getScoreColor(score) {
-    if (score >= 80) return '#1E8E3E';
-    if (score >= 60) return '#F9AB00';
-    return '#5F6368';
-}
+function getScoreColor(score) { return score >= 80 ? '#1E8E3E' : (score >= 60 ? '#F9AB00' : '#5F6368'); }
 
-/**
- * Generate digest logic
- */
 function generateTodayDigest() {
-    const jobs = jobsData.map(job => ({
-        ...job,
-        matchScore: calculateMatchScore(job)
-    }));
-
-    // Select top 10 jobs by score desc, recency asc
-    const digestJobs = jobs
-        .sort((a, b) => (b.matchScore - a.matchScore) || (a.postedDaysAgo - b.postedDaysAgo))
-        .slice(0, 10);
-
+    const jobs = jobsData.map(job => ({ ...job, matchScore: calculateMatchScore(job) }));
+    const digestJobs = jobs.sort((a, b) => (b.matchScore - a.matchScore) || (a.postedDaysAgo - b.postedDaysAgo)).slice(0, 10);
     const today = new Date().toISOString().split('T')[0];
     localStorage.setItem(`jobTrackerDigest_${today}`, JSON.stringify(digestJobs));
     renderRoute();
 }
 window.generateTodayDigest = generateTodayDigest;
 
-/**
- * Copy digest to clipboard
- */
 function copyDigestToClipboard() {
     const today = new Date().toISOString().split('T')[0];
     const digestJobs = JSON.parse(localStorage.getItem(`jobTrackerDigest_${today}`) || '[]');
-
-    if (digestJobs.length === 0) return;
-
-    let text = `Top 10 Jobs For You — 9AM Digest (${new Date().toLocaleDateString()})\n\n`;
-    digestJobs.forEach((job, i) => {
-        text += `${i + 1}. ${job.title} at ${job.company}\n`;
-        text += `   Match: ${job.matchScore}% | ${job.location} | ${job.experience}\n`;
-        text += `   Apply: ${job.applyUrl}\n\n`;
-    });
-    text += "Generated by KodNest Job Notification Tracker.";
-
-    navigator.clipboard.writeText(text).then(() => {
-        alert("Digest copied to clipboard!");
-    });
+    let text = "Top 10 Jobs:\n" + digestJobs.map((j, i) => `${i + 1}. ${j.title} @ ${j.company} (${j.matchScore}%)`).join('\n');
+    navigator.clipboard.writeText(text).then(() => alert("Copied!"));
 }
 window.copyDigestToClipboard = copyDigestToClipboard;
 
-/**
- * Create email draft
- */
 function createEmailDraft() {
     const today = new Date().toISOString().split('T')[0];
     const digestJobs = JSON.parse(localStorage.getItem(`jobTrackerDigest_${today}`) || '[]');
-
-    if (digestJobs.length === 0) return;
-
-    const subject = encodeURIComponent("My 9AM Job Digest");
-    let body = `Top 10 Jobs For You — 9AM Digest (${new Date().toLocaleDateString()})\n\n`;
-    digestJobs.forEach((job, i) => {
-        body += `${i + 1}. ${job.title} at ${job.company} (${job.matchScore}% Match)\n`;
-        body += `Apply: ${job.applyUrl}\n\n`;
-    });
-
-    window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(body)}`;
+    const body = "Top Jobs:\n" + digestJobs.map(j => `- ${j.title} @ ${j.company}`).join('\n');
+    window.location.href = `mailto:?subject=Job Digest&body=${encodeURIComponent(body)}`;
 }
 window.createEmailDraft = createEmailDraft;
 
-function renderProofPage() {
+/**
+ * Testing & Ship Routes
+ */
+function renderTestingPage() {
+    const passed = getTestsPassed();
+    const score = passed.length;
+
     return `
         <div class="page-container">
             <div class="page-header">
-                <h1 class="page-header__title">Proof</h1>
-                <p class="page-header__subtitle">Verification of intelligent matching engine</p>
+                <h1 class="page-header__title">Internal Quality Review</h1>
+                <p class="page-header__subtitle">Verification checklist for the matching engine and status tracker.</p>
             </div>
-            <div class="proof-container">
-                <div class="proof-section">
-                    <h2 class="proof-section__title">Feature Checklist</h2>
-                    <div class="proof-checklist">
-                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Match Scoring Engine</span></div>
-                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Job Status Tracking (Applied/Rejected/Selected)</span></div>
-                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Status History in Digest</span></div>
-                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Persistent Status (localStorage)</span></div>
-                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Combined Status + Match Filters</span></div>
-                    </div>
+            
+            <div class="test-container">
+                <div class="test-progress">
+                    <div class="test-progress__score">Tests Passed: ${score} / 10</div>
+                    ${score < 10
+            ? `<div class="test-progress__warning">Resolve all issues before shipping.</div>`
+            : `<div class="test-progress__success">Quality standards met. Ready for deployment.</div>`
+        }
+                </div>
+
+                <div class="test-checklist">
+                    ${testItems.map(item => `
+                        <div class="test-item">
+                            <input type="checkbox" id="${item.id}" class="test-item__checkbox" ${passed.includes(item.id) ? 'checked' : ''} onchange="setTestStatus('${item.id}', this.checked)">
+                            <div class="test-item__info">
+                                <label for="${item.id}" class="test-item__label">${item.label}</label>
+                                <span class="test-item__tooltip">${item.hint}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="form-actions" style="margin-top: 32px; justify-content: center;">
+                    <button class="btn btn--secondary" onclick="resetTestStatus()">Reset Test Status</button>
+                    <a href="#/jt/08-ship" class="btn btn--primary">Proceed to Ship</a>
                 </div>
             </div>
         </div>
     `;
 }
 
+function renderShipPage() {
+    const passedCount = getTestsPassed().length;
+
+    if (passedCount < 10) {
+        return `
+            <div class="page-container">
+                <div class="ship-lock">
+                    <div class="ship-lock__icon">🔒</div>
+                    <h1 class="ship-lock__title">Ship Route Locked</h1>
+                    <p class="ship-lock__text">You must pass all 10 quality checks before this route becomes accessible. Please complete the testing checklist.</p>
+                    <a href="#/jt/07-test" class="btn btn--primary">Back to Testing</a>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="page-container">
+            <div class="page-header">
+                <h1 class="page-header__title">Ship Application</h1>
+                <p class="page-header__subtitle">Deployment and handover verification.</p>
+            </div>
+            <div class="empty-state">
+                <div style="font-size: 48px; margin-bottom: 24px;">🚀</div>
+                <h2 class="empty-state__title">Application Ready for Ship</h2>
+                <p class="empty-state__description">All 10 internal quality checks have passed. You are cleared for final deployment.</p>
+                <button class="btn btn--primary" onclick="alert('Deployment sequence complete!')">Launch Application</button>
+            </div>
+        </div>
+    `;
+}
+
+function renderProofPage() {
+    return `<div class="page-container"><div class="page-header"><h1 class="page-header__title">Proof</h1></div><div class="proof-checklist">Check internal routes /jt/07-test and /jt/08-ship for verification.</div></div>`;
+}
+
 /**
- * Filter handling
+ * Filtering and UI Helpers
  */
 function clearFilters() {
     currentFilters = { keyword: '', location: '', mode: '', experience: '', source: '', sort: 'latest', showOnlyMatches: false, status: '' };
@@ -865,36 +832,27 @@ function clearFilters() {
 }
 window.clearFilters = clearFilters;
 
-/**
- * Event Listeners Initialization
- */
 function initializeEventListeners() {
     const currentRoute = getCurrentRoute();
-
     if (currentRoute === '/dashboard') {
-        const keywordInput = document.getElementById('filter-keyword');
-        const locSelect = document.getElementById('filter-location');
-        const modeSelect = document.getElementById('filter-mode');
-        const expSelect = document.getElementById('filter-experience');
-        const srcSelect = document.getElementById('filter-source');
-        const statSelect = document.getElementById('filter-status');
-        const sortSelect = document.getElementById('filter-sort');
+        const ids = ['filter-keyword', 'filter-location', 'filter-mode', 'filter-experience', 'filter-source', 'filter-status', 'filter-sort'];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener(id === 'filter-keyword' ? 'input' : 'change', e => {
+                const key = id.replace('filter-', '');
+                currentFilters[key] = e.target.value;
+                renderDashboardContent();
+            });
+        });
         const matchToggle = document.getElementById('match-toggle');
-
-        if (keywordInput) keywordInput.addEventListener('input', e => { currentFilters.keyword = e.target.value; renderDashboardContent(); });
-        if (locSelect) locSelect.addEventListener('change', e => { currentFilters.location = e.target.value; renderDashboardContent(); });
-        if (modeSelect) modeSelect.addEventListener('change', e => { currentFilters.mode = e.target.value; renderDashboardContent(); });
-        if (expSelect) expSelect.addEventListener('change', e => { currentFilters.experience = e.target.value; renderDashboardContent(); });
-        if (srcSelect) srcSelect.addEventListener('change', e => { currentFilters.source = e.target.value; renderDashboardContent(); });
-        if (statSelect) statSelect.addEventListener('change', e => { currentFilters.status = e.target.value; renderDashboardContent(); });
-        if (sortSelect) sortSelect.addEventListener('change', e => { currentFilters.sort = e.target.value; renderDashboardContent(); });
-        if (matchToggle) matchToggle.addEventListener('change', e => { currentFilters.showOnlyMatches = e.target.checked; renderDashboardContent(); });
+        if (matchToggle) matchToggle.addEventListener('change', e => {
+            currentFilters.showOnlyMatches = e.target.checked;
+            renderDashboardContent();
+        });
     }
-
     if (currentRoute === '/settings') {
         const form = document.getElementById('prefs-form');
         if (form) form.addEventListener('submit', handlePrefsSubmit);
-
         const slider = document.getElementById('pref-threshold');
         if (slider) slider.addEventListener('input', e => {
             document.getElementById('threshold-val').textContent = e.target.value + '%';
@@ -902,41 +860,21 @@ function initializeEventListeners() {
     }
 }
 
-/**
- * Render dashboard content without full page reload for performance
- */
 function renderDashboardContent() {
     const jobs = getFilteredJobs();
     const grid = document.querySelector('.jobs-grid');
     const subtitle = document.querySelector('.page-header__subtitle');
-
-    if (subtitle) subtitle.textContent = `${jobs.length} jobs matching your current filters`;
-
-    if (grid) {
-        if (jobs.length > 0) {
-            grid.innerHTML = jobs.map(job => renderJobCard(job)).join('');
-        } else {
-            grid.innerHTML = `
-                <div class="empty-state">
-                    <h2 class="empty-state__title">No roles match your criteria</h2>
-                    <p class="empty-state__description">Adjust filters or lower threshold.</p>
-                    <button class="btn btn--secondary" onclick="clearFilters()">Clear All Filters</button>
-                </div>
-            `;
-        }
-    }
+    if (subtitle) subtitle.textContent = `${jobs.length} jobs matching your filters`;
+    if (grid) grid.innerHTML = jobs.length > 0 ? jobs.map(j => renderJobCard(j)).join('') : `<div class="empty-state"><h2>No matches</h2><button class="btn btn--secondary" onclick="clearFilters()">Clear</button></div>`;
 }
 
-/**
- * Core Router Logic
- */
 function getCurrentRoute() { return window.location.hash.slice(1) || '/'; }
 function navigateTo(path) { window.location.hash = path; }
 
 function updateActiveNav() {
     const route = getCurrentRoute();
     document.querySelectorAll('.top-nav__link, .top-nav__mobile-link').forEach(link => {
-        link.classList.toggle('active', link.getAttribute('data-route') === route || (route === '/dashboard' && link.getAttribute('data-route') === '/'));
+        link.classList.toggle('active', link.getAttribute('data-route') === route);
     });
 }
 
@@ -944,59 +882,21 @@ function renderRoute() {
     const routePath = getCurrentRoute();
     const route = routes[routePath] || routes['/'];
     document.title = `${route.title} - KodNest Premium`;
-
     const content = document.getElementById('app-content');
     if (content) content.innerHTML = route.render();
-
     updateActiveNav();
     initializeEventListeners();
     window.scrollTo(0, 0);
 }
 
-// Global modal helpers
 function openJobModal(jobId) {
     const job = jobsData.find(j => j.id === jobId);
     if (!job) return;
     const score = calculateMatchScore(job);
     const scoreClass = getScoreBadgeClass(score);
-    const prefsSet = arePreferencesSet();
-    const status = getJobStatus(job.id);
-    const statusClass = `status-badge--${status.toLowerCase().replace(' ', '-')}`;
-
     const modal = document.createElement('div');
     modal.className = 'job-modal';
-    modal.innerHTML = `
-        <div class="job-modal__overlay" onclick="closeJobModal()"></div>
-        <div class="job-modal__content">
-            <button class="job-modal__close" onclick="closeJobModal()">&times;</button>
-            <div class="job-modal__header">
-                <h2 class="job-modal__title">
-                    ${job.title}
-                    <span class="status-badge ${statusClass}">${status}</span>
-                    ${prefsSet ? `<span class="job-score ${scoreClass}">${score}% Match</span>` : ''}
-                </h2>
-                <p class="job-modal__company">${job.company}</p>
-            </div>
-            <div class="job-modal__meta">
-                <span>📍 ${job.location}</span>
-                <span>💼 ${job.mode}</span>
-                <span>⏱️ ${job.experience}</span>
-                <span>💰 ${job.salaryRange}</span>
-            </div>
-            <div class="job-modal__section">
-                <h3 class="job-modal__section-title">Description</h3>
-                <p class="job-modal__description">${job.description}</p>
-            </div>
-            <div class="job-modal__section">
-                <h3 class="job-modal__section-title">Required Skills</h3>
-                <div class="job-skills">${job.skills.map(s => `<span class="job-skill">${s}</span>`).join('')}</div>
-            </div>
-            <div class="job-modal__actions">
-                <button class="btn btn--primary" onclick="window.open('${job.applyUrl}', '_blank')">Apply Now</button>
-                <button class="btn btn--secondary" onclick="closeJobModal()">Close</button>
-            </div>
-        </div>
-    `;
+    modal.innerHTML = `<div class="job-modal__overlay" onclick="closeJobModal()"></div><div class="job-modal__content"><button class="job-modal__close" onclick="closeJobModal()">&times;</button><div class="job-modal__header"><h2>${job.title} <span class="job-score ${scoreClass}">${score}%</span></h2><p>${job.company}</p></div><div class="job-modal__meta"><span>📍 ${job.location}</span><span>💼 ${job.mode}</span><span>💰 ${job.salaryRange}</span></div><div class="job-modal__section"><h3>Description</h3><p>${job.description}</p></div><div class="job-modal__actions"><button class="btn btn--primary" onclick="window.open('${job.applyUrl}', '_blank')">Apply</button></div></div>`;
     document.body.appendChild(modal);
     currentJobModal = modal;
     document.body.style.overflow = 'hidden';
@@ -1004,19 +904,15 @@ function openJobModal(jobId) {
 window.openJobModal = openJobModal;
 
 function closeJobModal() {
-    if (currentJobModal) {
-        document.body.removeChild(currentJobModal);
-        currentJobModal = null;
-        document.body.style.overflow = '';
-    }
+    if (currentJobModal) { document.body.removeChild(currentJobModal); currentJobModal = null; document.body.style.overflow = ''; }
 }
 window.closeJobModal = closeJobModal;
 
-// Mobile menu
 function toggleMobileMenu() {
     document.querySelector('.top-nav__toggle').classList.toggle('active');
     document.querySelector('.top-nav__mobile').classList.toggle('active');
 }
+
 window.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('hashchange', renderRoute);
     const toggle = document.querySelector('.top-nav__toggle');
@@ -1024,7 +920,6 @@ window.addEventListener('DOMContentLoaded', () => {
     renderRoute();
 });
 
-// App init
 document.addEventListener('click', e => {
     const link = e.target.closest('a[data-route]');
     if (link) { e.preventDefault(); navigateTo(link.getAttribute('data-route')); }
