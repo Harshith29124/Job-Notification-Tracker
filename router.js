@@ -588,23 +588,150 @@ function renderSavedPage() {
 }
 
 /**
- * Render remaining pages
+ * Render digest page
  */
 function renderDigestPage() {
+    const prefsSet = arePreferencesSet();
+    if (!prefsSet) {
+        return `
+            <div class="page-container">
+                <div class="page-header">
+                    <h1 class="page-header__title">Daily Digest</h1>
+                    <p class="page-header__subtitle">Set preferences to generate a personalized digest.</p>
+                </div>
+                <div class="empty-state">
+                    <h2 class="empty-state__title">Preferences Required</h2>
+                    <p class="empty-state__description">Set your preferences to activate the intelligent digest matching engine.</p>
+                    <a href="#/settings" class="btn btn--primary">Configure Settings</a>
+                </div>
+            </div>
+        `;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const digestKey = `jobTrackerDigest_${today}`;
+    const storedDigest = localStorage.getItem(digestKey);
+    const digestJobs = storedDigest ? JSON.parse(storedDigest) : null;
+
     return `
-        <div class="page-container">
+        <div class="page-container page-container--wide">
             <div class="page-header">
                 <h1 class="page-header__title">Daily Digest</h1>
-                <p class="page-header__subtitle">Precision summary of roles matching your profile</p>
+                <p class="page-header__subtitle">Your personalized 9AM summary of the best roles for you.</p>
             </div>
-            <div class="empty-state">
-                <h2 class="empty-state__title">Digest logic coming soon</h2>
-                <p class="empty-state__description">In the next phase, we'll implement the 9AM summary generator.</p>
-                <a href="#/settings" class="btn btn--secondary">Refine Profile</a>
+
+            <div class="digest-container">
+                ${!digestJobs ? `
+                    <div class="empty-state">
+                        <h2 class="empty-state__title">Today's Digest Ready</h2>
+                        <p class="empty-state__description">Simulate the 9AM automated trigger to see your top 10 matches for today.</p>
+                        <button class="btn btn--primary" onclick="generateTodayDigest()">Generate Today's 9AM Digest (Simulated)</button>
+                    </div>
+                ` : `
+                    <div class="digest-actions-top">
+                        <button class="btn btn--secondary btn--small" onclick="copyDigestToClipboard()">Copy Digest to Clipboard</button>
+                        <button class="btn btn--secondary btn--small" onclick="createEmailDraft()">Create Email Draft</button>
+                    </div>
+                    <div class="newsletter" id="digest-newsletter">
+                        <div class="newsletter__header">
+                            <h2 class="newsletter__title">Top 10 Jobs For You — 9AM Digest</h2>
+                            <p class="newsletter__date">${new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        </div>
+                        
+                        <div class="newsletter__content">
+                            ${digestJobs.map(job => `
+                                <div class="newsletter__item">
+                                    <div class="newsletter__job-info">
+                                        <h3 class="newsletter__job-title">${job.title}</h3>
+                                        <div class="newsletter__job-meta">
+                                            <span>${job.company}</span> • <span>${job.location}</span> • <span>${job.experience}</span>
+                                            <span class="newsletter__job-score" style="color: ${getScoreColor(job.matchScore)}">${job.matchScore}% Match</span>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn--small btn--primary" onclick="window.open('${job.applyUrl}', '_blank')">Apply</button>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="newsletter__footer">
+                            <p>This digest was generated based on your preferences.</p>
+                        </div>
+                    </div>
+                    <p class="digest-note">Demo Mode: Daily 9AM trigger simulated manually.</p>
+                `}
             </div>
         </div>
     `;
 }
+
+function getScoreColor(score) {
+    if (score >= 80) return '#1E8E3E';
+    if (score >= 60) return '#F9AB00';
+    return '#5F6368';
+}
+
+/**
+ * Generate digest logic
+ */
+function generateTodayDigest() {
+    const jobs = jobsData.map(job => ({
+        ...job,
+        matchScore: calculateMatchScore(job)
+    }));
+
+    // Select top 10 jobs by score desc, recency asc
+    const digestJobs = jobs
+        .sort((a, b) => (b.matchScore - a.matchScore) || (a.postedDaysAgo - b.postedDaysAgo))
+        .slice(0, 10);
+
+    const today = new Date().toISOString().split('T')[0];
+    localStorage.setItem(`jobTrackerDigest_${today}`, JSON.stringify(digestJobs));
+    renderRoute();
+}
+window.generateTodayDigest = generateTodayDigest;
+
+/**
+ * Copy digest to clipboard
+ */
+function copyDigestToClipboard() {
+    const today = new Date().toISOString().split('T')[0];
+    const digestJobs = JSON.parse(localStorage.getItem(`jobTrackerDigest_${today}`) || '[]');
+
+    if (digestJobs.length === 0) return;
+
+    let text = `Top 10 Jobs For You — 9AM Digest (${new Date().toLocaleDateString()})\n\n`;
+    digestJobs.forEach((job, i) => {
+        text += `${i + 1}. ${job.title} at ${job.company}\n`;
+        text += `   Match: ${job.matchScore}% | ${job.location} | ${job.experience}\n`;
+        text += `   Apply: ${job.applyUrl}\n\n`;
+    });
+    text += "Generated by KodNest Job Notification Tracker.";
+
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Digest copied to clipboard!");
+    });
+}
+window.copyDigestToClipboard = copyDigestToClipboard;
+
+/**
+ * Create email draft
+ */
+function createEmailDraft() {
+    const today = new Date().toISOString().split('T')[0];
+    const digestJobs = JSON.parse(localStorage.getItem(`jobTrackerDigest_${today}`) || '[]');
+
+    if (digestJobs.length === 0) return;
+
+    const subject = encodeURIComponent("My 9AM Job Digest");
+    let body = `Top 10 Jobs For You — 9AM Digest (${new Date().toLocaleDateString()})\n\n`;
+    digestJobs.forEach((job, i) => {
+        body += `${i + 1}. ${job.title} at ${job.company} (${job.matchScore}% Match)\n`;
+        body += `Apply: ${job.applyUrl}\n\n`;
+    });
+
+    window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(body)}`;
+}
+window.createEmailDraft = createEmailDraft;
 
 function renderProofPage() {
     return `

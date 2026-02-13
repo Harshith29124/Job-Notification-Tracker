@@ -1004,6 +1004,108 @@ input:checked+.toggle-switch::after {
 }
 
 /* ============================================
+   DIGEST & NEWSLETTER
+   ============================================ */
+.digest-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.digest-actions-top {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.newsletter {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: var(--space-xl);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.newsletter__header {
+    text-align: center;
+    border-bottom: 2px solid var(--color-background);
+    padding-bottom: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.newsletter__title {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-xl);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.newsletter__date {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.newsletter__item {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-background);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.newsletter__item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.newsletter__job-info {
+    flex: 1;
+}
+
+.newsletter__job-title {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+}
+
+.newsletter__job-meta {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.newsletter__job-score {
+    display: inline-block;
+    margin-left: var(--space-sm);
+    font-weight: 700;
+}
+
+.newsletter__footer {
+    text-align: center;
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 2px solid var(--color-background);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.digest-note {
+    text-align: center;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    color: #999;
+    margin-top: var(--space-md);
+    font-style: italic;
+}
+
+/* ============================================
    PLACEHOLDER PAGE
    ============================================ */
 .placeholder-page {
