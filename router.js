@@ -181,7 +181,7 @@ function renderLandingPage() {
                         <p style="margin-bottom: 32px;">Heuristic JD analyzer and interview architect. Generate professional preparation roadmaps and track technical mastery.</p>
                     </div>
                     <div style="display: flex; gap: 16px;">
-                        <a href="placement/index.html" class="btn btn--primary" style="flex: 1;">Launch Platform</a>
+                        <a href="placement-prep/dist/index.html" class="btn btn--primary" style="flex: 1;">Launch Platform</a>
                         <div class="status-badge" style="background: var(--color-bg); border-color: var(--color-border); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 900;">V1.2 Active</div>
                     </div>
                 </div>
