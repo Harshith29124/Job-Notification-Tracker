@@ -26,8 +26,16 @@ const SPECIFIC_QUESTIONS = {
     "Linux": "Explain the Linux file permission system (chmod)."
 };
 
-const ENTERPRISE_COMPANIES = ["amazon", "google", "microsoft", "apple", "meta", "tcs", "infosys", "wipro", "hcl", "accenture", "ibm", "oracle", "cisco", "intel", "adobe"];
-const MIDSIZE_COMPANIES = ["zomato", "swiggy", "paytm", "ola", "uber", "delivery", "makemytrip", "cred"];
+const ENTERPRISE_COMPANIES = ["amazon", "google", "microsoft", "apple", "meta", "tcs", "infosys", "wipro", "hcl", "accenture", "ibm", "oracle", "cisco", "intel", "adobe", "samsung", "deloitte", "pwc", "ey", "kpmg", "morgan stanley", "jpmorgan", "goldman sachs"];
+const MIDSIZE_COMPANIES = ["zomato", "swiggy", "paytm", "ola", "uber", "delivery", "makemytrip", "cred", "razorpay", "phonepe", "flipkart", "meesho", "unacademy", "byjus"];
+
+const INDUSTRY_KEYWORDS = {
+    "Banking & Finance": ["bank", "finance", "fintech", "payment", "wealth", "trading", "insurance", "invest"],
+    "E-commerce": ["commerce", "retail", "shop", "delivery", "marketplace", "logistics"],
+    "EdTech": ["education", "learn", "academy", "school", "course", "training"],
+    "HealthTech": ["health", "medical", "clinic", "hospital", "pharma"],
+    "Technology Services": ["software", "service", "consulting", "it", "cloud", "solutions"]
+};
 
 export function analyzeJD(company, role, jdText) {
     const text = jdText.toLowerCase();
@@ -44,13 +52,22 @@ export function analyzeJD(company, role, jdText) {
     });
 
     if (Object.keys(extractedSkills).length === 0) {
-        extractedSkills["General"] = ["General Fresher Stack"];
+        extractedSkills["General"] = ["General Software Engineering"];
+    }
+
+    // Advanced Industry Inference
+    let inferredIndustry = "Technology Services";
+    for (const [industry, keywords] of Object.entries(INDUSTRY_KEYWORDS)) {
+        if (keywords.some(kw => text.includes(kw) || companyLower.includes(kw))) {
+            inferredIndustry = industry;
+            break;
+        }
     }
 
     // Company Intel Heuristics
     const companyIntel = {
         name: company || "Strategic Enterprise",
-        industry: "Technology Services",
+        industry: inferredIndustry,
         sizeCategory: "Startup (<200)",
         hiringFocus: "Practical problem solving + tech stack depth",
         type: "startup"
@@ -58,32 +75,39 @@ export function analyzeJD(company, role, jdText) {
 
     if (ENTERPRISE_COMPANIES.some(c => companyLower.includes(c))) {
         companyIntel.sizeCategory = "Enterprise (2000+)";
-        companyIntel.hiringFocus = "Highly structured DSA + core fundamentals + scale understanding";
+        companyIntel.hiringFocus = "Highly structured DSA + core fundamentals + scale understanding. Focus on optimization and system reliability.";
         companyIntel.type = "enterprise";
     } else if (MIDSIZE_COMPANIES.some(c => companyLower.includes(c))) {
         companyIntel.sizeCategory = "Mid-size (200-2000)";
-        companyIntel.hiringFocus = "Hybrid focus: Product thinking + strong DS fundamentals";
+        companyIntel.hiringFocus = "Hybrid focus: Product thinking + strong DS fundamentals. Rapid feature development and ownership.";
         companyIntel.type = "midsize";
     }
 
     // Round Mapping Logic
     const allSkills = Object.values(extractedSkills).flat();
-    const hasWeb = extractedSkills["Web"] || text.includes("web");
-    const hasDSA = extractedSkills["Core CS"] || text.includes("dsa");
+    const hasWeb = extractedSkills["Web"] || text.includes("web") || text.includes("react") || text.includes("node");
+    const hasData = extractedSkills["Data"] || text.includes("data") || text.includes("sql");
+    const hasDSA = extractedSkills["Core CS"] || text.includes("dsa") || text.includes("algorithm");
 
     let roundMapping = [];
     if (companyIntel.type === "enterprise") {
         roundMapping = [
-            { name: "Online Assessment", focus: "DSA + Aptitude", importance: "Elimination round focusing on speed and accuracy in logic." },
-            { name: "Technical Round 1", focus: "DSA + Core CS", importance: "Deep dive into data structures and operating system fundamentals." },
-            { name: "Technical Round 2", focus: "Projects + Tech Stack", importance: "Verification of your practical application and architectural understanding." },
-            { name: "HR / Managerial", focus: "Cultural Fit", importance: "Long-term alignment with company values and behavior." }
+            { name: "Online Assessment", focus: hasDSA ? "DSA + Aptitude" : "Technical Literacy", importance: "Elimination round focusing on speed and accuracy. Essential to pass benchmark scores." },
+            { name: "Technical Round 1", focus: "DSA + Core CS", importance: "Deep dive into data structures and operating system fundamentals. Testing peak logical capacity." },
+            { name: "Technical Round 2", focus: "System Design / Projects", importance: "Verification of your practical application. Can you connect code to real-world impact?" },
+            { name: "HR / Values", focus: "Culture & Alignment", importance: "Long-term alignment with company values. Are you a high-potential culture add?" }
+        ];
+    } else if (companyIntel.type === "midsize") {
+        roundMapping = [
+            { name: "Coding Assignment", focus: hasWeb ? "Fullstack Task" : "Core Problem", importance: "Focus on writing clean, production-ready code with good architecture." },
+            { name: "Product Engineering", focus: "System Discussion", importance: "Testing how you think about product trade-offs and user-centric engineering." },
+            { name: "Cultural Fit / Bar Raiser", focus: "Ownership + Mindset", importance: "Critical for high-growth environments. Testing grit and problem-solving speed." }
         ];
     } else {
         roundMapping = [
-            { name: "Practical Coding", focus: hasWeb ? "Web App Task" : "System Coding", importance: "Focus on writing clean, production-ready code under pressure." },
-            { name: "System Discussion", focus: "Architecture + Scalability", importance: "Testing how you think about data flow and system constraints." },
-            { name: "Culture Fit", focus: "Ownership + Mindset", importance: "Critical for startups to ensure high ownership and fast-paced alignment." }
+            { name: "Practical Coding", focus: hasWeb ? "Web Feature Task" : "Logic Task", importance: "Hands-on session to see if you can ship features independently." },
+            { name: "Technical Discussion", focus: "Tech Stack Depth", importance: "Ensuring you know the 'why' behind the libraries and frameworks you use." },
+            { name: "Founder / Cultural Round", focus: "Mission Alignment", importance: "Ensuring you believe in the startup's vision and can work in ambiguity." }
         ];
     }
 

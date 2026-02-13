@@ -124,17 +124,20 @@ ${data.plan.map(p => `${p.day} (${p.focus}):\n - ${p.tasks.join('\n - ')}`).join
                 <div className="lg:col-span-2 space-y-10">
 
                     {/* Round Mapping Engine */}
-                    <Section icon={<Layout className="text-primary" />} title="Recruitment Pipeline Architect">
-                        <div className="relative ml-4 border-l-2 border-slate-100 pl-8 space-y-12 py-4">
+                    <Section icon={<Layout className="text-primary" />} title="Recruitment Flow Architect">
+                        <div className="relative ml-4 border-l-2 border-slate-100 pl-8 space-y-10 py-4">
                             {data.roundMapping?.map((round, idx) => (
                                 <div key={idx} className="relative group">
                                     <div className="absolute -left-[41px] top-0 w-4 h-4 rounded-full bg-white border-4 border-primary shadow-sm group-hover:scale-125 transition-transform z-10"></div>
                                     <div className="bg-slate-50 border border-slate-200 p-8 rounded-[2rem] group-hover:border-primary/20 transition-all">
-                                        <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center justify-between mb-4">
                                             <h4 className="font-black text-slate-900 text-lg">Round {idx + 1}: {round.name}</h4>
                                             <span className="bg-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-primary/20">{round.focus}</span>
                                         </div>
-                                        <p className="text-sm text-slate-500 font-bold leading-relaxed italic">"{round.importance}"</p>
+                                        <div className="space-y-2">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Why this round matters</p>
+                                            <p className="text-sm text-slate-600 font-bold leading-relaxed italic">"{round.importance}"</p>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
