@@ -41,7 +41,7 @@ export default function TestChecklist() {
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+                    <h1 className="text-3xl font-black text-technical-slate tracking-tight flex items-center gap-3">
                         <div className="bg-primary/10 p-2 rounded-xl text-primary">
                             <ClipboardCheck size={28} />
                         </div>
@@ -51,14 +51,14 @@ export default function TestChecklist() {
                 </div>
                 <button
                     onClick={handleReset}
-                    className="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-red-500 font-bold transition-all text-sm uppercase tracking-widest"
+                    className="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-primary font-bold transition-all text-sm uppercase tracking-widest"
                 >
                     <RotateCcw size={16} /> Reset Checklist
                 </button>
             </header>
 
             {/* Summary Card */}
-            <div className={`p-8 rounded-[2.5rem] border-2 transition-all duration-500 ${isReady ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
+            <div className={`p-8 rounded-[2.5rem] border-2 transition-all duration-500 ${isReady ? 'bg-success-soft border-success/20' : 'bg-warning-soft border-warning/20'}`}>
                 <div className="flex flex-col md:flex-row items-center gap-8">
                     <div className="relative w-32 h-32 flex-shrink-0">
                         <svg className="w-full h-full -rotate-90">
@@ -66,24 +66,24 @@ export default function TestChecklist() {
                             <circle
                                 cx="64" cy="64" r="60"
                                 style={{ strokeDasharray: 377, strokeDashoffset: 377 - (passedCount / TEST_ITEMS.length) * 377 }}
-                                className={`fill-none stroke-[8] stroke-round transition-all duration-1000 ${isReady ? 'stroke-emerald-500' : 'stroke-amber-500'}`}
+                                className={`fill-none stroke-[8] stroke-round transition-all duration-1000 ${isReady ? 'stroke-success' : 'stroke-warning'}`}
                             />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <span className={`text-3xl font-black ${isReady ? 'text-emerald-700' : 'text-amber-700'}`}>{passedCount} / {TEST_ITEMS.length}</span>
+                            <span className={`text-3xl font-black ${isReady ? 'text-success' : 'text-warning'}`}>{passedCount} / {TEST_ITEMS.length}</span>
                         </div>
                     </div>
                     <div className="flex-1 text-center md:text-left space-y-2">
-                        <h2 className={`text-2xl font-black ${isReady ? 'text-emerald-900' : 'text-amber-900'}`}>
+                        <h2 className={`text-2xl font-black ${isReady ? 'text-success' : 'text-warning'}`}>
                             {isReady ? 'All Protocols Validated' : 'Validation in Progress'}
                         </h2>
                         {isReady ? (
-                            <div className="flex items-center gap-2 text-emerald-600 font-bold">
+                            <div className="flex items-center gap-2 text-success font-bold">
                                 <CheckCircle2 size={20} />
                                 Platform ready for final shipment gate.
                             </div>
                         ) : (
-                            <div className="flex items-center gap-2 text-amber-600 font-bold animate-pulse">
+                            <div className="flex items-center gap-2 text-warning font-bold animate-pulse">
                                 <ShieldAlert size={20} />
                                 Fix issues before shipping. Deployment locked.
                             </div>
@@ -93,19 +93,19 @@ export default function TestChecklist() {
             </div>
 
             {/* Checklist Items */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
-                <div className="divide-y divide-slate-100">
+            <div className="bg-white rounded-[2.5rem] border border-technical-border shadow-sm overflow-hidden">
+                <div className="divide-y divide-bone">
                     {TEST_ITEMS.map((item) => (
                         <div
                             key={item.id}
                             onClick={() => handleToggle(item.id)}
-                            className={`p-6 flex items-start gap-6 cursor-pointer transition-all hover:bg-slate-50/50 ${checkedItems[item.id] ? 'bg-emerald-50/30' : ''}`}
+                            className={`p-6 flex items-start gap-6 cursor-pointer transition-all hover:bg-bone/50 ${checkedItems[item.id] ? 'bg-success-soft/30' : ''}`}
                         >
-                            <div className={`flex-shrink-0 w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${checkedItems[item.id] ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 text-transparent group-hover:border-primary/50'}`}>
+                            <div className={`flex-shrink-0 w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${checkedItems[item.id] ? 'bg-success border-success text-white' : 'border-technical-border text-transparent group-hover:border-primary/50'}`}>
                                 <CheckCircle2 size={20} />
                             </div>
                             <div className="flex-1 space-y-1">
-                                <h4 className={`font-bold transition-all ${checkedItems[item.id] ? 'text-emerald-900 line-through opacity-50' : 'text-slate-800'}`}>
+                                <h4 className={`font-bold transition-all ${checkedItems[item.id] ? 'text-success line-through opacity-50' : 'text-technical-slate'}`}>
                                     {item.text}
                                 </h4>
                                 <div className="flex items-start gap-2 text-xs text-slate-400 font-medium italic group">

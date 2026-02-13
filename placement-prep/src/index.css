@@ -4,11 +4,11 @@
 
 @layer base {
   :root {
-    --primary: 245 58% 51%;
-    --primary-foreground: 0 0% 100%;
+    --primary: #8B0000;
+    --primary-foreground: #FFFFFF;
   }
 }
 
 body {
-  @apply bg-slate-50 text-slate-900;
+  @apply bg-bone text-technical-slate;
 }

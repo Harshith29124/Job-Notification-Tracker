@@ -8,9 +8,25 @@ export default {
         extend: {
             colors: {
                 primary: {
-                    DEFAULT: "hsl(245, 58%, 51%)",
-                    foreground: "hsl(0, 0%, 100%)",
+                    DEFAULT: "#8B0000",
+                    foreground: "#FFFFFF",
                 },
+                bone: {
+                    DEFAULT: "#F7F6F3",
+                    darker: "#EBEAE6",
+                },
+                success: {
+                    DEFAULT: "#2D5016",
+                    soft: "#EAF1E6",
+                },
+                warning: {
+                    DEFAULT: "#8B6914",
+                    soft: "#F9F4E5",
+                },
+                technical: {
+                    slate: "#111111",
+                    border: "#D4D2CC",
+                }
             },
         },
     },
