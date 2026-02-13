@@ -8,7 +8,8 @@ let currentFilters = {
     experience: '',
     source: '',
     sort: 'latest',
-    showOnlyMatches: false
+    showOnlyMatches: false,
+    status: ''
 };
 
 let currentJobModal = null;
@@ -82,6 +83,67 @@ function savePreferences(prefs) {
 function arePreferencesSet() {
     const prefs = getPreferences();
     return prefs.roleKeywords.length > 0 || prefs.preferredLocations.length > 0 || prefs.skills.length > 0;
+}
+
+/**
+ * Job Status Management
+ */
+function getJobStatus(jobId) {
+    const statuses = JSON.parse(localStorage.getItem('jobTrackerStatus') || '{}');
+    return statuses[jobId] || 'Not Applied';
+}
+
+function setJobStatus(jobId, status) {
+    const statuses = JSON.parse(localStorage.getItem('jobTrackerStatus') || '{}');
+    statuses[jobId] = status;
+    localStorage.setItem('jobTrackerStatus', JSON.stringify(statuses));
+
+    const job = jobsData.find(j => j.id === jobId);
+    if (job) {
+        showToast(`Status updated: ${status}`);
+        saveUpdateHistory(job, status);
+    }
+
+    renderRoute();
+}
+window.setJobStatus = setJobStatus;
+
+function saveUpdateHistory(job, status) {
+    if (status === 'Not Applied') return;
+
+    const history = JSON.parse(localStorage.getItem('jobUpdateHistory') || '[]');
+    history.unshift({
+        jobId: job.id,
+        title: job.title,
+        company: job.company,
+        status: status,
+        date: new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    });
+
+    // Keep last 5 updates
+    localStorage.setItem('jobUpdateHistory', JSON.stringify(history.slice(0, 5)));
+}
+
+/**
+ * Show toast notification
+ */
+function showToast(message) {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        if (container.contains(toast)) container.removeChild(toast);
+        if (container.children.length === 0) document.body.removeChild(container);
+    }, 3000);
 }
 
 /**
@@ -181,7 +243,8 @@ function parseSalary(salaryStr) {
 function getFilteredJobs() {
     let filtered = jobsData.map(job => ({
         ...job,
-        matchScore: calculateMatchScore(job)
+        matchScore: calculateMatchScore(job),
+        status: getJobStatus(job.id)
     }));
 
     const prefs = getPreferences();
@@ -189,6 +252,11 @@ function getFilteredJobs() {
     // Apply "Show only matches" toggle
     if (currentFilters.showOnlyMatches) {
         filtered = filtered.filter(job => job.matchScore >= prefs.minMatchScore);
+    }
+
+    // Apply status filter
+    if (currentFilters.status) {
+        filtered = filtered.filter(job => job.status === currentFilters.status);
     }
 
     // Apply keyword filter (search title, company, skills)
@@ -283,6 +351,8 @@ function renderJobCard(job) {
     const saveIcon = isSaved ? '❤️' : '🤍';
     const scoreClass = getScoreBadgeClass(job.matchScore);
     const prefsSet = arePreferencesSet();
+    const status = getJobStatus(job.id);
+    const statusClass = `status-badge--${status.toLowerCase().replace(' ', '-')}`;
 
     return `
         <div class="job-card">
@@ -290,6 +360,7 @@ function renderJobCard(job) {
                 <div class="job-card__title-section">
                     <h3 class="job-card__title">
                         ${job.title}
+                        <span class="status-badge ${statusClass}">${status}</span>
                         ${prefsSet ? `<span class="job-score ${scoreClass}">${job.matchScore}% Match</span>` : ''}
                     </h3>
                     <p class="job-card__company">${job.company}</p>
@@ -303,7 +374,12 @@ function renderJobCard(job) {
                 <span class="job-meta__item">⏱️ ${job.experience}</span>
             </div>
             
-            <div class="job-card__salary">${job.salaryRange}</div>
+            <div class="status-selector">
+                <button class="status-btn ${status === 'Not Applied' ? 'active' : ''}" onclick="setJobStatus('${job.id}', 'Not Applied')">Not Applied</button>
+                <button class="status-btn ${status === 'Applied' ? 'active' : ''}" onclick="setJobStatus('${job.id}', 'Applied')">Applied</button>
+                <button class="status-btn ${status === 'Rejected' ? 'active' : ''}" onclick="setJobStatus('${job.id}', 'Rejected')">Rejected</button>
+                <button class="status-btn ${status === 'Selected' ? 'active' : ''}" onclick="setJobStatus('${job.id}', 'Selected')">Selected</button>
+            </div>
             
             <div class="job-card__footer">
                 <span class="job-card__posted">${formatPostedTime(job.postedDaysAgo)}</span>
@@ -327,6 +403,7 @@ function renderFilterBar() {
     const modes = [...new Set(jobsData.map(j => j.mode))].sort();
     const experiences = [...new Set(jobsData.map(j => j.experience))].sort();
     const sources = [...new Set(jobsData.map(j => j.source))].sort();
+    const statuses = ['Not Applied', 'Applied', 'Rejected', 'Selected'];
 
     return `
         <div class="filter-bar">
@@ -359,6 +436,11 @@ function renderFilterBar() {
                 <select id="filter-source" class="filter-select">
                     <option value="">All Sources</option>
                     ${sources.map(src => `<option value="${src}" ${currentFilters.source === src ? 'selected' : ''}>${src}</option>`).join('')}
+                </select>
+
+                <select id="filter-status" class="filter-select">
+                    <option value="">All Statuses</option>
+                    ${statuses.map(st => `<option value="${st}" ${currentFilters.status === st ? 'selected' : ''}>${st}</option>`).join('')}
                 </select>
                 
                 <select id="filter-sort" class="filter-select">
@@ -426,7 +508,7 @@ function renderDashboardPage() {
             : `
                         <div class="empty-state">
                             <h2 class="empty-state__title">No roles match your criteria</h2>
-                            <p class="empty-state__description">No roles match your criteria. Adjust filters or lower threshold.</p>
+                            <p class="empty-state__description">Adjust filters or lower threshold.</p>
                             <button class="btn btn--secondary" onclick="clearFilters()">Clear All Filters</button>
                         </div>
                     `
@@ -563,7 +645,8 @@ function renderSavedPage() {
     const savedIds = JSON.parse(localStorage.getItem('savedJobs') || '[]');
     const savedJobs = jobsData.filter(job => savedIds.includes(job.id)).map(job => ({
         ...job,
-        matchScore: calculateMatchScore(job)
+        matchScore: calculateMatchScore(job),
+        status: getJobStatus(job.id)
     }));
 
     return `
@@ -612,6 +695,7 @@ function renderDigestPage() {
     const digestKey = `jobTrackerDigest_${today}`;
     const storedDigest = localStorage.getItem(digestKey);
     const digestJobs = storedDigest ? JSON.parse(storedDigest) : null;
+    const history = JSON.parse(localStorage.getItem('jobUpdateHistory') || '[]');
 
     return `
         <div class="page-container page-container--wide">
@@ -659,6 +743,22 @@ function renderDigestPage() {
                     </div>
                     <p class="digest-note">Demo Mode: Daily 9AM trigger simulated manually.</p>
                 `}
+
+                ${history.length > 0 ? `
+                    <div class="updates-section">
+                        <h2 class="form-section__title">Recent Status Updates</h2>
+                        <ul class="update-list">
+                            ${history.map(update => `
+                                <li class="update-item">
+                                    <div class="update-info">
+                                        <span class="update-title">${update.title} @ ${update.company}</span>
+                                        <span class="update-meta">Changed to <strong style="color: var(--color-accent)">${update.status}</strong> on ${update.date}</span>
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
             </div>
         </div>
     `;
@@ -744,11 +844,11 @@ function renderProofPage() {
                 <div class="proof-section">
                     <h2 class="proof-section__title">Feature Checklist</h2>
                     <div class="proof-checklist">
-                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Match Scoring Engine (+25 Title, +15 Desc, etc.)</span></div>
-                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Persistent Preferences (localStorage)</span></div>
-                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Show Only Matches Toggle</span></div>
-                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Advanced Sorting (Match Score, Salary)</span></div>
-                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Preference Not Set Banner</span></div>
+                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Match Scoring Engine</span></div>
+                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Job Status Tracking (Applied/Rejected/Selected)</span></div>
+                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Status History in Digest</span></div>
+                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Persistent Status (localStorage)</span></div>
+                        <div class="proof-item"><input type="checkbox" checked disabled><span class="proof-label">Combined Status + Match Filters</span></div>
                     </div>
                 </div>
             </div>
@@ -760,7 +860,7 @@ function renderProofPage() {
  * Filter handling
  */
 function clearFilters() {
-    currentFilters = { keyword: '', location: '', mode: '', experience: '', source: '', sort: 'latest', showOnlyMatches: false };
+    currentFilters = { keyword: '', location: '', mode: '', experience: '', source: '', sort: 'latest', showOnlyMatches: false, status: '' };
     renderRoute();
 }
 window.clearFilters = clearFilters;
@@ -777,6 +877,7 @@ function initializeEventListeners() {
         const modeSelect = document.getElementById('filter-mode');
         const expSelect = document.getElementById('filter-experience');
         const srcSelect = document.getElementById('filter-source');
+        const statSelect = document.getElementById('filter-status');
         const sortSelect = document.getElementById('filter-sort');
         const matchToggle = document.getElementById('match-toggle');
 
@@ -785,6 +886,7 @@ function initializeEventListeners() {
         if (modeSelect) modeSelect.addEventListener('change', e => { currentFilters.mode = e.target.value; renderDashboardContent(); });
         if (expSelect) expSelect.addEventListener('change', e => { currentFilters.experience = e.target.value; renderDashboardContent(); });
         if (srcSelect) srcSelect.addEventListener('change', e => { currentFilters.source = e.target.value; renderDashboardContent(); });
+        if (statSelect) statSelect.addEventListener('change', e => { currentFilters.status = e.target.value; renderDashboardContent(); });
         if (sortSelect) sortSelect.addEventListener('change', e => { currentFilters.sort = e.target.value; renderDashboardContent(); });
         if (matchToggle) matchToggle.addEventListener('change', e => { currentFilters.showOnlyMatches = e.target.checked; renderDashboardContent(); });
     }
@@ -817,7 +919,7 @@ function renderDashboardContent() {
             grid.innerHTML = `
                 <div class="empty-state">
                     <h2 class="empty-state__title">No roles match your criteria</h2>
-                    <p class="empty-state__description">Try adjusting your filters or lower your match threshold in Settings.</p>
+                    <p class="empty-state__description">Adjust filters or lower threshold.</p>
                     <button class="btn btn--secondary" onclick="clearFilters()">Clear All Filters</button>
                 </div>
             `;
@@ -858,6 +960,8 @@ function openJobModal(jobId) {
     const score = calculateMatchScore(job);
     const scoreClass = getScoreBadgeClass(score);
     const prefsSet = arePreferencesSet();
+    const status = getJobStatus(job.id);
+    const statusClass = `status-badge--${status.toLowerCase().replace(' ', '-')}`;
 
     const modal = document.createElement('div');
     modal.className = 'job-modal';
@@ -868,6 +972,7 @@ function openJobModal(jobId) {
             <div class="job-modal__header">
                 <h2 class="job-modal__title">
                     ${job.title}
+                    <span class="status-badge ${statusClass}">${status}</span>
                     ${prefsSet ? `<span class="job-score ${scoreClass}">${score}% Match</span>` : ''}
                 </h2>
                 <p class="job-modal__company">${job.company}</p>
