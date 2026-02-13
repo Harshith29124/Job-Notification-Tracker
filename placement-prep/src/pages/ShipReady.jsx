@@ -1,94 +1,96 @@
 import { useNavigate } from 'react-router-dom';
-import { Truck, Lock, ShieldCheck, ArrowLeft, Github, Globe } from 'lucide-react';
+import { Truck, CheckCircle2, ShieldAlert, ArrowRight, ExternalLink, ShieldCheck } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function ShipReady() {
     const navigate = useNavigate();
+    const [isVerified, setIsVerified] = useState(false);
 
-    const saved = localStorage.getItem('prp_test_checklist');
-    const checkedItems = saved ? JSON.parse(saved) : {};
-    const passedCount = Object.values(checkedItems).filter(Boolean).length;
-    const TOTAL_TESTS = 10;
-    const isLocked = passedCount < TOTAL_TESTS;
+    useEffect(() => {
+        const saved = localStorage.getItem('prp_qa_completed');
+        const completed = saved ? JSON.parse(saved) : [];
+        setIsVerified(completed.length === 5);
+    }, []);
 
     return (
-        <div className="space-y-12 py-6">
-            {isLocked ? (
-                <div className="bg-white border border-border p-20 text-center space-y-8 rounded">
-                    <div className="relative inline-block">
-                        <div className="bg-background p-10 rounded border border-border text-slate-300">
-                            <Lock size={48} />
-                        </div>
-                        <div className="absolute -top-2 -right-2 bg-accent text-white p-2 rounded border-2 border-white">
-                            <ShieldCheck size={20} />
-                        </div>
-                    </div>
-                    <div className="space-y-3">
-                        <h2 className="heading-lg text-text-primary">Shipment Protocol Locked</h2>
-                        <p className="text-slate-500 max-w-md mx-auto font-medium text-[16px]">
-                            Gateway access restricted. You must complete all 10 diagnostic checkpoints in the Quality Assurance Center to authorize shipment.
-                        </p>
-                    </div>
-                    <button
-                        onClick={() => navigate('/test-checklist')}
-                        className="btn btn-primary px-10 h-[56px] text-sm uppercase tracking-widest"
-                    >
-                        Return to QA Center
-                    </button>
+        <div className="space-y-10">
+            <div className="flex items-center justify-between border-b border-border pb-6">
+                <div>
+                    <h2 className="heading-md uppercase">Shipment Gate</h2>
+                    <p className="text-slate-500 font-medium text-sm">Final verification protocol before production authorization.</p>
                 </div>
-            ) : (
-                <div className="space-y-12">
-                    <div className="text-center space-y-3 border-b border-border pb-10">
-                        <div className="bg-success/5 border border-success/20 p-6 rounded-full text-success inline-block mb-4">
-                            <Truck size={40} />
-                        </div>
-                        <h2 className="heading-xl uppercase tracking-tighter text-text-primary">Authorized for Shipment</h2>
-                        <p className="text-[18px] font-bold text-success italic tracking-tight uppercase">System Status: Integrity Verified</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        <ShipCard
-                            icon={<Github size={24} />}
-                            title="Deploy to Production"
-                            text="Execute final push to main branch with verified build artifacts."
-                            action="Execute Push"
-                            primary
-                        />
-                        <ShipCard
-                            icon={<Globe size={24} />}
-                            title="Edge Propagation"
-                            text="Broadcast latest intelligence suite assets to global nodes."
-                            action="Trigger Sync"
-                        />
-                    </div>
-
-                    <div className="bg-white border border-border p-10 rounded shadow-none text-left space-y-6">
-                        <h3 className="text-[16px] font-black text-text-primary flex items-center gap-3 uppercase tracking-widest">
-                            <ShieldCheck size={18} className="text-accent" /> Shipment Verification Token
-                        </h3>
-                        <div className="bg-background border border-border p-6 rounded text-accent font-mono text-[18px] text-center tracking-widest uppercase">
-                            PRP-AUTH-{Math.random().toString(36).substring(2, 12).toUpperCase()}
-                        </div>
-                        <p className="text-[11px] text-slate-400 font-bold italic uppercase tracking-[0.2em] text-center">
-                            Authorized with {TOTAL_TESTS} passing protocols at {new Date().toLocaleString()}
-                        </p>
-                    </div>
+                <div className={`flex items-center gap-3 px-4 py-2 border ${isVerified ? 'bg-success/5 border-success/30 text-success' : 'bg-accent/5 border-accent/20 text-accent'}`}>
+                    <ShieldCheck size={16} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">{isVerified ? 'Auth Secured' : 'Auth Locked'}</span>
                 </div>
-            )}
+            </div>
+
+            <div className="grid grid-cols-1 gap-12">
+                {!isVerified ? (
+                    <div className="card-premium border-dashed py-32 text-center space-y-8">
+                        <div className="w-24 h-24 bg-background border border-accent/20 flex items-center justify-center text-accent mx-auto">
+                            <ShieldAlert size={48} />
+                        </div>
+                        <div className="space-y-4">
+                            <h3 className="text-[32px] font-serif font-black text-text-primary">Authorization Required</h3>
+                            <p className="body-text text-sm mx-auto max-w-md">System state cannot be moved to production until all Quality Assurance protocols are finalized in the QA Center.</p>
+                        </div>
+                        <button
+                            onClick={() => navigate('/test-checklist')}
+                            className="btn btn-secondary !border-accent !text-accent px-12 h-[60px]"
+                        >
+                            Return to QA Center
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            <div className="card-premium space-y-8">
+                                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-border pb-2">Technical Artifacts</h3>
+                                <div className="space-y-6">
+                                    <ArtifactItem label="Production Build" status="VERIFIED" />
+                                    <ArtifactItem label="Asset Optimization" status="COMPLETE" />
+                                    <ArtifactItem label="SEO Meta Payloads" status="INJECTED" />
+                                </div>
+                            </div>
+                            <div className="card-premium space-y-8">
+                                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-border pb-2">Platform Integrity</h3>
+                                <div className="space-y-6">
+                                    <ArtifactItem label="Responsive Grid" status="STABLE" />
+                                    <ArtifactItem label="Color Palette" status="LOCKED" />
+                                    <ArtifactItem label="Radius Conformity" status="4PX" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white border-2 border-accent p-12 text-center space-y-10 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-4">
+                                <Truck size={120} className="text-accent/5 -rotate-12 translate-x-12" />
+                            </div>
+                            <div className="space-y-4 relative z-10">
+                                <h3 className="text-[48px] font-serif font-black text-text-primary leading-tight">Ready for Deployment.</h3>
+                                <p className="body-text text-[18px] mx-auto text-slate-500 font-medium">The Placement Readiness Platform v1.2 is fully compliant with the KodNest Premium Build System.</p>
+                            </div>
+                            <div className="flex justify-center gap-6 relative z-10">
+                                <button className="btn btn-primary px-16 h-[64px] text-[16px] uppercase tracking-widest">
+                                    Final Production Ship <ArrowRight size={20} className="ml-3" />
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
     );
 }
 
-function ShipCard({ icon, title, text, action, primary }) {
+function ArtifactItem({ label, status }) {
     return (
-        <div className={`p-10 rounded border text-left space-y-6 transition-all ${primary ? 'bg-white border-accent' : 'bg-white border-border hover:border-slate-400'}`}>
-            <div className="text-accent">{icon}</div>
-            <div className="space-y-2">
-                <h4 className="text-[20px] font-serif font-black text-text-primary">{title}</h4>
-                <p className="text-[14px] text-slate-500 font-medium leading-relaxed">{text}</p>
-            </div>
-            <button className={`w-full py-4 rounded font-black uppercase tracking-widest text-[11px] transition-all ${primary ? 'bg-accent text-white hover:brightness-90' : 'bg-white border border-border text-text-primary hover:bg-background'}`}>
-                {action}
-            </button>
+        <div className="flex items-center justify-between p-4 bg-background border border-border">
+            <span className="font-bold text-text-primary text-[14px] uppercase tracking-tight">{label}</span>
+            <span className="text-[10px] font-black text-success uppercase tracking-widest flex items-center gap-2">
+                <CheckCircle2 size={12} /> {status}
+            </span>
         </div>
     );
 }

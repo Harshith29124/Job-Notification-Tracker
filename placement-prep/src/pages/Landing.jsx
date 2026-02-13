@@ -1,68 +1,68 @@
 import { Link } from 'react-router-dom';
-import { Code2, Video, BarChart3, ChevronRight } from 'lucide-react';
+import { Code2, Video, BarChart3, ChevronRight, Target, Brain, Shield } from 'lucide-react';
 
 export default function Landing() {
     return (
-        <div className="min-h-screen bg-background text-text-primary">
+        <div className="min-h-screen bg-background text-text-primary selection:bg-accent/10">
             {/* Header */}
-            <nav className="h-[80px] bg-white border-b border-border px-10 flex items-center justify-between">
+            <nav className="h-[80px] bg-white border-b border-border px-6 md:px-10 flex items-center justify-between sticky top-0 z-[100]">
                 <div className="flex items-center gap-3">
                     <div className="bg-accent p-2 rounded">
                         <div className="w-5 h-5 bg-white rounded-sm"></div>
                     </div>
                     <span className="font-serif font-black text-2xl tracking-tight uppercase">Placement Prep</span>
                 </div>
-                <div className="flex items-center gap-10">
-                    <Link to="/dashboard" className="text-slate-500 hover:text-accent font-bold text-[12px] uppercase tracking-widest transition-colors">Sign In</Link>
-                    <Link to="/dashboard" className="btn btn-primary !py-2 !px-8 text-[12px] uppercase tracking-widest">
+                <div className="hidden md:flex items-center gap-10">
+                    <Link to="/dashboard" className="text-slate-500 hover:text-accent font-bold text-[12px] uppercase tracking-[0.2em] transition-colors">Sign In</Link>
+                    <Link to="/dashboard" className="btn btn-primary !py-2.5 !px-8 text-[12px] uppercase tracking-widest leading-none">
                         Join Platform
                     </Link>
                 </div>
             </nav>
 
             {/* Hero */}
-            <section className="max-w-[1440px] mx-auto px-10 py-32 text-center relative overflow-hidden">
-                <div className="inline-block bg-white border border-border px-4 py-2 rounded mb-10">
+            <section className="max-w-[1440px] mx-auto px-6 md:px-10 py-24 md:py-40 text-center relative overflow-hidden">
+                <div className="inline-block bg-white border border-border px-5 py-2.5 rounded mb-12">
                     <span className="text-[11px] font-black uppercase tracking-[0.3em] text-accent">Career Intelligence Suite</span>
                 </div>
 
-                <h1 className="text-[72px] font-serif font-black text-text-primary tracking-tighter mb-8 leading-[1.1] max-w-4xl mx-auto">
+                <h1 className="text-[48px] md:text-[84px] font-serif font-black text-text-primary tracking-tighter mb-8 leading-[1] max-w-5xl mx-auto">
                     Strategic Readiness for <span className="text-accent italic">Exceptional</span> Candidates.
                 </h1>
-                <p className="body-text mx-auto mb-12 text-[20px] font-medium text-slate-500">
+                <p className="max-w-[720px] mx-auto mb-16 text-[18px] md:text-[22px] font-medium text-slate-500 leading-relaxed">
                     Master high-stakes recruitment through clinical job description analysis and automated preparation roadmaps.
                 </p>
-                <div className="flex items-center justify-center gap-6">
+                <div className="flex flex-col md:flex-row items-center justify-center gap-6">
                     <Link
                         to="/dashboard"
-                        className="btn btn-primary !px-10 !py-5 !text-[16px] uppercase tracking-widest"
+                        className="btn btn-primary !px-12 !py-6 !text-[16px] uppercase tracking-widest w-full md:w-auto"
                     >
                         Initialize Onboarding
                     </Link>
-                    <button className="btn btn-secondary !px-10 !py-5 !text-[16px] uppercase tracking-widest">
+                    <button className="btn btn-secondary !px-12 !py-6 !text-[16px] uppercase tracking-widest w-full md:w-auto">
                         Watch Protocol
                     </button>
                 </div>
             </section>
 
-            {/* Features */}
+            {/* Features Audit Grid */}
             <section className="bg-white py-32 border-y border-border">
-                <div className="max-w-[1440px] mx-auto px-10">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div className="max-w-[1440px] mx-auto px-6 md:px-10">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                         <FeatureCard
-                            icon={<Code2 className="text-accent" size={32} />}
+                            icon={<Target className="text-accent" size={28} />}
                             title="Requirement Extraction"
-                            description="Automatically map JD payloads to technical domains and required skill sets."
+                            description="Automatically map JD payloads to technical domains and required skill sets with zero noise."
                         />
                         <FeatureCard
-                            icon={<Video className="text-accent" size={32} />}
+                            icon={<Brain className="text-accent" size={28} />}
                             title="Round Simulation"
-                            description="Understand specific recruitment round priorities before you step into the room."
+                            description="Understand specific recruitment round priorities and behavioral triggers before you step into the room."
                         />
                         <FeatureCard
-                            icon={<BarChart3 className="text-accent" size={32} />}
-                            title="Progress Analytics"
-                            description="Track your mastery across five core placement dimensions with clinical precision."
+                            icon={<Shield className="text-accent" size={28} />}
+                            title="Progress Integrity"
+                            description="Track your mastery across core placement dimensions with clinical audit-ready precision."
                         />
                     </div>
                 </div>
@@ -70,12 +70,19 @@ export default function Landing() {
 
             {/* Footer */}
             <footer className="py-20 bg-background">
-                <div className="max-w-[1440px] mx-auto px-10 flex flex-col md:flex-row items-center justify-between gap-8 text-slate-400 font-bold uppercase tracking-widest text-[11px]">
-                    <p>&copy; {new Date().getFullYear()} Placement Readiness Platform | KodNest Premium</p>
-                    <div className="flex gap-10">
-                        <Link to="/" className="hover:text-accent">Protocol</Link>
-                        <Link to="/" className="hover:text-accent">Security</Link>
-                        <Link to="/" className="hover:text-accent">Support</Link>
+                <div className="max-w-[1440px] mx-auto px-10 flex flex-col md:flex-row items-center justify-between gap-12">
+                    <div className="flex items-center gap-4">
+                        <div className="w-8 h-8 bg-border flex items-center justify-center text-white">
+                            <span className="font-serif font-black">K</span>
+                        </div>
+                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[11px]">
+                            &copy; {new Date().getFullYear()} Placement Readiness Platform | KodNest Premium
+                        </p>
+                    </div>
+                    <div className="flex gap-10 text-slate-400 font-bold uppercase tracking-widest text-[11px]">
+                        <Link to="/" className="hover:text-accent transition-colors">Protocol</Link>
+                        <Link to="/" className="hover:text-accent transition-colors">Security</Link>
+                        <Link to="/" className="hover:text-accent transition-colors">Infrastructure</Link>
                     </div>
                 </div>
             </footer>
@@ -85,12 +92,12 @@ export default function Landing() {
 
 function FeatureCard({ icon, title, description }) {
     return (
-        <div className="bg-background border border-border p-12 rounded relative group hover:border-accent/30 transition-all">
-            <div className="bg-white w-16 h-16 rounded border border-border flex items-center justify-center mb-8">
+        <div className="bg-background border border-border p-12 rounded relative group hover:border-accent transition-all duration-300">
+            <div className="bg-white w-14 h-14 rounded border border-border flex items-center justify-center mb-10 group-hover:border-accent/40 group-hover:bg-accent group-hover:text-white transition-all">
                 {icon}
             </div>
-            <h3 className="text-[24px] font-serif font-black text-text-primary mb-4 tracking-tight uppercase leading-none">{title}</h3>
-            <p className="text-slate-500 leading-relaxed font-medium text-[15px]">{description}</p>
+            <h3 className="text-[26px] font-serif font-black text-text-primary mb-4 tracking-tight uppercase leading-none">{title}</h3>
+            <p className="text-slate-500 leading-relaxed font-medium text-[16px]">{description}</p>
         </div>
     );
 }

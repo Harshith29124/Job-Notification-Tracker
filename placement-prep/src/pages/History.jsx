@@ -1,80 +1,89 @@
-import { getHistory } from '../utils/analysisEngine';
-import { History as HistoryIcon, Search, ArrowRight, Building2, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getHistory } from '../utils/analysisEngine';
+import { History as HistoryIcon, ArrowRight, Calendar, Building2, BarChart3, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
 export default function History() {
-    const history = getHistory();
+    const [analyses, setAnalyses] = useState(getHistory());
     const navigate = useNavigate();
+
+    const handleClear = () => {
+        if (window.confirm("CRITICAL: This action will purge all historical diagnostic records from local storage. Proceed?")) {
+            localStorage.removeItem('prepHistory');
+            setAnalyses([]);
+        }
+    };
 
     return (
         <div className="space-y-10">
             <div className="flex items-center justify-between border-b border-border pb-6">
-                <h2 className="heading-md uppercase">Analysis Archive</h2>
-                <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                    <input
-                        type="text"
-                        placeholder="Search historical data..."
-                        className="pl-12 pr-6 py-2 bg-white border border-border rounded w-80 focus:ring-1 focus:ring-text-primary outline-none transition-all font-bold text-sm text-text-primary"
-                    />
+                <div>
+                    <h2 className="heading-md uppercase">Analysis Archive</h2>
+                    <p className="text-slate-500 font-medium text-sm">Historical repository of strategic readiness audits.</p>
                 </div>
+                {analyses.length > 0 && (
+                    <button onClick={handleClear} className="text-[11px] font-black text-accent uppercase tracking-widest hover:underline flex items-center gap-2">
+                        <Trash2 size={13} /> Purge Archive
+                    </button>
+                )}
             </div>
 
-            {history.length === 0 ? (
-                <div className="bg-white border border-border p-20 text-center space-y-6 rounded">
-                    <div className="w-20 h-20 bg-background rounded border border-border flex items-center justify-center mx-auto text-slate-300">
-                        <HistoryIcon size={32} />
-                    </div>
-                    <div>
-                        <h2 className="text-[20px] font-serif font-black text-text-primary mb-2">No Historical Records</h2>
-                        <p className="text-slate-500 font-medium">Your analysis history will appear here once you process your first JD.</p>
-                    </div>
-                    <button
-                        onClick={() => navigate('/assessments')}
-                        className="btn btn-primary px-8"
-                    >
-                        Start First Analysis
-                    </button>
+            {analyses.length === 0 ? (
+                <div className="py-32 text-center card-premium border-dashed">
+                    <HistoryIcon size={48} className="mx-auto text-slate-300 mb-6" />
+                    <h3 className="text-[24px] font-serif font-black text-text-primary mb-2">Archive Empty</h3>
+                    <p className="body-text text-sm mx-auto mb-8">No historical data found. Initialize your first diagnostic to populate the archive.</p>
+                    <button onClick={() => navigate('/assessments')} className="btn btn-primary px-12">New Analysis</button>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-6">
-                    {history.map((entry) => (
-                        <div
-                            key={entry.id}
-                            onClick={() => navigate(`/results?id=${entry.id}`)}
-                            className="bg-white group border border-border hover:border-accent/40 p-8 rounded shadow-none transition-all cursor-pointer flex flex-col md:flex-row items-center gap-10"
-                        >
-                            <div className="flex-shrink-0 w-24 h-24 bg-background rounded border border-border flex items-center justify-center group-hover:border-accent/20 transition-all">
-                                <div className="text-center">
-                                    <span className="text-[32px] font-serif font-black text-text-primary block leading-tight">{entry.finalScore || entry.readinessScore}</span>
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Stability</span>
+                    {analyses.map((item) => (
+                        <div key={item.id} className="card-premium group hover:border-accent/40 transition-all">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-background border border-border flex items-center justify-center text-accent">
+                                            <Building2 size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-[20px] font-serif font-black text-text-primary">{item.role}</h3>
+                                            <p className="text-slate-500 text-sm font-bold italic">{item.company}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-6">
+                                        <div className="flex items-center gap-2 text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                                            <Calendar size={13} /> {new Date(item.createdAt).toLocaleDateString()}
+                                        </div>
+                                        <div className="flex items-center gap-2 text-[11px] font-black text-accent uppercase tracking-widest">
+                                            <BarChart3 size={13} /> {item.finalScore}% Match
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        onClick={() => navigate(`/results?id=${item.id}`)}
+                                        className="btn btn-secondary px-6 font-black text-[11px] uppercase tracking-widest"
+                                    >
+                                        View Strategy
+                                    </button>
+                                    <button className="text-slate-300 hover:text-accent transition-colors">
+                                        <ArrowRight size={20} />
+                                    </button>
                                 </div>
                             </div>
-
-                            <div className="flex-1 text-center md:text-left">
-                                <div className="flex flex-col md:flex-row md:items-center gap-4 mb-3">
-                                    <h3 className="text-[22px] font-serif font-bold text-text-primary group-hover:text-accent transition-colors">{entry.role || 'Expert Role'}</h3>
-                                    <div className="flex items-center justify-center md:justify-start gap-2 text-slate-400 font-bold text-[12px] uppercase tracking-widest bg-background px-3 py-1 rounded border border-border/50">
-                                        <Building2 size={12} />
-                                        {entry.company || 'Market Leader'}
-                                    </div>
-                                </div>
-                                <div className="flex items-center justify-center md:justify-start gap-6">
-                                    <div className="flex items-center gap-2 text-[12px] text-slate-500 font-bold uppercase tracking-tight">
-                                        <Calendar size={13} />
-                                        {new Date(entry.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                    </div>
-                                    <div className="text-accent text-[11px] font-black uppercase tracking-widest">
-                                        {Object.values(entry.extractedSkills).filter(arr => Array.isArray(arr) && arr.length > 0).length} Strategic Areas Detected
-                                    </div>
-                                </div>
-                            </div>
-
-                            <ArrowRight size={24} className="text-slate-200 group-hover:text-accent group-hover:translate-x-1 transition-all" />
                         </div>
                     ))}
                 </div>
             )}
+
+            <div className="bg-background border border-border p-8 flex items-start gap-4">
+                <div className="bg-white p-2 border border-border">
+                    <HistoryIcon size={16} className="text-accent" />
+                </div>
+                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                    Archive integrity is local to this browser session. Export critical diagnostic strategies to maintain permanent readiness records across environments.
+                </p>
+            </div>
         </div>
     );
 }

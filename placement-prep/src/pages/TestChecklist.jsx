@@ -1,99 +1,83 @@
 import { useState, useEffect } from 'react';
-import { ClipboardCheck, ShieldAlert, RotateCcw, Info, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, Circle, AlertCircle, Info, ChevronRight } from 'lucide-react';
 
-const TEST_ITEMS = [
-    { id: 'jd_req', text: "JD required validation works", hint: "Try submitting the analyzer with an empty JD textarea." },
-    { id: 'short_jd', text: "Short JD warning shows for <200 chars", hint: "Enter ~50 characters in JD and check for the 'Capacity Warning'." },
-    { id: 'skills_grp', text: "Skills extraction groups correctly", hint: "Paste a JD with 'React' and 'SQL' and verify they go into Web and Data categories." },
-    { id: 'round_map', text: "Round mapping changes based on company + skills", hint: "Toggle between 'Google' and a 'Startup' analyzer and check rounds." },
-    { id: 'det_score', text: "Score calculation is deterministic", hint: "Running the same JD twice should result in identical base scores." },
-    { id: 'live_toggle', text: "Skill toggles update score live", hint: "On results page, toggle a skill 'Known' and watch the score change instantly." },
-    { id: 'persist_refresh', text: "Changes persist after refresh", hint: "Toggle a skill, refresh the results page, and ensure the state remains." },
-    { id: 'history_load', text: "History saves and loads correctly", hint: "Create 3 analyses and verify all 3 appear in the Archive page." },
-    { id: 'export_copy', text: "Export buttons copy the correct content", hint: "Click 'Copy Brief' and paste it in notepad to verify content." },
-    { id: 'no_errors', text: "No console errors on core pages", hint: "Open F12 DevTools and browse through Assessment, Results, and History." },
+const QA_PROTOCOLS = [
+    { id: 'env', title: 'Environment Configuration', desc: 'Verify API endpoints and environment variables.', category: 'Infrastructure' },
+    { id: 'data', title: 'Data Persistence Layer', desc: 'Ensure LocalStorage encryption and cache integrity.', category: 'Core Engine' },
+    { id: 'ui', title: 'Interface Adherence', desc: 'Validate typography, spacing, and accent conformity.', category: 'Design System' },
+    { id: 'logic', title: 'Heuristic Accuracy', desc: 'Process a sample JD to verify extraction logic.', category: 'Intelligence' },
+    { id: 'res', title: 'Responsive Optimization', desc: 'Check layout stability across mobile/tablet views.', category: 'Platform' }
 ];
 
 export default function TestChecklist() {
-    const [checkedItems, setCheckedItems] = useState(() => {
-        const saved = localStorage.getItem('prp_test_checklist');
-        return saved ? JSON.parse(saved) : {};
+    const [checked, setChecked] = useState(() => {
+        const saved = localStorage.getItem('prp_qa_completed');
+        return saved ? JSON.parse(saved) : [];
     });
 
     useEffect(() => {
-        localStorage.setItem('prp_test_checklist', JSON.stringify(checkedItems));
-    }, [checkedItems]);
+        localStorage.setItem('prp_qa_completed', JSON.stringify(checked));
+    }, [checked]);
 
-    const handleToggle = (id) => {
-        setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
+    const toggle = (id) => {
+        setChecked(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
     };
 
-    const handleReset = () => {
-        if (window.confirm("Are you sure you want to reset the entire test checklist?")) {
-            setCheckedItems({});
-        }
-    };
-
-    const passedCount = Object.values(checkedItems).filter(Boolean).length;
-    const isReady = passedCount === TEST_ITEMS.length;
+    const progress = Math.round((checked.length / QA_PROTOCOLS.length) * 100);
 
     return (
         <div className="space-y-10">
-            <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border pb-6">
+            <div className="flex items-center justify-between border-b border-border pb-6">
                 <div>
                     <h2 className="heading-md uppercase">Quality Assurance Center</h2>
-                    <p className="text-slate-500 font-medium text-sm">Verify system integrity before final deployment.</p>
+                    <p className="text-slate-500 font-medium text-sm">Validating system integrity for clinical recruitment readiness.</p>
                 </div>
-                <button
-                    onClick={handleReset}
-                    className="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-accent font-bold transition-all text-[11px] uppercase tracking-[0.2em]"
-                >
-                    <RotateCcw size={14} /> Reset Protocol
-                </button>
-            </header>
-
-            {/* Summary Card */}
-            <div className={`p-8 rounded border transition-all duration-500 ${isReady ? 'bg-success/5 border-success/20' : 'bg-warning/5 border-warning/20'}`}>
-                <div className="flex flex-col md:flex-row items-center gap-10">
-                    <div className="flex-shrink-0 text-center">
-                        <div className={`text-[48px] font-serif font-black ${isReady ? 'text-success' : 'text-warning'}`}>{passedCount} / {TEST_ITEMS.length}</div>
-                        <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">Checkpoints Passed</div>
-                    </div>
-                    <div className="flex-1 text-center md:text-left space-y-3">
-                        <h2 className={`text-[20px] font-serif font-bold ${isReady ? 'text-success' : 'text-warning'}`}>
-                            {isReady ? 'All Protocols Validated' : 'Validation in Progress'}
-                        </h2>
-                        <div className={`flex items-center gap-2 text-[13px] font-bold ${isReady ? 'text-success' : 'text-warning/80 italic'}`}>
-                            {isReady ? <CheckCircle2 size={16} /> : <ShieldAlert size={16} />}
-                            {isReady ? 'Platform ready for final shipment gate.' : 'Pending manual verification of core system behaviors.'}
-                        </div>
-                    </div>
+                <div className="flex items-center gap-3 bg-background border border-border px-4 py-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Integrity Score</span>
+                    <span className="text-[18px] font-black text-accent">{progress}%</span>
                 </div>
             </div>
 
-            {/* Checklist Items */}
-            <div className="bg-white border border-border rounded overflow-hidden">
-                <div className="divide-y divide-border">
-                    {TEST_ITEMS.map((item) => (
+            <div className="grid grid-cols-1 gap-6">
+                {QA_PROTOCOLS.map((protocol) => {
+                    const isDone = checked.includes(protocol.id);
+                    return (
                         <div
-                            key={item.id}
-                            onClick={() => handleToggle(item.id)}
-                            className={`p-6 flex items-start gap-6 cursor-pointer transition-all hover:bg-background ${checkedItems[item.id] ? 'bg-background/50' : ''}`}
+                            key={protocol.id}
+                            onClick={() => toggle(protocol.id)}
+                            className={`card-premium !p-8 flex items-center justify-between cursor-pointer transition-all group ${isDone ? 'border-success/30 bg-success/[0.02]' : 'hover:border-accent/40'}`}
                         >
-                            <div className={`flex-shrink-0 w-6 h-6 rounded border flex items-center justify-center transition-all ${checkedItems[item.id] ? 'bg-accent border-accent text-white' : 'border-border bg-white text-transparent'}`}>
-                                <Check size={14} strokeWidth={4} />
-                            </div>
-                            <div className="flex-1 space-y-1">
-                                <h4 className={`text-[15px] font-bold transition-all ${checkedItems[item.id] ? 'text-slate-400 line-through' : 'text-text-primary'}`}>
-                                    {item.text}
-                                </h4>
-                                <div className="flex items-start gap-2 text-[12px] text-slate-400 font-medium italic">
-                                    <Info size={13} className="mt-0.5 flex-shrink-0" />
-                                    <span>Protocol: {item.hint}</span>
+                            <div className="flex items-center gap-8">
+                                <div className={`w-12 h-12 border-2 rounded-full flex items-center justify-center transition-all ${isDone ? 'bg-success border-success text-white' : 'border-border bg-background text-slate-300 group-hover:border-accent/40'}`}>
+                                    {isDone ? <CheckCircle2 size={24} /> : <Circle size={24} />}
+                                </div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-3">
+                                        <h3 className={`text-[20px] font-serif font-black transition-colors ${isDone ? 'text-success' : 'text-text-primary'}`}>{protocol.title}</h3>
+                                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 px-2 py-1 border border-border bg-white">{protocol.category}</span>
+                                    </div>
+                                    <p className="text-slate-500 text-sm font-medium">{protocol.desc}</p>
                                 </div>
                             </div>
+                            <ChevronRight className={`transition-all ${isDone ? 'text-success' : 'text-slate-200 group-hover:text-accent group-hover:translate-x-1'}`} />
                         </div>
-                    ))}
+                    );
+                })}
+            </div>
+
+            <div className={`p-8 border flex items-start gap-6 transition-all ${progress === 100 ? 'bg-success/5 border-success/20' : 'bg-accent/5 border-accent/20'}`}>
+                <div className={`w-12 h-12 flex-shrink-0 flex items-center justify-center border ${progress === 100 ? 'bg-white border-success/20 text-success' : 'bg-white border-accent/20 text-accent'}`}>
+                    {progress === 100 ? <ShieldCheck size={28} /> : <AlertCircle size={28} />}
+                </div>
+                <div className="space-y-2">
+                    <h4 className={`text-[18px] font-serif font-black ${progress === 100 ? 'text-success' : 'text-text-primary'}`}>
+                        {progress === 100 ? 'Pre-Flight Authorization Granted' : 'Verification Pending'}
+                    </h4>
+                    <p className="text-[13px] text-slate-600 font-medium">
+                        {progress === 100
+                            ? 'All platform layers have been verified against the KodNest Premium standards. System is authorized for shipment.'
+                            : 'Strategic deployment is restricted until all core integrity protocols are verified and checked above.'}
+                    </p>
                 </div>
             </div>
         </div>

@@ -32,18 +32,18 @@ export default function Layout() {
     return (
         <div className="min-h-screen flex flex-col bg-background selection:bg-accent/10">
             {/* Top Bar */}
-            <nav className="h-[72px] bg-white border-b border-border px-10 flex items-center justify-between sticky top-0 z-[100]">
-                <div className="font-black text-[20px] text-accent tracking-tight uppercase">Placement Prep</div>
+            <nav className="h-auto min-h-[72px] bg-white border-b border-border px-4 lg:px-10 py-4 flex flex-wrap items-center justify-between sticky top-0 z-[100] gap-4">
+                <div className="font-black text-[18px] lg:text-[20px] text-accent tracking-tight uppercase">Placement Prep</div>
 
-                <div className="bg-background px-4 py-2 rounded-[8px] text-[13px] font-bold text-slate-500 uppercase tracking-widest border border-border/50">
+                <div className="bg-background px-3 lg:px-4 py-2 rounded-[8px] text-[11px] font-bold text-slate-500 uppercase tracking-widest border border-border/50">
                     Step {currentStep.step} / 8
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <div className={`px-4 py-1.5 rounded-[12px] text-[11px] font-black uppercase tracking-widest border border-current ${qaStatus.deploy ? 'bg-success/10 text-success' : 'bg-warning-soft text-warning'}`}>
+                    <div className={`px-3 lg:px-4 py-1.5 rounded-[12px] text-[10px] lg:text-[11px] font-black uppercase tracking-widest border border-current ${qaStatus.deploy ? 'bg-success/10 text-success' : 'bg-warning-soft text-warning'}`}>
                         {qaStatus.deploy ? 'Shipped' : (qaStatus.ui ? 'In Progress' : 'Not Started')}
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-bone border border-border flex items-center justify-center font-black text-accent">H</div>
+                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-bone border border-border flex items-center justify-center font-black text-accent text-sm lg:text-base">H</div>
                 </div>
             </nav>
 
@@ -56,14 +56,14 @@ export default function Layout() {
             </header>
 
             {/* Main Content Area */}
-            <main className="flex-1 max-w-[1440px] mx-auto w-full flex p-10 gap-10">
+            <main className="flex-1 max-w-[1440px] mx-auto w-full flex flex-col lg:flex-row p-4 lg:p-10 gap-6 lg:gap-10">
                 {/* Primary Workspace (70%) */}
-                <section className="flex-[0_0_70%] min-w-0">
+                <section className="w-full lg:flex-[0_0_70%] min-w-0">
                     <Outlet />
                 </section>
 
                 {/* Secondary Panel (30%) */}
-                <aside className="flex-[0_0_30%] space-y-6">
+                <aside className="w-full lg:flex-[0_0_30%] space-y-6">
                     <div className="card-premium p-6 border-accent/20">
                         <h3 className="text-[18px] font-bold mb-4 uppercase tracking-tighter text-accent">Intelligence Navigation</h3>
                         <nav className="space-y-1">
@@ -91,7 +91,7 @@ export default function Layout() {
             </main>
 
             {/* Proof Footer */}
-            <footer className="h-[64px] bg-white border-t border-border px-10 flex items-center justify-center gap-10 sticky bottom-0 z-[100]">
+            <footer className="h-auto min-h-[64px] bg-white border-t border-border px-4 lg:px-10 py-4 flex flex-wrap items-center justify-center gap-4 lg:gap-10 sticky bottom-0 z-[100]">
                 <ProofCheck label="UI Built" checked={qaStatus.ui} onClick={() => toggleQa('ui')} />
                 <ProofCheck label="Logic Working" checked={qaStatus.logic} onClick={() => toggleQa('logic')} />
                 <ProofCheck label="Test Passed" checked={qaStatus.test} onClick={() => toggleQa('test')} />

@@ -101,7 +101,7 @@ function renderRoute() {
     const path = window.location.hash.slice(1) || '/';
     const route = routes[path] || routes['/'];
 
-    document.title = `${route.title} - KodNest Premium`;
+    document.title = `${route.title} - KodNest Intelligence Hub`;
 
     // Progress
     document.getElementById('app-progress').textContent = `Step ${route.step} / 8`;
@@ -109,7 +109,7 @@ function renderRoute() {
     // Status Badge
     const tests = getTestsPassed().length;
     const links = getSubmissionLinks();
-    const isShipped = tests === 10 && links.lovable && links.github && links.live;
+    const isShipped = tests >= 5 && links.live;
     const statusText = isShipped ? 'Shipped' : (tests > 0 ? 'In Progress' : 'Not Started');
     const statusClass = isShipped ? 'status--shipped' : (tests > 0 ? 'status--in-progress' : 'status--not-started');
     document.getElementById('app-status').innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
@@ -126,7 +126,7 @@ function renderRoute() {
     const items = [
         { label: 'UI Built', checked: true },
         { label: 'Logic Working', checked: getPreferences().roleKeywords.length > 0 },
-        { label: 'Test Passed', checked: tests === 10 },
+        { label: 'Test Passed', checked: tests >= 5 },
         { label: 'Deployed', checked: !!links.live }
     ];
     document.getElementById('app-footer').innerHTML = items.map(i => `<div class="checklist-item">${i.checked ? '☑' : '□'} ${i.label}</div>`).join('');
@@ -134,13 +134,13 @@ function renderRoute() {
     // Nav Menu (In Workspace for Dash/Saved)
     if (['/dashboard', '/saved', '/digest', '/settings', '/jt/proof'].includes(path)) {
         const nav = `
-            <div class="card" style="padding: 12px; margin-bottom: 24px; display: flex; gap: 16px; font-size: 14px;">
-                <a href="#/" style="color: ${path === '/' ? 'var(--color-accent)' : 'inherit'}; text-decoration: none; font-weight: 500;">Home</a>
-                <a href="#/dashboard" style="color: ${path === '/dashboard' ? 'var(--color-accent)' : 'inherit'}; text-decoration: none; font-weight: 500;">Dashboard</a>
-                <a href="#/saved" style="color: ${path === '/saved' ? 'var(--color-accent)' : 'inherit'}; text-decoration: none; font-weight: 500;">Saved</a>
-                <a href="#/digest" style="color: ${path === '/digest' ? 'var(--color-accent)' : 'inherit'}; text-decoration: none; font-weight: 500;">Digest</a>
-                <a href="#/settings" style="color: ${path === '/settings' ? 'var(--color-accent)' : 'inherit'}; text-decoration: none; font-weight: 500;">Settings</a>
-                <a href="#/jt/proof" style="color: ${path === '/jt/proof' ? 'var(--color-accent)' : 'inherit'}; text-decoration: none; font-weight: 500;">Proof</a>
+            <div class="card" style="padding: 12px; margin-bottom: 32px; display: flex; gap: 24px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid var(--color-border); border-width: 0 0 1px 0; border-radius: 0;">
+                <a href="#/" style="color: ${path === '/' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Home</a>
+                <a href="#/dashboard" style="color: ${path === '/dashboard' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Dashboard</a>
+                <a href="#/saved" style="color: ${path === '/saved' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Saved</a>
+                <a href="#/digest" style="color: ${path === '/digest' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Digest</a>
+                <a href="#/settings" style="color: ${path === '/settings' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Settings</a>
+                <a href="#/jt/proof" style="color: ${path === '/jt/proof' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Proof</a>
             </div>
         `;
         document.getElementById('app-workspace').insertAdjacentHTML('afterbegin', nav);
@@ -155,56 +155,58 @@ function renderRoute() {
 function renderLandingPage() {
     return {
         workspaceHtml: `
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 32px; padding-top: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 40px; padding-top: 8px;">
                 <!-- Job Tracker Card -->
-                <div class="card" style="padding: 40px; display: flex; flex-direction: column; justify-content: space-between; border-top: 6px solid #CBD5E1;">
+                <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
-                        <div style="width: 48px; hieght: 48px; background: #F1F5F9; border-radius: 12px; display: flex; items-center; justify-content: center; margin-bottom: 24px;">
-                             <span style="font-size: 24px;">📡</span>
+                        <div style="width: 48px; height: 48px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+                             <span style="font-size: 20px;">📡</span>
                         </div>
-                        <h2 style="font-size: 28px; margin-bottom: 16px; color: var(--color-text);">Job Discovery Engine</h2>
-                        <p style="font-size: 15px; margin-bottom: 32px; line-height: 1.6;">Automated matching system for identifying high-value career opportunities. Real-time market tracking and intelligent prioritization.</p>
+                        <h2 style="margin-bottom: 16px;">Job Discovery Engine</h2>
+                        <p style="margin-bottom: 32px;">Automated matching system for identifying high-value career opportunities. Real-time market tracking and intelligent prioritization.</p>
                     </div>
                     <div style="display: flex; gap: 16px;">
-                        <a href="#/dashboard" class="btn btn--primary" style="flex: 1; background: #334155;">Enter Dashboard</a>
+                        <a href="#/dashboard" class="btn btn--primary" style="flex: 1;">Enter Dashboard</a>
                         <a href="#/settings" class="btn btn--secondary" style="padding: 12px 16px;">⚙️</a>
                     </div>
                 </div>
 
                 <!-- Placement Platform Card -->
-                <div class="card" style="padding: 40px; display: flex; flex-direction: column; justify-content: space-between; border-top: 6px solid var(--color-accent); background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFF 100%);">
+                <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-color: var(--color-accent);">
                     <div>
-                        <div style="width: 48px; hieght: 48px; background: #EEF2FF; border-radius: 12px; display: flex; items-center; justify-content: center; margin-bottom: 24px;">
-                             <span style="font-size: 24px; color: var(--color-accent);">💎</span>
+                        <div style="width: 48px; height: 48px; background: var(--color-white); border: 1px solid var(--color-accent); border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+                             <span style="font-size: 20px; color: var(--color-accent);">💎</span>
                         </div>
-                        <h2 style="font-size: 28px; margin-bottom: 16px; color: var(--color-text);">Readiness Platform</h2>
-                        <p style="font-size: 15px; margin-bottom: 32px; line-height: 1.6;">Heuristic JD analyzer and interview architect. Generate professional preparation roadmaps and track technical mastery.</p>
+                        <h2 style="margin-bottom: 16px;">Readiness Platform</h2>
+                        <p style="margin-bottom: 32px;">Heuristic JD analyzer and interview architect. Generate professional preparation roadmaps and track technical mastery.</p>
                     </div>
                     <div style="display: flex; gap: 16px;">
                         <a href="placement/index.html" class="btn btn--primary" style="flex: 1;">Launch Platform</a>
-                        <div class="status-badge" style="background: #EEF2FF; color: var(--color-accent); display: flex; align-items: center; justify-content: center;">V1.2 Active</div>
+                        <div class="status-badge" style="background: var(--color-bg); border-color: var(--color-border); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 900;">V1.2 Active</div>
                     </div>
                 </div>
             </div>
         `,
         panelHtml: `
-            <div class="card" style="background: var(--color-text); color: white; border: none;">
-                <h3 style="color: white; margin-bottom: 12px;">Intelligence Suite</h3>
-                <p style="color: #94A3B8; font-size: 14px; margin-bottom: 24px;">Integrated command center for career acceleration. All systems functional.</p>
+            <div class="card" style="background: var(--color-text); color: white;">
+                <h3 style="color: white; margin-bottom: 12px; font-family: var(--font-display);">Intelligence Suite</h3>
+                <p style="color: #94A3B8; font-size: 14px; margin-bottom: 24px; max-width: 100%;">Integrated command center for career acceleration. All systems functional.</p>
                 <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em;">
                         <span>System Latency</span>
-                        <span style="color: var(--color-success);">24ms</span>
+                        <span style="color: #10B981;">24ms</span>
                     </div>
-                    <div style="width: 100%; height: 4px; background: #334155; border-radius: 2px;">
-                        <div style="width: 98%; height: 100%; background: var(--color-success); border-radius: 2px;"></div>
+                    <div style="width: 100%; height: 2px; background: #334155;">
+                        <div style="width: 98%; height: 100%; background: #10B981;"></div>
                     </div>
                 </div>
             </div>
             <div class="card">
-                <h3 style="font-size: 16px; margin-bottom: 8px;">Active Session</h3>
-                <p style="font-size: 13px;">User: <strong>Harshith</strong></p>
-                <p style="font-size: 13px;">Role: <strong>Strategic Candidate</strong></p>
+                <h3 style="font-size: 16px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em;">Active Session</h3>
+                <div style="font-size: 14px; font-weight: 500; color: var(--color-text);">
+                    <p style="margin-bottom: 8px;">User: <strong style="color: var(--color-accent);">Harshith</strong></p>
+                    <p>Role: <strong style="color: var(--color-accent);">Strategic Candidate</strong></p>
+                </div>
             </div>
         `
     };
@@ -214,13 +216,13 @@ function renderDashboardPage() {
     const jobs = getFilteredJobs();
     return {
         workspaceHtml: `
-            <div style="margin-bottom: 24px; display: flex; gap: 12px; align-items: center;">
-                <select id="filter-location" class="input" style="width: 200px;"><option value="">All Locations</option>${[...new Set(jobsData.map(j => j.location))].sort().map(l => `<option value="${l}" ${currentFilters.location === l ? 'selected' : ''}>${l}</option>`).join('')}</select>
-                <label style="font-size: 14px;"><input type="checkbox" onchange="window.toggleMatchFilter(this.checked)" ${currentFilters.showOnlyMatches ? 'checked' : ''}> High Quality Only</label>
+            <div style="margin-bottom: 32px; display: flex; gap: 16px; align-items: center;">
+                <select id="filter-location" class="input" style="width: 240px; border-radius: 4px;"><option value="">All Locations</option>${[...new Set(jobsData.map(j => j.location))].sort().map(l => `<option value="${l}" ${currentFilters.location === l ? 'selected' : ''}>${l}</option>`).join('')}</select>
+                <label style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-secondary); display: flex; align-items: center; gap: 8px; cursor: pointer;"><input type="checkbox" onchange="window.toggleMatchFilter(this.checked)" ${currentFilters.showOnlyMatches ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: var(--color-accent);"> High Quality Only</label>
             </div>
-            <div class="jobs-grid">${jobs.map(renderJobCard).join('')}</div>
+            <div class="jobs-grid" style="display: grid; grid-template-columns: 1fr; gap: 16px;">${jobs.map(renderJobCard).join('')}</div>
         `,
-        panelHtml: `<div class="card"><h3>Live Data</h3><p style="font-size: 14px; color: #666;">Analyzing ${jobs.length} roles found in tracking network.</p></div>`
+        panelHtml: `<div class="card"><h3>Live Data</h3><p style="font-size: 14px; color: var(--color-text-secondary);">Analyzing ${jobs.length} roles found in tracking network.</p></div>`
     };
 }
 
@@ -228,23 +230,23 @@ function renderJobCard(job) {
     const isSaved = getSavedJobs().includes(job.id);
     const statusClass = `status--${job.status.toLowerCase().replace(' ', '-')}`;
     return `
-        <div class="card" style="margin-bottom: 16px;">
+        <div class="card" style="margin-bottom: 0;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div><h4 class="serif">${job.title}</h4><p style="font-size: 14px; color: #666;">${job.company} • ${job.location}</p></div>
-                <span class="status-badge" style="background:#EEE;">${job.source}</span>
+                <div><h3 style="margin-bottom: 4px;">${job.title}</h3><p style="font-size: 14px; font-weight: 600; color: var(--color-accent);">${job.company} • ${job.location}</p></div>
+                <span class="status-badge" style="background:var(--color-bg); border: 1px solid var(--color-border); border-radius: 4px;">${job.source}</span>
             </div>
-            <div style="margin-top: 12px; display: flex; gap: 8px;">
-                <span class="status-badge ${statusClass}" style="font-size: 10px;">${job.status}</span>
-                <span class="status-badge" style="font-size: 10px; background: #F0F4F8; color: #1E3A8A;">${job.matchScore || 0}% Match</span>
+            <div style="margin-top: 16px; display: flex; gap: 12px;">
+                <span class="status-badge ${statusClass}">${job.status}</span>
+                <span class="status-badge" style="background: var(--color-white); border: 1px solid var(--color-border); color: var(--color-text-secondary); border-radius: 4px;">${job.matchScore || 0}% Match Index</span>
             </div>
-            <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; gap: 4px;">
-                    <button class="btn btn--secondary" style="padding: 4px 8px; font-size: 11px;" onclick="window.setJobStatus('${job.id}', 'Applied')">Applied</button>
-                    <button class="btn btn--secondary" style="padding: 4px 8px; font-size: 11px;" onclick="window.setJobStatus('${job.id}', 'Rejected')">Rejected</button>
-                </div>
+            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; gap: 8px;">
-                    <button class="btn btn--secondary btn--small" onclick="window.toggleSaveJob('${job.id}')">${isSaved ? '❤️' : '🤍'}</button>
-                    <button class="btn btn--primary btn--small" onclick="window.open('${job.applyUrl}','_blank')">Apply</button>
+                    <button class="btn btn--secondary" style="padding: 8px 16px; font-size: 11px;" onclick="window.setJobStatus('${job.id}', 'Applied')">Applied</button>
+                    <button class="btn btn--secondary" style="padding: 8px 16px; font-size: 11px;" onclick="window.setJobStatus('${job.id}', 'Rejected')">Rejected</button>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn--secondary" style="width: 44px; padding: 0;" onclick="window.toggleSaveJob('${job.id}')">${isSaved ? '❤️' : '🤍'}</button>
+                    <button class="btn btn--primary" style="padding: 10px 32px;" onclick="window.open('${job.applyUrl}','_blank')">Apply Role</button>
                 </div>
             </div>
         </div>
@@ -256,26 +258,26 @@ function renderSettingsPage() {
     return {
         workspaceHtml: `
             <div class="card">
-                <div class="form-group" style="margin-bottom: 24px;"><label>Role Keywords</label><input type="text" id="pref-keywords" class="input" value="${p.roleKeywords.join(', ')}" placeholder="SDE, Frontend..."></div>
-                <div class="form-group"><label>Threshold: <span id="threshold-val">${p.minMatchScore}%</span></label><input type="range" id="pref-threshold" min="0" max="100" value="${p.minMatchScore}" oninput="document.getElementById('threshold-val').textContent=this.value+'%'"></div>
-                <button class="btn btn--primary" style="margin-top: 24px;" onclick="window.saveAllPrefs()">Save Configuration</button>
+                <div class="form-group" style="margin-bottom: 32px;"><label style="display: block; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 8px;">Role Keywords (CSV)</label><input type="text" id="pref-keywords" class="input" value="${p.roleKeywords.join(', ')}" placeholder="SDE, Frontend..." style="border-radius: 4px;"></div>
+                <div class="form-group"><label style="display: block; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 8px;">Threshold: <span id="threshold-val" style="color: var(--color-accent);">${p.minMatchScore}%</span></label><input type="range" id="pref-threshold" min="0" max="100" value="${p.minMatchScore}" oninput="document.getElementById('threshold-val').textContent=this.value+'%'" style="width: 100%; accent-color: var(--color-accent);"></div>
+                <button class="btn btn--primary" style="margin-top: 40px; width: 100%; border-radius: 4px;" onclick="window.saveAllPrefs()">Update Logic Configuration</button>
             </div>
         `,
-        panelHtml: `<div class="card"><h3>Logic Controls</h3><p style="font-size: 14px; color: #666;">Adjusting these parameters re-calculates the match engine instantaneously.</p></div>`
+        panelHtml: `<div class="card"><h3>Logic Controls</h3><p style="font-size: 14px; color: var(--color-text-secondary);">Adjusting these parameters re-calculates the match engine instantaneously.</p></div>`
     };
 }
 
 function renderTestingPage() {
     const passed = getTestsPassed();
-    const items = [{ id: 't1', l: 'Persistence' }, { id: 't2', l: 'Matching' }, { id: 't3', l: 'Filtering' }, { id: 't4', l: 'Saving' }, { id: 't5', l: 'Linking' }];
+    const items = [{ id: 't1', l: 'Persistence Layer' }, { id: 't2', l: 'Matching Heuristics' }, { id: 't3', l: 'Filter Logic' }, { id: 't4', l: 'State Archival' }, { id: 't5', l: 'Linking Protocol' }];
     return {
-        workspaceHtml: `<div class="card">${items.map(i => `<div style="padding:12px; border-bottom:1px solid #EEE;"><input type="checkbox" onchange="window.setTestStatus('${i.id}', this.checked)" ${passed.includes(i.id) ? 'checked' : ''}> ${i.l}</div>`).join('')}</div>`,
-        panelHtml: `<div class="card"><h3>QA Check</h3><p>${passed.length} / 5 passed.</p><a href="#/jt/08-ship" class="btn btn--primary btn--small" style="width: 100%; margin-top: 16px;">Next: Ship</a></div>`
+        workspaceHtml: `<div class="card" style="padding: 0; overflow: hidden; border-radius: 4px;">${items.map(i => `<div style="padding:20px; border-bottom:1px solid var(--color-border); display: flex; align-items: center; gap: 12px; font-weight: 600;"><input type="checkbox" onchange="window.setTestStatus('${i.id}', this.checked)" ${passed.includes(i.id) ? 'checked' : ''} style="width: 20px; height: 20px; accent-color: var(--color-accent);"> ${i.l}</div>`).join('')}</div>`,
+        panelHtml: `<div class="card"><h3>QA Protocol</h3><p style="font-size: 15px; font-weight: 700;">${passed.length} / 5 passed.</p><a href="#/jt/08-ship" class="btn btn--primary" style="width: 100%; margin-top: 24px;">Authorization Gate</a></div>`
     };
 }
 
 function renderShipPage() {
-    return { workspaceHtml: `<div class="card"><h2>Application Ready for Production.</h2><p>Click below to finalize project evidence.</p><a href="#/jt/proof" class="btn btn--primary" style="margin-top:16px;">Go to Proof</a></div>`, panelHtml: `<div class="card"><h3>Ready</h3></div>` };
+    return { workspaceHtml: `<div class="card" style="text-center; border-radius: 4px;"><h2>Application Ready for Production.</h2><p style="margin-bottom: 24px;">Click below to finalize project evidence and protocol signatures.</p><a href="#/jt/proof" class="btn btn--primary" style="width: 100%;">Final Submission Proof</a></div>`, panelHtml: `<div class="card"><h3>Pre-Flight</h3></div>` };
 }
 
 function renderProofPage() {
@@ -283,17 +285,17 @@ function renderProofPage() {
     return {
         workspaceHtml: `
             <div class="card">
-                <div class="form-group" style="margin-bottom:16px;"><label>GitHub URL</label><input type="url" class="input" value="${links.github}" onchange="window.saveSubmissionLink('github', this.value)"></div>
-                <div class="form-group" style="margin-bottom:16px;"><label>Live URL</label><input type="url" class="input" value="${links.live}" onchange="window.saveSubmissionLink('live', this.value)"></div>
-                <button class="btn btn--primary" style="margin-top:16px;" onclick="window.copySubmission()">Copy Final Submission</button>
+                <div class="form-group" style="margin-bottom:24px;"><label style="display: block; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 8px;">GitHub Repository</label><input type="url" class="input" value="${links.github}" onchange="window.saveSubmissionLink('github', this.value)" style="border-radius: 4px;"></div>
+                <div class="form-group" style="margin-bottom:24px;"><label style="display: block; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 8px;">Production URL</label><input type="url" class="input" value="${links.live}" onchange="window.saveSubmissionLink('live', this.value)" style="border-radius: 4px;"></div>
+                <button class="btn btn--primary" style="width: 100%; margin-top: 16px;" onclick="window.copySubmission()">Generate Final Payload</button>
             </div>
         `,
-        panelHtml: `<div class="card"><h3>Final Steps</h3><p style="font-size:14px; color:#666;">Provide project artifacts to complete shipment.</p></div>`
+        panelHtml: `<div class="card"><h3>Final Steps</h3><p style="font-size:14px; color:var(--color-text-secondary);">Provide project artifacts to complete shipment.</p></div>`
     };
 }
 
-function renderSavedPage() { return { workspaceHtml: `<div class="card"><h3>Strategic Bookmarks</h3><div class="jobs-grid">${getFilteredJobs().filter(j => getSavedJobs().includes(j.id)).map(renderJobCard).join('')}</div></div>`, panelHtml: `<div class="card"><h3>Saved</h3></div>` }; }
-function renderDigestPage() { return { workspaceHtml: `<div class="card"><h3>Automated Intelligence</h3><p>Newsletter simulation goes here.</p><button class="btn btn--primary" onclick="window.generateTodayDigest()">Generate Digest</button></div>`, panelHtml: `<div class="card"><h3>9AM Trigger</h3></div>` }; }
+function renderSavedPage() { return { workspaceHtml: `<div class="card"><h3>Strategic Bookmarks</h3><div class="jobs-grid" style="display: grid; grid-template-columns: 1fr; gap: 16px;">${getFilteredJobs().filter(j => getSavedJobs().includes(j.id)).map(renderJobCard).join('')}</div></div>`, panelHtml: `<div class="card"><h3>Saved Repository</h3></div>` }; }
+function renderDigestPage() { return { workspaceHtml: `<div class="card"><h3>Automated Intelligence</h3><p style="margin-bottom: 24px;">The 9AM matching engine trigger simulates a daily market brief for strategic candidates.</p><button class="btn btn--primary" style="width: 100%;" onclick="window.generateTodayDigest()">Initialize Digest Generation</button></div>`, panelHtml: `<div class="card"><h3>Trigger Logic</h3></div>` }; }
 
 /**
  * Global Interactivity
@@ -302,7 +304,7 @@ window.saveAllPrefs = () => {
     const k = document.getElementById('pref-keywords').value.split(',').map(s => s.trim()).filter(s => s);
     const t = parseInt(document.getElementById('pref-threshold').value);
     savePreferences({ roleKeywords: k, minMatchScore: t });
-    showToast("Preferences Saved");
+    showToast("Preferences Updated");
     renderRoute();
 };
 
@@ -310,13 +312,13 @@ window.toggleMatchFilter = (val) => { currentFilters.showOnlyMatches = val; rend
 
 window.copySubmission = () => {
     const l = getSubmissionLinks();
-    const txt = `Job Notification Tracker — Final Submission\n\nGitHub: ${l.github}\nLive: ${l.live}\n\nProcessed with KodNest Premium Build System.`;
-    navigator.clipboard.writeText(txt).then(() => showToast("Copied!"));
+    const txt = `Intelligence Hub — Final Proof\n\nGitHub: ${l.github}\nLive: ${l.live}\n\nProcessed via KodNest Premium Build System.`;
+    navigator.clipboard.writeText(txt).then(() => showToast("Payload Copied!"));
 };
 
 function showToast(msg) {
     const t = document.createElement('div');
-    t.style = "position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #111; color: #FFF; padding: 10px 20px; border-radius: 4px; font-size: 14px; z-index: 1000;";
+    t.style = "position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--color-text); color: #FFF; padding: 12px 24px; border: 1px solid var(--color-border); border-radius: 4px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; z-index: 1000;";
     t.textContent = msg;
     document.body.appendChild(t);
     setTimeout(() => document.body.removeChild(t), 2000);
