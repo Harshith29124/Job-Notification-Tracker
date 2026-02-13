@@ -1,0 +1,11 @@
+export default function Resources() {
+    return (
+        <div>
+            <h1 className="text-3xl font-black text-slate-900 mb-2">Study Resources</h1>
+            <p className="text-slate-500 mb-8">Concept notes, interview experiences, and technical guides.</p>
+            <div className="bg-white rounded-3xl p-12 border border-slate-200 border-dashed text-center">
+                <p className="text-slate-400 font-medium italic">Resource library loading...</p>
+            </div>
+        </div>
+    );
+}
