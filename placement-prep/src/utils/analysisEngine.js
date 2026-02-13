@@ -118,16 +118,34 @@ export function analyzeJD(company, role, jdText) {
         plan,
         checklist,
         questions,
-        readinessScore: score
+        baseReadinessScore: score,
+        readinessScore: score,
+        skillConfidenceMap: {} // Default empty, all "practice"
     };
 }
 
 export function saveToHistory(analysis) {
     const history = JSON.parse(localStorage.getItem('prepHistory') || '[]');
-    history.unshift(analysis);
+    const index = history.findIndex(a => a.id === analysis.id);
+    if (index !== -1) {
+        history[index] = analysis;
+    } else {
+        history.unshift(analysis);
+    }
     localStorage.setItem('prepHistory', JSON.stringify(history.slice(0, 50))); // Keep last 50
     localStorage.setItem('lastAnalysisId', analysis.id);
     return analysis;
+}
+
+export function updateAnalysis(id, updates) {
+    const history = getHistory();
+    const index = history.findIndex(a => a.id === Number(id));
+    if (index !== -1) {
+        history[index] = { ...history[index], ...updates };
+        localStorage.setItem('prepHistory', JSON.stringify(history));
+        return history[index];
+    }
+    return null;
 }
 
 export function getHistory() {
