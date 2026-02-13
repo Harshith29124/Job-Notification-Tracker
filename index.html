@@ -1,162 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KodNest Premium Build System</title>
-    <meta name="description" content="A calm, intentional build system for serious product development">
+    <title>Job Notification Tracker - KodNest Premium</title>
+    <meta name="description" content="Track and manage job notifications with calm, intentional design">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="app.css">
 </head>
+
 <body>
-    <!-- Top Bar -->
-    <header class="top-bar">
-        <div class="top-bar__project">KodNest Premium</div>
-        <div class="top-bar__progress">Step 1 / 5</div>
-        <div class="top-bar__status">
-            <span class="status-badge status-badge--not-started">Not Started</span>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="top-nav__container">
+            <div class="top-nav__brand">
+                <span class="top-nav__brand-text">KodNest</span>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="top-nav__links">
+                <a href="#/" class="top-nav__link" data-route="/">Home</a>
+                <a href="#/dashboard" class="top-nav__link" data-route="/dashboard">Dashboard</a>
+                <a href="#/saved" class="top-nav__link" data-route="/saved">Saved</a>
+                <a href="#/digest" class="top-nav__link" data-route="/digest">Digest</a>
+                <a href="#/settings" class="top-nav__link" data-route="/settings">Settings</a>
+                <a href="#/proof" class="top-nav__link" data-route="/proof">Proof</a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="top-nav__toggle" aria-label="Toggle navigation menu">
+                <span class="top-nav__toggle-icon"></span>
+            </button>
         </div>
-    </header>
 
-    <!-- Context Header -->
-    <section class="context-header">
-        <h1 class="context-header__title">Design System Foundation</h1>
-        <p class="context-header__subtitle">Establish the visual language and component library for your product</p>
-    </section>
+        <!-- Mobile Navigation -->
+        <div class="top-nav__mobile">
+            <a href="#/" class="top-nav__mobile-link" data-route="/">Home</a>
+            <a href="#/dashboard" class="top-nav__mobile-link" data-route="/dashboard">Dashboard</a>
+            <a href="#/saved" class="top-nav__mobile-link" data-route="/saved">Saved</a>
+            <a href="#/digest" class="top-nav__mobile-link" data-route="/digest">Digest</a>
+            <a href="#/settings" class="top-nav__mobile-link" data-route="/settings">Settings</a>
+            <a href="#/proof" class="top-nav__mobile-link" data-route="/proof">Proof</a>
+        </div>
+    </nav>
 
-    <!-- Main Layout -->
-    <main class="main-layout">
-        <!-- Primary Workspace -->
-        <section class="primary-workspace">
-            <div class="card">
-                <h2 class="card__title">Component Preview</h2>
-                
-                <!-- Typography Samples -->
-                <div class="section">
-                    <h3 class="section__label">Typography</h3>
-                    <h1 class="heading-xl">Extra Large Heading</h1>
-                    <h2 class="heading-lg">Large Heading</h2>
-                    <h3 class="heading-md">Medium Heading</h3>
-                    <p class="body-text">This is body text set at 16px with a line height of 1.6. It's designed for comfortable reading with maximum width constraints to prevent eye strain.</p>
-                    <p class="body-text-sm">Smaller body text for secondary information and captions.</p>
-                </div>
-
-                <!-- Button Samples -->
-                <div class="section">
-                    <h3 class="section__label">Buttons</h3>
-                    <div class="button-group">
-                        <button class="btn btn--primary">Primary Action</button>
-                        <button class="btn btn--secondary">Secondary Action</button>
-                        <button class="btn btn--primary" disabled>Disabled State</button>
-                    </div>
-                </div>
-
-                <!-- Input Samples -->
-                <div class="section">
-                    <h3 class="section__label">Form Elements</h3>
-                    <div class="form-group">
-                        <label class="form-label" for="sample-input">Input Label</label>
-                        <input type="text" id="sample-input" class="form-input" placeholder="Enter text here">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="sample-textarea">Textarea Label</label>
-                        <textarea id="sample-textarea" class="form-input" rows="4" placeholder="Enter longer text here"></textarea>
-                    </div>
-                </div>
-
-                <!-- Status Badges -->
-                <div class="section">
-                    <h3 class="section__label">Status Indicators</h3>
-                    <div class="badge-group">
-                        <span class="status-badge status-badge--not-started">Not Started</span>
-                        <span class="status-badge status-badge--in-progress">In Progress</span>
-                        <span class="status-badge status-badge--shipped">Shipped</span>
-                        <span class="status-badge status-badge--success">Success</span>
-                        <span class="status-badge status-badge--warning">Warning</span>
-                        <span class="status-badge status-badge--error">Error</span>
-                    </div>
-                </div>
-
-                <!-- Card Samples -->
-                <div class="section">
-                    <h3 class="section__label">Cards</h3>
-                    <div class="card card--nested">
-                        <h4 class="card__subtitle">Nested Card Example</h4>
-                        <p class="body-text">Cards use subtle borders and balanced padding. No drop shadows, no gradients.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Empty State Example -->
-            <div class="card">
-                <div class="empty-state">
-                    <h3 class="empty-state__title">No items yet</h3>
-                    <p class="empty-state__description">Get started by creating your first component</p>
-                    <button class="btn btn--primary">Create Component</button>
-                </div>
-            </div>
-
-            <!-- Error State Example -->
-            <div class="card">
-                <div class="error-state">
-                    <h3 class="error-state__title">Build failed</h3>
-                    <p class="error-state__description">The build process encountered an error in your configuration file. Check that all required fields are properly defined and try again.</p>
-                    <button class="btn btn--secondary">Review Configuration</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Secondary Panel -->
-        <aside class="secondary-panel">
-            <div class="panel-card">
-                <h3 class="panel-card__title">Step Explanation</h3>
-                <p class="panel-card__text">This design system establishes a calm, coherent visual language. Every component follows the same spacing scale, color palette, and interaction patterns.</p>
-            </div>
-
-            <div class="panel-card">
-                <h3 class="panel-card__title">Copyable Prompt</h3>
-                <div class="prompt-box">
-                    <code class="prompt-box__code">npm install @kodnest/design-system</code>
-                    <button class="prompt-box__copy" aria-label="Copy to clipboard">Copy</button>
-                </div>
-            </div>
-
-            <div class="panel-card">
-                <h3 class="panel-card__title">Actions</h3>
-                <div class="action-group">
-                    <button class="btn btn--secondary btn--full-width">Build in Lovable</button>
-                    <button class="btn btn--secondary btn--full-width">It Worked</button>
-                    <button class="btn btn--secondary btn--full-width">Report Error</button>
-                    <button class="btn btn--secondary btn--full-width">Add Screenshot</button>
-                </div>
-            </div>
-        </aside>
+    <!-- Main Content Area -->
+    <main class="app-main" id="app-content">
+        <!-- Content will be dynamically rendered here -->
     </main>
 
-    <!-- Proof Footer -->
-    <footer class="proof-footer">
-        <div class="proof-footer__content">
-            <label class="checkbox-item">
-                <input type="checkbox" class="checkbox-item__input">
-                <span class="checkbox-item__label">UI Built</span>
-            </label>
-            <label class="checkbox-item">
-                <input type="checkbox" class="checkbox-item__input">
-                <span class="checkbox-item__label">Logic Working</span>
-            </label>
-            <label class="checkbox-item">
-                <input type="checkbox" class="checkbox-item__input">
-                <span class="checkbox-item__label">Test Passed</span>
-            </label>
-            <label class="checkbox-item">
-                <input type="checkbox" class="checkbox-item__input">
-                <span class="checkbox-item__label">Deployed</span>
-            </label>
-        </div>
-    </footer>
-
-    <script src="app.js"></script>
+    <script src="jobs-data.js"></script>
+    <script src="router.js"></script>
 </body>
+
 </html>
