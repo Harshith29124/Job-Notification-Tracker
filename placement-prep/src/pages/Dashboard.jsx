@@ -195,9 +195,9 @@ export default function Dashboard() {
 
 function Card({ title, children }) {
     return (
-        <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden relative group">
-            <div className="absolute top-0 left-0 w-2 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <h2 className="text-xl font-bold text-slate-800 mb-8 flex items-center gap-2">
+        <div className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden relative group">
+            <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/5 group-hover:bg-primary transition-colors"></div>
+            <h2 className="text-xl font-black text-slate-800 mb-8 flex items-center gap-3">
                 <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                 {title}
             </h2>

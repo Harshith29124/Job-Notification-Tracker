@@ -37,55 +37,55 @@ export default function Assessments() {
                 <p className="text-slate-500 font-medium">Analyze your JD to generate a personalized recruitment roadmap.</p>
             </header>
 
-            <div className="bg-white rounded-3xl border border-slate-200 p-10 shadow-sm">
+            <div className="bg-white rounded-[2rem] border border-slate-200 p-10 shadow-sm">
                 <form onSubmit={handleAnalyze} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                                <Building2 size={16} /> Company Name
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                                <Building2 size={14} /> Company Name
                             </label>
                             <input
                                 type="text"
                                 value={company}
                                 onChange={(e) => setCompany(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold placeholder:text-slate-300"
                                 placeholder="Google, Amazon, TCS..."
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                                <UserCircle2 size={16} /> Job Role
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                                <UserCircle2 size={14} /> Job Role
                             </label>
                             <input
                                 type="text"
                                 value={role}
                                 onChange={(e) => setRole(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold placeholder:text-slate-300"
                                 placeholder="Software Engineer, SDE-1..."
                             />
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                            <FileText size={16} /> Job Description
+                        <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                            <FileText size={14} /> Job Description
                         </label>
                         <textarea
                             value={jdText}
                             onChange={(e) => setJdText(e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-3xl p-6 min-h-[300px] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
-                            placeholder="Paste the full job description here to extract skills and generate a plan..."
+                            className="w-full bg-slate-50 border border-slate-200 rounded-[2rem] p-8 min-h-[300px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all resize-none font-medium leading-relaxed"
+                            placeholder="Paste the full job description here..."
                             required
                         />
-                        <p className="text-xs text-slate-400 font-medium italic">We analyze for skills, tech stack, and core CS fundamentals.</p>
+                        <p className="text-xs text-slate-400 font-bold italic">Heuristic analysis for skills, tech stack, and core CS fundamentals.</p>
                     </div>
 
                     <button
                         type="submit"
                         disabled={isAnalyzing || !jdText.trim()}
                         className={`w-full py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 transition-all ${isAnalyzing
-                                ? 'bg-primary/20 text-primary cursor-wait'
-                                : 'bg-primary text-white hover:bg-primary/90 hover:scale-[1.01] shadow-xl shadow-primary/25 active:scale-[0.99]'
+                            ? 'bg-primary/20 text-primary cursor-wait'
+                            : 'bg-primary text-white hover:bg-primary/90 hover:scale-[1.01] shadow-xl shadow-primary/25 active:scale-[0.99]'
                             }`}
                     >
                         {isAnalyzing ? (
@@ -96,7 +96,7 @@ export default function Assessments() {
                         ) : (
                             <>
                                 <Send size={20} />
-                                Generate Tailored Prep Plan
+                                Generate Preparation Roadmap
                             </>
                         )}
                     </button>

@@ -28,15 +28,15 @@ export default function Layout() {
     return (
         <div className="flex h-screen bg-slate-50">
             {/* Sidebar */}
-            <aside className={`bg-white border-r border-slate-200 transition-all duration-300 ${isSidebarOpen ? 'w-72' : 'w-24'}`}>
-                <div className="h-20 flex items-center px-8 border-bottom">
-                    <div className="bg-primary p-2 rounded-xl mr-3 shadow-lg shadow-primary/20">
-                        <div className="w-5 h-5 bg-white rounded-sm"></div>
+            <aside className={`bg-white border-r border-slate-200 transition-all duration-300 flex flex-col ${isSidebarOpen ? 'w-72' : 'w-24'}`}>
+                <div className="h-24 flex items-center px-8 flex-shrink-0">
+                    <div className="bg-primary p-2.5 rounded-2xl mr-3 shadow-lg shadow-primary/20">
+                        <div className="w-5 h-5 bg-white rounded-md"></div>
                     </div>
-                    {isSidebarOpen && <span className="font-black text-xl text-slate-900 tracking-tight">Placement Prep</span>}
+                    {isSidebarOpen && <span className="font-black text-2xl text-slate-900 tracking-tight">Placement Prep</span>}
                 </div>
 
-                <nav className="mt-6 px-4 space-y-2">
+                <nav className="mt-4 px-4 space-y-2 flex-1 overflow-y-auto">
                     {navItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = location.pathname === item.path || (item.path === '/assessments' && location.pathname === '/results');
@@ -57,27 +57,33 @@ export default function Layout() {
                             </Link>
                         );
                     })}
+                </nav>
+
+                <div className="p-6 space-y-4 flex-shrink-0">
+                    {isSidebarOpen && (
+                        <div className="p-6 bg-slate-900 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group/pro">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover/pro:scale-110 transition-transform">
+                                <History size={40} />
+                            </div>
+                            <h5 className="font-black text-xs mb-1 uppercase tracking-[0.2em] text-primary">Pro Status</h5>
+                            <p className="text-[10px] text-slate-400 font-bold leading-relaxed mb-4">Unlimited JD analyses and mock sessions enabled.</p>
+                            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                                <div className="bg-primary h-full w-3/4"></div>
+                            </div>
+                        </div>
+                    )}
 
                     <a
                         href="../index.html"
-                        className="flex items-center p-4 rounded-2xl transition-all duration-300 text-slate-400 hover:bg-slate-50 hover:text-slate-900 font-bold border-t border-slate-50 mt-4 pt-6"
+                        className={`flex items-center p-4 rounded-2xl transition-all group ${isSidebarOpen ? 'bg-slate-50 border border-slate-100 hover:border-slate-200' : ''
+                            }`}
                     >
                         <div className={`${isSidebarOpen ? 'mr-4' : 'mx-auto'}`}>
-                            <Home size={20} />
+                            <Home size={20} className="text-slate-400 group-hover:text-primary transition-colors" />
                         </div>
-                        {isSidebarOpen && <span className="font-bold tracking-tight">Return to Hub</span>}
+                        {isSidebarOpen && <span className="font-bold text-slate-500 group-hover:text-primary transition-colors text-sm">Return to Hub</span>}
                     </a>
-                </nav>
-
-                {isSidebarOpen && (
-                    <div className="absolute bottom-10 left-8 right-8 p-6 bg-slate-900 rounded-[2rem] text-white">
-                        <h5 className="font-black text-sm mb-1 uppercase tracking-widest text-primary">Pro Status</h5>
-                        <p className="text-[10px] text-slate-400 font-bold leading-relaxed mb-4">Unlimited JD analyses and mock sessions enabled.</p>
-                        <div className="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
-                            <div className="bg-primary h-full w-3/4"></div>
-                        </div>
-                    </div>
-                )}
+                </div>
             </aside>
 
             {/* Main Content */}

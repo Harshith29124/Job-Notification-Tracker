@@ -128,13 +128,13 @@ ${data.plan.map(p => `${p.day} (${p.focus}):\n - ${p.tasks.join('\n - ')}`).join
                         <div className="relative ml-4 border-l-2 border-slate-100 pl-8 space-y-12 py-4">
                             {data.roundMapping?.map((round, idx) => (
                                 <div key={idx} className="relative group">
-                                    <div className="absolute -left-[41px] top-0 w-4 h-4 rounded-full bg-white border-4 border-primary shadow-sm group-hover:scale-125 transition-transform"></div>
-                                    <div className="bg-slate-50 border border-slate-200 p-6 rounded-3xl group-hover:border-primary/20 transition-all">
+                                    <div className="absolute -left-[41px] top-0 w-4 h-4 rounded-full bg-white border-4 border-primary shadow-sm group-hover:scale-125 transition-transform z-10"></div>
+                                    <div className="bg-slate-50 border border-slate-200 p-8 rounded-[2rem] group-hover:border-primary/20 transition-all">
                                         <div className="flex items-center justify-between mb-2">
                                             <h4 className="font-black text-slate-900 text-lg">Round {idx + 1}: {round.name}</h4>
-                                            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{round.focus}</span>
+                                            <span className="bg-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-primary/20">{round.focus}</span>
                                         </div>
-                                        <p className="text-sm text-slate-500 font-medium leading-relaxed italic">"{round.importance}"</p>
+                                        <p className="text-sm text-slate-500 font-bold leading-relaxed italic">"{round.importance}"</p>
                                     </div>
                                 </div>
                             ))}
@@ -202,7 +202,8 @@ ${data.plan.map(p => `${p.day} (${p.focus}):\n - ${p.tasks.join('\n - ')}`).join
 
 function Section({ icon, title, children }) {
     return (
-        <div className="bg-white rounded-[2.5rem] border border-slate-200 p-10 shadow-sm relative overflow-hidden group">
+        <div className="bg-white rounded-[2rem] border border-slate-200 p-10 shadow-sm relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/5 group-hover:bg-primary transition-colors"></div>
             <div className="flex items-center gap-4 mb-10">
                 <div className="p-3 bg-slate-50 rounded-2xl group-hover:scale-110 transition-transform duration-500">{icon}</div>
                 <h2 className="text-2xl font-black text-slate-900 tracking-tight">{title}</h2>
