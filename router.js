@@ -155,27 +155,58 @@ function renderRoute() {
 function renderLandingPage() {
     return {
         workspaceHtml: `
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                <div class="card">
-                    <h2 class="serif" style="font-size: 24px; margin-bottom: 16px;">Job Notification Tracker</h2>
-                    <p>Core matching engine for identifying and curating high-value recruitment opportunities across the market network.</p>
-                    <div style="margin-top: 24px; display: flex; gap: 12px;">
-                        <a href="#/dashboard" class="btn btn--primary">Access Workspace</a>
-                        <a href="#/settings" class="btn btn--secondary">Configure Logic</a>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 32px; padding-top: 20px;">
+                <!-- Job Tracker Card -->
+                <div class="card" style="padding: 40px; display: flex; flex-direction: column; justify-content: space-between; border-top: 6px solid #CBD5E1;">
+                    <div>
+                        <div style="width: 48px; hieght: 48px; background: #F1F5F9; border-radius: 12px; display: flex; items-center; justify-content: center; margin-bottom: 24px;">
+                             <span style="font-size: 24px;">📡</span>
+                        </div>
+                        <h2 style="font-size: 28px; margin-bottom: 16px; color: var(--color-text);">Job Discovery Engine</h2>
+                        <p style="font-size: 15px; margin-bottom: 32px; line-height: 1.6;">Automated matching system for identifying high-value career opportunities. Real-time market tracking and intelligent prioritization.</p>
+                    </div>
+                    <div style="display: flex; gap: 16px;">
+                        <a href="#/dashboard" class="btn btn--primary" style="flex: 1; background: #334155;">Enter Dashboard</a>
+                        <a href="#/settings" class="btn btn--secondary" style="padding: 12px 16px;">⚙️</a>
                     </div>
                 </div>
 
-                <div class="card" style="border-left: 4px solid var(--color-accent);">
-                    <h2 class="serif" style="font-size: 24px; margin-bottom: 16px;">Placement Readiness Platform</h2>
-                    <p>Advanced readiness engine featuring JD analysis, heuristic skill extraction, and dynamic recruitment timeline mapping.</p>
-                    <div style="margin-top: 24px; display: flex; gap: 12px;">
-                        <a href="placement/index.html" class="btn btn--primary" style="background: #111;">Launch Platform</a>
-                        <button class="btn btn--secondary" onclick="alert('Analysis Engine: Active')">Status: Online</button>
+                <!-- Placement Platform Card -->
+                <div class="card" style="padding: 40px; display: flex; flex-direction: column; justify-content: space-between; border-top: 6px solid var(--color-accent); background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFF 100%);">
+                    <div>
+                        <div style="width: 48px; hieght: 48px; background: #EEF2FF; border-radius: 12px; display: flex; items-center; justify-content: center; margin-bottom: 24px;">
+                             <span style="font-size: 24px; color: var(--color-accent);">💎</span>
+                        </div>
+                        <h2 style="font-size: 28px; margin-bottom: 16px; color: var(--color-text);">Readiness Platform</h2>
+                        <p style="font-size: 15px; margin-bottom: 32px; line-height: 1.6;">Heuristic JD analyzer and interview architect. Generate professional preparation roadmaps and track technical mastery.</p>
+                    </div>
+                    <div style="display: flex; gap: 16px;">
+                        <a href="placement/index.html" class="btn btn--primary" style="flex: 1;">Launch Platform</a>
+                        <div class="status-badge" style="background: #EEF2FF; color: var(--color-accent); display: flex; align-items: center; justify-content: center;">V1.2 Active</div>
                     </div>
                 </div>
             </div>
         `,
-        panelHtml: `<div class="card"><h3>Strategic Portfolio</h3><p style="font-size: 14px; color: #666;">Multi-module command center for modern career growth. Select a flagship system to begin.</p></div>`
+        panelHtml: `
+            <div class="card" style="background: var(--color-text); color: white; border: none;">
+                <h3 style="color: white; margin-bottom: 12px;">Intelligence Suite</h3>
+                <p style="color: #94A3B8; font-size: 14px; margin-bottom: 24px;">Integrated command center for career acceleration. All systems functional.</p>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700;">
+                        <span>System Latency</span>
+                        <span style="color: var(--color-success);">24ms</span>
+                    </div>
+                    <div style="width: 100%; height: 4px; background: #334155; border-radius: 2px;">
+                        <div style="width: 98%; height: 100%; background: var(--color-success); border-radius: 2px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3 style="font-size: 16px; margin-bottom: 8px;">Active Session</h3>
+                <p style="font-size: 13px;">User: <strong>Harshith</strong></p>
+                <p style="font-size: 13px;">Role: <strong>Strategic Candidate</strong></p>
+            </div>
+        `
     };
 }
 

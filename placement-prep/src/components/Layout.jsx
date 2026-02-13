@@ -7,7 +7,8 @@ import {
     BookOpen,
     UserCircle,
     Menu,
-    X
+    X,
+    Home
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -45,8 +46,8 @@ export default function Layout() {
                                 key={item.name}
                                 to={item.path}
                                 className={`flex items-center p-4 rounded-2xl transition-all duration-300 ${isActive
-                                        ? 'bg-primary text-white shadow-xl shadow-primary/30 scale-[1.02]'
-                                        : 'text-slate-500 hover:bg-slate-50 hover:text-primary font-bold'
+                                    ? 'bg-primary text-white shadow-xl shadow-primary/30 scale-[1.02]'
+                                    : 'text-slate-500 hover:bg-slate-50 hover:text-primary font-bold'
                                     }`}
                             >
                                 <div className={`${isSidebarOpen ? 'mr-4' : 'mx-auto'}`}>
@@ -56,6 +57,16 @@ export default function Layout() {
                             </Link>
                         );
                     })}
+
+                    <a
+                        href="../index.html"
+                        className="flex items-center p-4 rounded-2xl transition-all duration-300 text-slate-400 hover:bg-slate-50 hover:text-slate-900 font-bold border-t border-slate-50 mt-4 pt-6"
+                    >
+                        <div className={`${isSidebarOpen ? 'mr-4' : 'mx-auto'}`}>
+                            <Home size={20} />
+                        </div>
+                        {isSidebarOpen && <span className="font-bold tracking-tight">Return to Hub</span>}
+                    </a>
                 </nav>
 
                 {isSidebarOpen && (
