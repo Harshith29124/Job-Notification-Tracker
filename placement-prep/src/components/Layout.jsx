@@ -3,6 +3,7 @@ import {
     LayoutDashboard,
     Code2,
     ClipboardCheck,
+    History,
     BookOpen,
     UserCircle,
     Menu,
@@ -13,7 +14,8 @@ import { useState } from 'react';
 const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Practice', path: '/practice', icon: Code2 },
-    { name: 'Assessments', path: '/assessments', icon: ClipboardCheck },
+    { name: 'Analyze JD', path: '/assessments', icon: ClipboardCheck },
+    { name: 'Archive', path: '/history', icon: History },
     { name: 'Resources', path: '/resources', icon: BookOpen },
     { name: 'Profile', path: '/profile', icon: UserCircle },
 ];
@@ -25,59 +27,71 @@ export default function Layout() {
     return (
         <div className="flex h-screen bg-slate-50">
             {/* Sidebar */}
-            <aside className={`bg-white border-r border-slate-200 transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
-                <div className="h-16 flex items-center px-6 border-bottom">
-                    <div className="bg-primary p-1.5 rounded-lg mr-3">
+            <aside className={`bg-white border-r border-slate-200 transition-all duration-300 ${isSidebarOpen ? 'w-72' : 'w-24'}`}>
+                <div className="h-20 flex items-center px-8 border-bottom">
+                    <div className="bg-primary p-2 rounded-xl mr-3 shadow-lg shadow-primary/20">
                         <div className="w-5 h-5 bg-white rounded-sm"></div>
                     </div>
-                    {isSidebarOpen && <span className="font-bold text-xl text-slate-800 tracking-tight">Placement Prep</span>}
+                    {isSidebarOpen && <span className="font-black text-xl text-slate-900 tracking-tight">Placement Prep</span>}
                 </div>
 
-                <nav className="mt-6 px-3 space-y-1">
+                <nav className="mt-6 px-4 space-y-2">
                     {navItems.map((item) => {
                         const Icon = item.icon;
-                        const isActive = location.pathname === item.path;
+                        const isActive = location.pathname === item.path || (item.path === '/assessments' && location.pathname === '/results');
 
                         return (
                             <Link
                                 key={item.name}
                                 to={item.path}
-                                className={`flex items-center p-3 rounded-xl transition-colors ${isActive
-                                        ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                                        : 'text-slate-600 hover:bg-primary/5 hover:text-primary'
+                                className={`flex items-center p-4 rounded-2xl transition-all duration-300 ${isActive
+                                        ? 'bg-primary text-white shadow-xl shadow-primary/30 scale-[1.02]'
+                                        : 'text-slate-500 hover:bg-slate-50 hover:text-primary font-bold'
                                     }`}
                             >
-                                <Icon size={20} className={isSidebarOpen ? 'mr-3' : ''} />
-                                {isSidebarOpen && <span className="font-medium">{item.name}</span>}
+                                <div className={`${isSidebarOpen ? 'mr-4' : 'mx-auto'}`}>
+                                    <Icon size={isActive ? 22 : 20} strokeWidth={isActive ? 2.5 : 2} />
+                                </div>
+                                {isSidebarOpen && <span className="font-bold tracking-tight">{item.name}</span>}
                             </Link>
                         );
                     })}
                 </nav>
+
+                {isSidebarOpen && (
+                    <div className="absolute bottom-10 left-8 right-8 p-6 bg-slate-900 rounded-[2rem] text-white">
+                        <h5 className="font-black text-sm mb-1 uppercase tracking-widest text-primary">Pro Status</h5>
+                        <p className="text-[10px] text-slate-400 font-bold leading-relaxed mb-4">Unlimited JD analyses and mock sessions enabled.</p>
+                        <div className="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+                            <div className="bg-primary h-full w-3/4"></div>
+                        </div>
+                    </div>
+                )}
             </aside>
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 {/* Header */}
-                <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
+                <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-10 sticky top-0 z-50">
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="p-2 hover:bg-slate-100 rounded-lg text-slate-600"
+                        className="p-3 hover:bg-slate-50 rounded-2xl text-slate-400 transition-colors border border-transparent hover:border-slate-100"
                     >
                         {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
                     </button>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-6">
                         <div className="text-right hidden sm:block">
-                            <p className="text-sm font-semibold text-slate-800">John Doe</p>
-                            <p className="text-xs text-slate-500">Student</p>
+                            <p className="text-sm font-black text-slate-900">Harshith</p>
+                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest underline decoration-primary decoration-2 underline-offset-4">Candidate</p>
                         </div>
-                        <div className="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm flex items-center justify-center text-slate-500 font-bold">
-                            JD
+                        <div className="w-12 h-12 rounded-2xl bg-slate-100 border-2 border-white shadow-sm flex items-center justify-center text-primary font-black text-lg overflow-hidden group cursor-pointer hover:border-primary/20 transition-all">
+                            H
                         </div>
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-y-auto p-8">
+                <main className="flex-1 overflow-y-auto p-10 bg-[#fbfbfb]">
                     <Outlet />
                 </main>
             </div>

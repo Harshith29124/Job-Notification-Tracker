@@ -6,6 +6,8 @@ import Practice from './pages/Practice';
 import Assessments from './pages/Assessments';
 import Resources from './pages/Resources';
 import Profile from './pages/Profile';
+import Results from './pages/Results';
+import History from './pages/History';
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/practice" element={<Practice />} />
           <Route path="/assessments" element={<Assessments />} />
+          <Route path="/results" element={<Results />} />
+          <Route path="/history" element={<History />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
