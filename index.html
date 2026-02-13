@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Notification Tracker - KodNest Premium</title>
-    <meta name="description" content="Track and manage job notifications with calm, intentional design">
+    <title>KodNest Premium Build System</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -15,44 +14,36 @@
 </head>
 
 <body>
-    <!-- Top Navigation Bar -->
-    <nav class="top-nav">
-        <div class="top-nav__container">
-            <div class="top-nav__brand">
-                <span class="top-nav__brand-text">KodNest</span>
+    <div class="layout">
+        <nav class="top-bar">
+            <div class="top-bar__project">KodNest Premium Build System</div>
+            <div class="top-bar__progress" id="app-progress">Step 1 / 8</div>
+            <div class="top-bar__status" id="app-status">
+                <span class="status-badge status--not-started">Not Started</span>
             </div>
+        </nav>
 
-            <!-- Desktop Navigation -->
-            <div class="top-nav__links">
-                <a href="#/" class="top-nav__link" data-route="/">Home</a>
-                <a href="#/dashboard" class="top-nav__link" data-route="/dashboard">Dashboard</a>
-                <a href="#/saved" class="top-nav__link" data-route="/saved">Saved</a>
-                <a href="#/digest" class="top-nav__link" data-route="/digest">Digest</a>
-                <a href="#/settings" class="top-nav__link" data-route="/settings">Settings</a>
-                <a href="#/proof" class="top-nav__link" data-route="/proof">Proof</a>
-            </div>
+        <header class="context-header" id="app-header">
+            <h1 class="context-header__title">Project Overview</h1>
+            <p class="context-header__subtitle">Strategic planning for the Job Notification Tracker.</p>
+        </header>
 
-            <!-- Mobile Menu Toggle -->
-            <button class="top-nav__toggle" aria-label="Toggle navigation menu">
-                <span class="top-nav__toggle-icon"></span>
-            </button>
-        </div>
+        <main class="main-content">
+            <section class="primary-workspace" id="app-workspace">
+                <!-- Content will be injected by router.js -->
+            </section>
 
-        <!-- Mobile Navigation -->
-        <div class="top-nav__mobile">
-            <a href="#/" class="top-nav__mobile-link" data-route="/">Home</a>
-            <a href="#/dashboard" class="top-nav__mobile-link" data-route="/dashboard">Dashboard</a>
-            <a href="#/saved" class="top-nav__mobile-link" data-route="/saved">Saved</a>
-            <a href="#/digest" class="top-nav__mobile-link" data-route="/digest">Digest</a>
-            <a href="#/settings" class="top-nav__mobile-link" data-route="/settings">Settings</a>
-            <a href="#/proof" class="top-nav__mobile-link" data-route="/proof">Proof</a>
-        </div>
-    </nav>
+            <aside class="secondary-panel" id="app-panel">
+                <!-- Global actions will be injected by router.js -->
+            </aside>
+        </main>
 
-    <!-- Main Content Area -->
-    <main class="app-main" id="app-content">
-        <!-- Content will be dynamically rendered here -->
-    </main>
+        <footer class="proof-footer" id="app-footer">
+            <!-- Proof checkpoints will be injected by router.js -->
+        </footer>
+    </div>
+
+    <div class="toast-container"></div>
 
     <script src="jobs-data.js"></script>
     <script src="router.js"></script>

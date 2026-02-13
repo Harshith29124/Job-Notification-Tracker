@@ -26,103 +26,145 @@ const routes = {
 };
 
 /**
+ * Storage Helpers
+ */
+const getPreferences = () => JSON.parse(localStorage.getItem('jobTrackerPreferences') || '{"roleKeywords":[],"minMatchScore":40}');
+const savePreferences = (p) => localStorage.setItem('jobTrackerPreferences', JSON.stringify(p));
+const getTestsPassed = () => JSON.parse(localStorage.getItem('jobTrackerTests') || '[]');
+const getSubmissionLinks = () => JSON.parse(localStorage.getItem('jobTrackerLinks') || '{"lovable":"","github":"","live":""}');
+const getJobStatus = (id) => JSON.parse(localStorage.getItem('jobTrackerStatus') || '{}')[id] || 'Not Applied';
+const getSavedJobs = () => JSON.parse(localStorage.getItem('savedJobs') || '[]');
+
+/**
+ * Global Actions
+ */
+window.setJobStatus = (id, status) => {
+    const s = JSON.parse(localStorage.getItem('jobTrackerStatus') || '{}');
+    s[id] = status;
+    localStorage.setItem('jobTrackerStatus', JSON.stringify(s));
+    showToast(`Status: ${status}`);
+    renderRoute();
+};
+
+window.toggleSaveJob = (id) => {
+    let s = getSavedJobs();
+    if (s.includes(id)) s = s.filter(x => x !== id); else s.push(id);
+    localStorage.setItem('savedJobs', JSON.stringify(s));
+    renderRoute();
+};
+
+window.setTestStatus = (id, checked) => {
+    let p = getTestsPassed();
+    if (checked) { if (!p.includes(id)) p.push(id); } else { p = p.filter(x => x !== id); }
+    localStorage.setItem('jobTrackerTests', JSON.stringify(p));
+    renderRoute();
+};
+
+window.saveSubmissionLink = (id, val) => {
+    const l = getSubmissionLinks();
+    l[id] = val;
+    localStorage.setItem('jobTrackerLinks', JSON.stringify(l));
+    renderRoute();
+};
+
+window.generateTodayDigest = () => {
+    const jobs = jobsData.map(j => ({ ...j, matchScore: calculateMatchScore(j) }));
+    const digest = jobs.sort((a, b) => b.matchScore - a.matchScore).slice(0, 10);
+    localStorage.setItem(`jobTrackerDigest_${new Date().toISOString().split('T')[0]}`, JSON.stringify(digest));
+    renderRoute();
+};
+
+/**
+ * Core Logic
+ */
+function calculateMatchScore(job) {
+    const p = getPreferences();
+    if (!p.roleKeywords.length) return 0;
+    let score = 0;
+    const tl = job.title.toLowerCase();
+    p.roleKeywords.forEach(kw => { if (tl.includes(kw.toLowerCase())) score += 25; });
+    return Math.min(score, 100);
+}
+
+function getFilteredJobs() {
+    let f = jobsData.map(j => ({ ...j, matchScore: calculateMatchScore(j), status: getJobStatus(j.id) }));
+    if (currentFilters.status) f = f.filter(j => j.status === currentFilters.status);
+    if (currentFilters.location) f = f.filter(j => j.location === currentFilters.location);
+    if (currentFilters.showOnlyMatches) f = f.filter(j => j.matchScore >= getPreferences().minMatchScore);
+    return f;
+}
+
+/**
  * Rendering Core
  */
 function renderRoute() {
     const path = window.location.hash.slice(1) || '/';
     const route = routes[path] || routes['/'];
 
-    // Update Document Meta
     document.title = `${route.title} - KodNest Premium`;
 
-    // Update Top Bar
-    const progress = document.getElementById('app-progress');
-    const statusContainer = document.getElementById('app-status');
-    if (progress) progress.textContent = `Step ${route.step} / 8`;
+    // Progress
+    document.getElementById('app-progress').textContent = `Step ${route.step} / 8`;
 
-    // Update Status Badge logic
+    // Status Badge
     const tests = getTestsPassed().length;
     const links = getSubmissionLinks();
     const isShipped = tests === 10 && links.lovable && links.github && links.live;
     const statusText = isShipped ? 'Shipped' : (tests > 0 ? 'In Progress' : 'Not Started');
     const statusClass = isShipped ? 'status--shipped' : (tests > 0 ? 'status--in-progress' : 'status--not-started');
+    document.getElementById('app-status').innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
 
-    if (statusContainer) {
-        statusContainer.innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
-    }
+    // Header
+    document.getElementById('app-header').innerHTML = `<h1 class="context-header__title">${route.title}</h1><p class="context-header__subtitle">${route.subtitle}</p>`;
 
-    // Update Header
-    const header = document.getElementById('app-header');
-    if (header) {
-        header.innerHTML = `
-            <h1 class="context-header__title">${route.title}</h1>
-            <p class="context-header__subtitle">${route.subtitle}</p>
-        `;
-    }
+    // Content
+    const { workspaceHtml, panelHtml } = route.content();
+    document.getElementById('app-workspace').innerHTML = workspaceHtml;
+    document.getElementById('app-panel').innerHTML = panelHtml;
 
-    // Update Workspace & Panel
-    const workspace = document.getElementById('app-workspace');
-    const panel = document.getElementById('app-panel');
-
-    if (workspace && panel) {
-        const { workspaceHtml, panelHtml } = route.content();
-        workspace.innerHTML = workspaceHtml;
-        panel.innerHTML = panelHtml;
-    }
-
-    // Update Footer
-    renderFooter();
-
-    // Re-initialize event listeners
-    initializeListeners();
-    window.scrollTo(0, 0);
-}
-
-function renderFooter() {
-    const footer = document.getElementById('app-footer');
-    const tests = getTestsPassed().length;
-    const links = getSubmissionLinks();
-
+    // Footer
     const items = [
         { label: 'UI Built', checked: true },
-        { label: 'Logic Working', checked: arePreferencesSet() },
+        { label: 'Logic Working', checked: getPreferences().roleKeywords.length > 0 },
         { label: 'Test Passed', checked: tests === 10 },
         { label: 'Deployed', checked: !!links.live }
     ];
+    document.getElementById('app-footer').innerHTML = items.map(i => `<div class="checklist-item">${i.checked ? '☑' : '□'} ${i.label}</div>`).join('');
 
-    if (footer) {
-        footer.innerHTML = items.map(i => `
-            <div class="checklist-item">${i.checked ? '☑' : '□'} ${i.label}</div>
-        `).join('');
+    // Nav Menu (In Workspace for Dash/Saved)
+    if (['/dashboard', '/saved', '/digest', '/settings', '/jt/proof'].includes(path)) {
+        const nav = `
+            <div class="card" style="padding: 12px; margin-bottom: 24px; display: flex; gap: 16px; font-size: 14px;">
+                <a href="#/" style="color: ${path === '/' ? 'var(--color-accent)' : 'inherit'}; text-decoration: none; font-weight: 500;">Home</a>
+                <a href="#/dashboard" style="color: ${path === '/dashboard' ? 'var(--color-accent)' : 'inherit'}; text-decoration: none; font-weight: 500;">Dashboard</a>
+                <a href="#/saved" style="color: ${path === '/saved' ? 'var(--color-accent)' : 'inherit'}; text-decoration: none; font-weight: 500;">Saved</a>
+                <a href="#/digest" style="color: ${path === '/digest' ? 'var(--color-accent)' : 'inherit'}; text-decoration: none; font-weight: 500;">Digest</a>
+                <a href="#/settings" style="color: ${path === '/settings' ? 'var(--color-accent)' : 'inherit'}; text-decoration: none; font-weight: 500;">Settings</a>
+                <a href="#/jt/proof" style="color: ${path === '/jt/proof' ? 'var(--color-accent)' : 'inherit'}; text-decoration: none; font-weight: 500;">Proof</a>
+            </div>
+        `;
+        document.getElementById('app-workspace').insertAdjacentHTML('afterbegin', nav);
     }
+
+    initializeListeners();
 }
 
 /**
- * Page Content Renderers
+ * Pages
  */
-
 function renderLandingPage() {
     return {
         workspaceHtml: `
             <div class="card">
-                <h2 class="serif" style="font-size: 24px; margin-bottom: 16px;">System Ready.</h2>
-                <p>The Job Notification Tracker is a precision B2C tool designed to automate career discovery. Use the build system to configure matching logic, verify functionality, and ship the final product.</p>
-                <div style="margin-top: 24px;">
-                    <a href="#/dashboard" class="btn btn--primary">Access Dashboard</a>
+                <h2 class="serif" style="font-size: 24px; margin-bottom: 16px;">KodNest Premium Build System</h2>
+                <p>Welcome to the project command center. The Job Notification Tracker is currently active in the build environment.</p>
+                <div style="margin-top: 24px; display: flex; gap: 12px;">
+                    <a href="#/dashboard" class="btn btn--primary">Access Workspace</a>
+                    <a href="#/settings" class="btn btn--secondary">Configure Logic</a>
                 </div>
             </div>
         `,
-        panelHtml: `
-            <div class="card">
-                <h3 class="serif" style="font-size: 18px; margin-bottom: 8px;">Step 1: Introduction</h3>
-                <p style="font-size: 14px; color: var(--color-text-secondary);">Initialize the project environment and review strategic objectives.</p>
-                <div class="prompt-box" style="margin-top: 16px;">Initialize KodNest Premium Build System...</div>
-                <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
-                    <button class="btn btn--secondary btn--small">Copy Objectives</button>
-                    <button class="btn btn--primary btn--small">Build in Lovable</button>
-                </div>
-            </div>
-        `
+        panelHtml: `<div class="card"><h3>Step 1: Planning</h3><p style="font-size: 14px; color: #666;">Initialize project and verify strategic objectives.</p></div>`
     };
 }
 
@@ -130,201 +172,119 @@ function renderDashboardPage() {
     const jobs = getFilteredJobs();
     return {
         workspaceHtml: `
-            <div class="dashboard-actions" style="margin-bottom: 24px;">
-                <label class="toggle-container">
-                    <span>Show only high-quality matches</span>
-                    <input type="checkbox" id="match-toggle" ${currentFilters.showOnlyMatches ? 'checked' : ''} onchange="toggleMatchFilter(this.checked)">
-                    <span class="toggle-switch"></span>
-                </label>
+            <div style="margin-bottom: 24px; display: flex; gap: 12px; align-items: center;">
+                <select id="filter-location" class="input" style="width: 200px;"><option value="">All Locations</option>${[...new Set(jobsData.map(j => j.location))].sort().map(l => `<option value="${l}" ${currentFilters.location === l ? 'selected' : ''}>${l}</option>`).join('')}</select>
+                <label style="font-size: 14px;"><input type="checkbox" onchange="window.toggleMatchFilter(this.checked)" ${currentFilters.showOnlyMatches ? 'checked' : ''}> High Quality Only</label>
             </div>
-            <div class="jobs-grid">
-                ${jobs.length ? jobs.map(j => renderJobCard(j)).join('') : '<div class="empty-state">No matching roles found.</div>'}
-            </div>
+            <div class="jobs-grid">${jobs.map(renderJobCard).join('')}</div>
         `,
-        panelHtml: `
-            <div class="card">
-                <h3 class="serif" style="font-size: 18px; margin-bottom: 8px;">Data Discovery</h3>
-                <p style="font-size: 14px; color: var(--color-text-secondary);">Filter and sort the live job feed to identify optimal tracking targets.</p>
-                <div style="margin-top: 16px;">
-                    <select id="filter-location" class="input" style="margin-bottom: 8px;">
-                        <option value="">All Locations</option>
-                        ${[...new Set(jobsData.map(j => j.location))].sort().map(l => `<option value="${l}" ${currentFilters.location === l ? 'selected' : ''}>${l}</option>`).join('')}
-                    </select>
-                    <select id="filter-status" class="input" style="margin-bottom: 8px;">
-                        <option value="">All Statuses</option>
-                        ${['Not Applied', 'Applied', 'Rejected', 'Selected'].map(s => `<option value="${s}" ${currentFilters.status === s ? 'selected' : ''}>${s}</option>`).join('')}
-                    </select>
-                </div>
-                <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
-                    <button class="btn btn--secondary btn--small" onclick="clearFilters()">Clear Filters</button>
-                    <button class="btn btn--secondary btn--small">Export Data</button>
-                </div>
-            </div>
-        `
+        panelHtml: `<div class="card"><h3>Live Data</h3><p style="font-size: 14px; color: #666;">Analyzing ${jobs.length} roles found in tracking network.</p></div>`
     };
 }
 
-// Helper for sub-components (re-used from previous system)
 function renderJobCard(job) {
-    const isSaved = JSON.parse(localStorage.getItem('savedJobs') || '[]').includes(job.id);
-    const scoreClass = job.matchScore >= 80 ? 'job-score--high' : (job.matchScore >= 60 ? 'job-score--mid' : 'job-score--neutral');
-    const statusClass = `status-badge--${job.status.toLowerCase().replace(' ', '-')}`;
+    const isSaved = getSavedJobs().includes(job.id);
+    const statusClass = `status--${job.status.toLowerCase().replace(' ', '-')}`;
     return `
         <div class="card" style="margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                <div>
-                    <h4 class="serif" style="font-size: 18px;">${job.title}</h4>
-                    <p style="font-size: 14px; color: var(--color-text-secondary);">${job.company} • ${job.location}</p>
-                </div>
-                <span class="status-badge" style="font-size: 10px; background: #EEE; color: #555;">${job.source}</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div><h4 class="serif">${job.title}</h4><p style="font-size: 14px; color: #666;">${job.company} • ${job.location}</p></div>
+                <span class="status-badge" style="background:#EEE;">${job.source}</span>
             </div>
-            <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
                 <span class="status-badge ${statusClass}" style="font-size: 10px;">${job.status}</span>
-                ${arePreferencesSet() ? `<span class="status-badge" style="font-size: 10px; background: #F0F4F8; color: #1E3A8A;">${job.matchScore}% Match</span>` : ''}
+                <span class="status-badge" style="font-size: 10px; background: #F0F4F8; color: #1E3A8A;">${job.matchScore || 0}% Match</span>
             </div>
-            <div class="status-selector" style="display: flex; gap: 4px; margin-bottom: 16px;">
-                ${['Applied', 'Rejected', 'Selected'].map(s => `
-                    <button class="btn btn--secondary" style="padding: 4px 8px; font-size: 11px; ${job.status === s ? 'background: #EEE;' : ''}" onclick="window.setJobStatus('${job.id}', '${s}')">${s}</button>
-                `).join('')}
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 12px; color: var(--color-text-secondary);">${job.postedDaysAgo === 0 ? 'Today' : job.postedDaysAgo + 'd ago'}</span>
+            <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 4px;">
+                    <button class="btn btn--secondary" style="padding: 4px 8px; font-size: 11px;" onclick="window.setJobStatus('${job.id}', 'Applied')">Applied</button>
+                    <button class="btn btn--secondary" style="padding: 4px 8px; font-size: 11px;" onclick="window.setJobStatus('${job.id}', 'Rejected')">Rejected</button>
+                </div>
                 <div style="display: flex; gap: 8px;">
-                    <button class="btn btn--secondary btn--small" onclick="toggleSaveJob('${job.id}')">${isSaved ? '❤️' : '🤍'}</button>
-                    <button class="btn btn--primary btn--small" onclick="window.open('${job.applyUrl}', '_blank')">Apply</button>
+                    <button class="btn btn--secondary btn--small" onclick="window.toggleSaveJob('${job.id}')">${isSaved ? '❤️' : '🤍'}</button>
+                    <button class="btn btn--primary btn--small" onclick="window.open('${job.applyUrl}','_blank')">Apply</button>
                 </div>
             </div>
         </div>
     `;
 }
 
-// Implementation for other route mocks (simplifying for brevity but keeping core logic)
-function renderSavedPage() {
-    return { workspaceHtml: '<div class="card">Curated bookmark list component goes here.</div>', panelHtml: '<div class="card">Panel metrics.</div>' };
-}
-function renderDigestPage() {
-    return { workspaceHtml: '<div class="card">Daily digest newsletter component goes here.</div>', panelHtml: '<div class="card">Digest settings.</div>' };
-}
 function renderSettingsPage() {
-    return { workspaceHtml: '<div class="card">Weighting parameters form.</div>', panelHtml: '<div class="card">Logic preview.</div>' };
-}
-function renderTestingPage() {
-    const passed = getTestsPassed();
+    const p = getPreferences();
     return {
         workspaceHtml: `
             <div class="card">
-                <div class="test-checklist">
-                    ${testItems.map(i => `
-                        <div class="test-item" style="padding: 12px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px;">
-                            <input type="checkbox" onchange="window.setTestStatus('${i.id}', this.checked)" ${passed.includes(i.id) ? 'checked' : ''}>
-                            <div><strong>${i.label}</strong><br><small style="color: #666;">${i.hint}</small></div>
-                        </div>
-                    `).join('')}
-                </div>
+                <div class="form-group" style="margin-bottom: 24px;"><label>Role Keywords</label><input type="text" id="pref-keywords" class="input" value="${p.roleKeywords.join(', ')}" placeholder="SDE, Frontend..."></div>
+                <div class="form-group"><label>Threshold: <span id="threshold-val">${p.minMatchScore}%</span></label><input type="range" id="pref-threshold" min="0" max="100" value="${p.minMatchScore}" oninput="document.getElementById('threshold-val').textContent=this.value+'%'"></div>
+                <button class="btn btn--primary" style="margin-top: 24px;" onclick="window.saveAllPrefs()">Save Configuration</button>
             </div>
         `,
-        panelHtml: `
-            <div class="card">
-                <h3 class="serif">QA Status</h3>
-                <p>${passed.length} / 10 passed.</p>
-                <button class="btn btn--primary btn--small" style="width: 100%; margin-top: 16px;" onclick="window.location.hash='#/jt/08-ship'">Continue to Ship</button>
-            </div>
-        `
+        panelHtml: `<div class="card"><h3>Logic Controls</h3><p style="font-size: 14px; color: #666;">Adjusting these parameters re-calculates the match engine instantaneously.</p></div>`
     };
 }
+
+function renderTestingPage() {
+    const passed = getTestsPassed();
+    const items = [{ id: 't1', l: 'Persistence' }, { id: 't2', l: 'Matching' }, { id: 't3', l: 'Filtering' }, { id: 't4', l: 'Saving' }, { id: 't5', l: 'Linking' }];
+    return {
+        workspaceHtml: `<div class="card">${items.map(i => `<div style="padding:12px; border-bottom:1px solid #EEE;"><input type="checkbox" onchange="window.setTestStatus('${i.id}', this.checked)" ${passed.includes(i.id) ? 'checked' : ''}> ${i.l}</div>`).join('')}</div>`,
+        panelHtml: `<div class="card"><h3>QA Check</h3><p>${passed.length} / 5 passed.</p><a href="#/jt/08-ship" class="btn btn--primary btn--small" style="width: 100%; margin-top: 16px;">Next: Ship</a></div>`
+    };
+}
+
 function renderShipPage() {
-    return { workspaceHtml: '<div class="card">Ready to deploy.</div>', panelHtml: '<div class="card">Deployment logs.</div>' };
+    return { workspaceHtml: `<div class="card"><h2>Application Ready for Production.</h2><p>Click below to finalize project evidence.</p><a href="#/jt/proof" class="btn btn--primary" style="margin-top:16px;">Go to Proof</a></div>`, panelHtml: `<div class="card"><h3>Ready</h3></div>` };
 }
+
 function renderProofPage() {
-    return { workspaceHtml: '<div class="card">Final artifact collection.</div>', panelHtml: '<div class="card">Download submission.</div>' };
+    const links = getSubmissionLinks();
+    return {
+        workspaceHtml: `
+            <div class="card">
+                <div class="form-group" style="margin-bottom:16px;"><label>GitHub URL</label><input type="url" class="input" value="${links.github}" onchange="window.saveSubmissionLink('github', this.value)"></div>
+                <div class="form-group" style="margin-bottom:16px;"><label>Live URL</label><input type="url" class="input" value="${links.live}" onchange="window.saveSubmissionLink('live', this.value)"></div>
+                <button class="btn btn--primary" style="margin-top:16px;" onclick="window.copySubmission()">Copy Final Submission</button>
+            </div>
+        `,
+        panelHtml: `<div class="card"><h3>Final Steps</h3><p style="font-size:14px; color:#666;">Provide project artifacts to complete shipment.</p></div>`
+    };
 }
 
+function renderSavedPage() { return { workspaceHtml: `<div class="card"><h3>Strategic Bookmarks</h3><div class="jobs-grid">${getFilteredJobs().filter(j => getSavedJobs().includes(j.id)).map(renderJobCard).join('')}</div></div>`, panelHtml: `<div class="card"><h3>Saved</h3></div>` }; }
+function renderDigestPage() { return { workspaceHtml: `<div class="card"><h3>Automated Intelligence</h3><p>Newsletter simulation goes here.</p><button class="btn btn--primary" onclick="window.generateTodayDigest()">Generate Digest</button></div>`, panelHtml: `<div class="card"><h3>9AM Trigger</h3></div>` }; }
+
 /**
- * Global Helpers & State Management (preserved from old router)
+ * Global Interactivity
  */
-function getTestsPassed() { return JSON.parse(localStorage.getItem('jobTrackerTests') || '[]'); }
-function setTestStatus(id, checked) {
-    let p = getTestsPassed();
-    if (checked) { if (!p.includes(id)) p.push(id); } else { p = p.filter(x => x !== id); }
-    localStorage.setItem('jobTrackerTests', JSON.stringify(p));
+window.saveAllPrefs = () => {
+    const k = document.getElementById('pref-keywords').value.split(',').map(s => s.trim()).filter(s => s);
+    const t = parseInt(document.getElementById('pref-threshold').value);
+    savePreferences({ roleKeywords: k, minMatchScore: t });
+    showToast("Preferences Saved");
     renderRoute();
-}
-window.setTestStatus = setTestStatus;
+};
 
-function getSubmissionLinks() { return JSON.parse(localStorage.getItem('jobTrackerLinks') || '{"lovable":"","github":"","live":""}'); }
-function arePreferencesSet() {
-    const prefs = JSON.parse(localStorage.getItem('jobTrackerPreferences') || '{}');
-    return (prefs.roleKeywords && prefs.roleKeywords.length > 0);
-}
+window.toggleMatchFilter = (val) => { currentFilters.showOnlyMatches = val; renderRoute(); };
 
-function getJobStatus(jobId) {
-    const statuses = JSON.parse(localStorage.getItem('jobTrackerStatus') || '{}');
-    return statuses[jobId] || 'Not Applied';
-}
+window.copySubmission = () => {
+    const l = getSubmissionLinks();
+    const txt = `Job Notification Tracker — Final Submission\n\nGitHub: ${l.github}\nLive: ${l.live}\n\nProcessed with KodNest Premium Build System.`;
+    navigator.clipboard.writeText(txt).then(() => showToast("Copied!"));
+};
 
-function setJobStatus(jobId, status) {
-    const s = JSON.parse(localStorage.getItem('jobTrackerStatus') || '{}');
-    s[jobId] = status;
-    localStorage.setItem('jobTrackerStatus', JSON.stringify(s));
-    renderRoute();
+function showToast(msg) {
+    const t = document.createElement('div');
+    t.style = "position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #111; color: #FFF; padding: 10px 20px; border-radius: 4px; font-size: 14px; z-index: 1000;";
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => document.body.removeChild(t), 2000);
 }
-window.setJobStatus = setJobStatus;
-
-function toggleSaveJob(id) {
-    let s = JSON.parse(localStorage.getItem('savedJobs') || '[]');
-    if (s.includes(id)) s = s.filter(x => x !== id); else s.push(id);
-    localStorage.setItem('savedJobs', JSON.stringify(s));
-    renderRoute();
-}
-window.toggleSaveJob = toggleSaveJob;
-
-function calculateMatchScore(job) {
-    // simplified mock or real logic
-    const prefs = JSON.parse(localStorage.getItem('jobTrackerPreferences') || '{"roleKeywords":[]}');
-    if (!prefs.roleKeywords || prefs.roleKeywords.length === 0) return 0;
-    return 85;
-}
-
-function getFilteredJobs() {
-    return jobsData.map(j => ({ ...j, matchScore: calculateMatchScore(j), status: getJobStatus(j.id) }));
-}
-
-function toggleMatchFilter(val) {
-    currentFilters.showOnlyMatches = val;
-    renderRoute();
-}
-
-function clearFilters() {
-    currentFilters = { keyword: '', location: '', mode: '', experience: '', source: '', sort: 'latest', showOnlyMatches: false, status: '' };
-    renderRoute();
-}
-
-const testItems = [
-    { id: 't1', label: 'Preferences persist', hint: 'Check refresh.' },
-    { id: 't2', label: 'Match score', hint: 'Check math.' },
-    { id: 't3', label: 'Toggle works', hint: 'Check visibility.' },
-    { id: 't4', label: 'Save works', hint: 'Check persistence.' },
-    { id: 't5', label: 'Apply opens tab', hint: 'External check.' },
-    { id: 't6', label: 'Status persists', hint: 'Color check.' },
-    { id: 't7', label: 'Status filter', hint: 'Data check.' },
-    { id: 't8', label: 'Digest top 10', hint: 'Sorting check.' },
-    { id: 't9', label: 'Digest persistence', hint: 'Daily check.' },
-    { id: 't10', label: 'No console errors', hint: 'F12 check.' }
-];
 
 /**
- * Initialization
+ * Init
  */
 function initializeListeners() {
-    // Re-attach listeners for dynamic inputs
-    document.getElementById('filter-location')?.addEventListener('change', e => {
-        currentFilters.location = e.target.value;
-        renderRoute();
-    });
-    document.getElementById('filter-status')?.addEventListener('change', e => {
-        currentFilters.status = e.target.value;
-        renderRoute();
-    });
+    document.getElementById('filter-location')?.addEventListener('change', e => { currentFilters.location = e.target.value; renderRoute(); });
 }
 
 window.addEventListener('hashchange', renderRoute);
