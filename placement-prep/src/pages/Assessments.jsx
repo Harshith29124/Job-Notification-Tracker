@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardCheck, Sparkles, Building2, UserCircle2, Send, AlertCircle } from 'lucide-react';
 import { analyzeJD, saveToHistory } from '../utils/analysisEngine';

@@ -135,7 +135,7 @@ export function analyzeJD(company, role, jdText) {
 
     // 6) Build Final Entry
     return {
-        id: Date.now(),
+        id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         company: company || "",
@@ -168,7 +168,7 @@ export function saveToHistory(analysis) {
 
 export function updateAnalysis(id, updates) {
     const history = getHistory();
-    const index = history.findIndex(a => a.id === Number(id));
+    const index = history.findIndex(a => String(a.id) === String(id));
     if (index !== -1) {
         const entry = { ...history[index], ...updates };
 
@@ -212,7 +212,7 @@ export function getHistory() {
 }
 
 export function getAnalysisById(id) {
-    return getHistory().find(a => a.id === Number(id));
+    return getHistory().find(a => String(a.id) === String(id));
 }
 
 export function getLastAnalysis() {

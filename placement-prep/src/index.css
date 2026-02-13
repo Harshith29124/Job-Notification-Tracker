@@ -57,6 +57,6 @@
   }
 
   .card-premium {
-    @apply bg-white border border-border p-10 rounded-none shadow-none;
+    @apply bg-white border border-border p-10 rounded shadow-none;
   }
 }
