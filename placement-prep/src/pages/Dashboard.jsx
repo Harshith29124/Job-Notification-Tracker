@@ -4,7 +4,6 @@ import {
     RadarChart,
     PolarGrid,
     PolarAngleAxis,
-    PolarRadiusAxis,
     ResponsiveContainer
 } from 'recharts';
 import {
@@ -12,8 +11,7 @@ import {
     ChevronRight,
     BookOpen,
     CheckCircle2,
-    History,
-    AlertCircle
+    History
 } from 'lucide-react';
 
 const skillData = [
@@ -35,124 +33,89 @@ const goals = [
 ];
 
 const assessments = [
-    { title: "DSA Mock Test", time: "Tomorrow, 10:00 AM", color: "bg-indigo-500" },
-    { title: "System Design Review", time: "Wed, 2:00 PM", color: "bg-purple-500" },
-    { title: "HR Interview Prep", time: "Friday, 11:00 AM", color: "bg-pink-500" },
+    { title: "DSA Mock Test", time: "Tomorrow, 10:00 AM" },
+    { title: "System Design Review", time: "Wed, 2:00 PM" },
+    { title: "HR Interview Prep", time: "Friday, 11:00 AM" },
 ];
 
 export default function Dashboard() {
     return (
-        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
-            <header>
-                <h1 className="text-3xl font-black text-technical-slate tracking-tight">Readiness Dashboard</h1>
-                <p className="text-slate-500 font-medium">Your preparation roadmap at a glance.</p>
-            </header>
-
+        <div className="space-y-8">
             {/* Main Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 gap-8">
 
-                {/* Readiness Circular Highlight */}
-                <Card title="Overall Readiness">
-                    <div className="flex flex-col items-center justify-center py-6">
-                        <div className="relative w-48 h-48">
-                            <svg className="w-full h-full -rotate-90">
-                                <circle
-                                    cx="96"
-                                    cy="96"
-                                    r="88"
-                                    className="stroke-bone-darker fill-none stroke-[12]"
-                                />
-                                <circle
-                                    cx="96"
-                                    cy="96"
-                                    r="88"
-                                    style={{
-                                        strokeDasharray: 553,
-                                        strokeDashoffset: 553 - (72 / 100) * 553,
-                                    }}
-                                    className="stroke-primary fill-none stroke-[12] stroke-round transition-all duration-1000 ease-out"
-                                />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-5xl font-black text-technical-slate">72</span>
-                                <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">Score</span>
-                            </div>
-                        </div>
-                        <p className="mt-6 text-slate-600 font-semibold">Readiness Score</p>
-                    </div>
-                </Card>
-
-                {/* Skill Breakdown Radar Chart */}
-                <Card title="Skill Breakdown">
-                    <div className="h-[320px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={skillData}>
-                                <PolarGrid stroke="#D4D2CC" />
-                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} />
-                                <Radar
-                                    name="Skills"
-                                    dataKey="value"
-                                    stroke="#8B0000"
-                                    fill="#8B0000"
-                                    fillOpacity={0.4}
-                                />
-                            </RadarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </Card>
-
-                {/* Practice and Goals Row */}
-                <div className="grid grid-cols-1 gap-8">
-                    {/* Continue Practice */}
-                    <Card title="Continue Practice">
-                        <div className="flex items-center gap-6">
-                            <div className="bg-primary/5 p-4 rounded-3xl">
-                                <BookOpen size={32} className="text-primary" />
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="text-xl font-bold text-technical-slate">Dynamic Programming</h3>
-                                <p className="text-slate-500 text-sm mb-4">Mastering optimal substructure and memoization.</p>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm font-bold">
-                                        <span className="text-slate-600">Progress</span>
-                                        <span className="text-primary">3/10 Completed</span>
-                                    </div>
-                                    <div className="w-full bg-bone-darker rounded-full h-2">
-                                        <div className="bg-primary h-2 rounded-full transition-all duration-500" style={{ width: '30%' }}></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button className="bg-technical-slate text-white p-3 rounded-2xl hover:bg-slate-800 transition-colors">
-                                <ChevronRight size={24} />
-                            </button>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Readiness Highlight */}
+                    <Card title="Overall Readiness">
+                        <div className="flex flex-col items-center justify-center py-6">
+                            <div className="text-[64px] font-serif font-black text-accent leading-none">72</div>
+                            <div className="text-[12px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-2">Current Stability Score</div>
+                            <p className="mt-6 text-slate-500 text-center text-sm font-medium italic">"Your profile demonstrates strong CS fundamentals with minor gaps in System Design."</p>
                         </div>
                     </Card>
 
-                    {/* Weekly Goals */}
+                    {/* Skill Breakdown Radar Chart */}
+                    <Card title="Skill Breakdown">
+                        <div className="h-[280px] w-full mt-4">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={skillData}>
+                                    <PolarGrid stroke="#D4D2CC" />
+                                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#111111', fontSize: 11, fontWeight: 700 }} />
+                                    <Radar
+                                        name="Skills"
+                                        dataKey="value"
+                                        stroke="#8B0000"
+                                        fill="#8B0000"
+                                        fillOpacity={0.1}
+                                    />
+                                </RadarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </Card>
+                </div>
+
+                {/* Practice and Goals */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <Card title="Continue Practice">
+                        <div className="flex items-start gap-6">
+                            <div className="bg-background p-4 rounded border border-border">
+                                <BookOpen size={24} className="text-accent" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-[18px] font-bold text-text-primary mb-1">Dynamic Programming</h3>
+                                <p className="text-slate-500 text-sm mb-4">Mastering optimal substructure and memoization.</p>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between text-[11px] font-black uppercase tracking-widest">
+                                        <span className="text-slate-400">Step 3 of 10</span>
+                                        <span className="text-accent">30% Complete</span>
+                                    </div>
+                                    <div className="w-full bg-background rounded-none h-1.5 border border-border">
+                                        <div className="bg-accent h-full transition-all duration-500" style={{ width: '30%' }}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+
                     <Card title="Weekly Goals">
                         <div className="space-y-6">
                             <div className="flex items-end justify-between">
                                 <div>
-                                    <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Consistency</p>
-                                    <h3 className="text-2xl font-black text-technical-slate">12/20 Problems</h3>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Consistency Metric</p>
+                                    <h3 className="text-[24px] font-serif font-black text-text-primary">12/20 Problems</h3>
                                 </div>
-                                <div className="text-right">
-                                    <p className="text-sm font-bold text-success uppercase tracking-wider">On Track</p>
+                                <div className="text-[11px] font-black text-success uppercase tracking-widest border border-success/20 px-2 py-1 rounded">
+                                    On Track
                                 </div>
                             </div>
 
-                            <div className="w-full bg-bone-darker rounded-full h-3">
-                                <div className="bg-success h-3 rounded-full transition-all duration-700" style={{ width: '60%' }}></div>
-                            </div>
-
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-between items-center bg-background p-4 border border-border">
                                 {goals.map((g) => (
                                     <div key={g.day} className="flex flex-col items-center gap-2">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${g.active ? 'bg-success text-white shadow-lg shadow-success/20 scale-110' : 'bg-bone-darker text-slate-400'
-                                            }`}>
-                                            {g.active ? <CheckCircle2 size={16} /> : <div className="w-1 h-1 rounded-full bg-slate-300"></div>}
+                                        <div className={`w-8 h-8 rounded border flex items-center justify-center transition-all ${g.active ? 'bg-success text-white border-success' : 'bg-white border-border text-slate-300'}`}>
+                                            {g.active ? <CheckCircle2 size={14} /> : <div className="w-1 h-1 rounded-full bg-slate-300"></div>}
                                         </div>
-                                        <span className={`text-xs font-bold ${g.active ? 'text-technical-slate' : 'text-slate-400'}`}>{g.day}</span>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest ${g.active ? 'text-text-primary' : 'text-slate-400'}`}>{g.day}</span>
                                     </div>
                                 ))}
                             </div>
@@ -160,31 +123,26 @@ export default function Dashboard() {
                     </Card>
                 </div>
 
-                {/* Upcoming Assessments List */}
+                {/* Upcoming Assessments */}
                 <Card title="Upcoming Assessments">
-                    <div className="space-y-4">
+                    <div className="divide-y divide-border">
                         {assessments.map((a, idx) => (
-                            <div key={idx} className="group flex items-center justify-between p-4 rounded-2xl border border-technical-border hover:border-primary/20 hover:bg-primary/5 transition-all cursor-pointer">
+                            <div key={idx} className="flex items-center justify-between py-4 first:pt-0 last:pb-0 group">
                                 <div className="flex items-center gap-4">
-                                    <div className={`w-12 h-12 rounded-2xl bg-technical-slate flex items-center justify-center text-white shadow-lg transition-transform group-hover:scale-110`}>
-                                        <Calendar size={20} />
+                                    <div className="w-10 h-10 rounded bg-background border border-border flex items-center justify-center text-slate-400 group-hover:text-accent group-hover:border-accent/30 transition-all">
+                                        <Calendar size={18} />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-technical-slate group-hover:text-primary transition-colors">{a.title}</h4>
-                                        <div className="flex items-center gap-2 text-slate-500 text-sm font-medium">
-                                            <History size={14} />
+                                        <h4 className="font-bold text-text-primary text-[15px]">{a.title}</h4>
+                                        <div className="flex items-center gap-2 text-slate-400 text-[12px] font-medium uppercase tracking-tight">
+                                            <History size={12} />
                                             {a.time}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="bg-white p-2 rounded-xl text-slate-300 group-hover:text-primary border border-technical-border group-hover:border-primary/20 shadow-sm transition-all">
-                                    <ChevronRight size={18} />
-                                </div>
+                                <button className="btn btn-secondary !px-4 !py-2 !text-[12px]">Initialize</button>
                             </div>
                         ))}
-                        <button className="w-full py-4 text-slate-500 font-bold hover:text-primary hover:bg-bone rounded-2xl transition-all flex items-center justify-center gap-2 mt-4 text-sm uppercase tracking-widest border border-dashed border-technical-border">
-                            View Full Schedule
-                        </button>
                     </div>
                 </Card>
 
@@ -195,12 +153,11 @@ export default function Dashboard() {
 
 function Card({ title, children }) {
     return (
-        <div className="bg-white rounded-[2rem] border border-technical-border p-8 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden relative group">
-            <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/5 group-hover:bg-primary transition-colors"></div>
-            <h2 className="text-xl font-black text-technical-slate mb-8 flex items-center gap-3">
-                <div className="w-1.5 h-6 bg-primary rounded-full"></div>
-                {title}
-            </h2>
+        <div className="bg-white border border-border p-8 rounded shadow-none relative transition-all">
+            <div className="flex items-center gap-3 mb-8">
+                <div className="w-1 h-5 bg-accent"></div>
+                <h2 className="text-[18px] font-serif font-bold text-text-primary tracking-tight">{title}</h2>
+            </div>
             {children}
         </div>
     );

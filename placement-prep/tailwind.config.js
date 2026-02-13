@@ -7,26 +7,23 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: {
-                    DEFAULT: "#8B0000",
-                    foreground: "#FFFFFF",
-                },
-                bone: {
-                    DEFAULT: "#F7F6F3",
-                    darker: "#EBEAE6",
-                },
-                success: {
-                    DEFAULT: "#2D5016",
-                    soft: "#EAF1E6",
-                },
-                warning: {
-                    DEFAULT: "#8B6914",
-                    soft: "#F9F4E5",
-                },
-                technical: {
-                    slate: "#111111",
-                    border: "#D4D2CC",
-                }
+                background: "#F7F6F3",
+                "text-primary": "#111111",
+                accent: "#8B0000",
+                success: "#2D5016",
+                warning: "#8B6914",
+                border: "#D4D2CC",
+            },
+            fontFamily: {
+                serif: ['"Crimson Pro"', 'serif'],
+                sans: ['Inter', 'sans-serif'],
+            },
+            borderRadius: {
+                DEFAULT: '4px',
+                'none': '0',
+            },
+            boxShadow: {
+                none: 'none',
             },
         },
     },

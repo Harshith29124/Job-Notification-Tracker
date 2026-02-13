@@ -3,12 +3,60 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --primary: #8B0000;
-    --primary-foreground: #FFFFFF;
+  body {
+    @apply bg-background text-text-primary font-sans;
+    line-height: 1.7;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif font-semibold;
+    line-height: 1.2;
+  }
+
+  .heading-xl {
+    @apply text-[48px] font-serif font-bold leading-[1.2];
+  }
+
+  .heading-lg {
+    @apply text-[32px] font-serif font-bold leading-[1.2];
+  }
+
+  .heading-md {
+    @apply text-[24px] font-serif font-bold leading-[1.2];
+  }
+
+  .body-text {
+    @apply text-[16px] leading-[1.6] max-w-[720px];
+  }
+
+  .body-text-sm {
+    @apply text-[14px] leading-[1.6];
   }
 }
 
-body {
-  @apply bg-bone text-technical-slate;
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 text-[14px] font-bold transition-all duration-150 ease-in-out border rounded;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-white border-transparent hover:brightness-90;
+  }
+
+  .btn-secondary {
+    @apply bg-white border-border text-text-primary hover:bg-background;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-white border border-border rounded focus:outline-none focus:border-text-primary transition-colors;
+  }
+
+  .card-premium {
+    @apply bg-white border border-border p-10 rounded-none shadow-none;
+  }
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { analyzeJD, saveToHistory } from '../utils/analysisEngine';
-import { ClipboardCheck, Building2, UserCircle2, FileText, Send, Info } from 'lucide-react';
+import { FileText, Building2, UserCircle2, Send, Info } from 'lucide-react';
 
 export default function Assessments() {
     const [company, setCompany] = useState('');
@@ -18,7 +18,6 @@ export default function Assessments() {
 
         setIsAnalyzing(true);
 
-        // Simulate thinking
         setTimeout(() => {
             const result = analyzeJD(company, role, jdText);
             saveToHistory(result);
@@ -28,95 +27,75 @@ export default function Assessments() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <header>
-                <h1 className="text-3xl font-black text-technical-slate tracking-tight flex items-center gap-3">
-                    <div className="bg-primary/10 p-2 rounded-xl text-primary">
-                        <ClipboardCheck size={28} />
-                    </div>
-                    Readiness Analyzer
-                </h1>
-                <p className="text-slate-500 font-medium">Analyze your JD to generate a personalized recruitment roadmap.</p>
-            </header>
-
-            <div className="bg-white rounded-[2rem] border border-technical-border p-10 shadow-sm relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-all duration-700">
-                    <ClipboardCheck size={120} className="text-primary" />
-                </div>
-
-                <form onSubmit={handleAnalyze} className="space-y-8 relative z-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <Building2 size={14} /> Company Name (Optional)
+        <div className="space-y-10">
+            <div className="bg-white border border-border p-10 rounded shadow-none">
+                <form onSubmit={handleAnalyze} className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-3">
+                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                <Building2 size={13} /> Target Company
                             </label>
                             <input
                                 type="text"
                                 value={company}
                                 onChange={(e) => setCompany(e.target.value)}
-                                className="w-full bg-bone border border-technical-border rounded-2xl p-4 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-technical-slate placeholder:text-slate-300"
-                                placeholder="Google, Amazon, TCS..."
+                                className="input-field font-bold"
+                                placeholder="e.g. Google, Stripe, or TCS"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <UserCircle2 size={14} /> Job Role (Optional)
+                        <div className="space-y-3">
+                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                <UserCircle2 size={13} /> Specific Role
                             </label>
                             <input
                                 type="text"
                                 value={role}
                                 onChange={(e) => setRole(e.target.value)}
-                                className="w-full bg-bone border border-technical-border rounded-2xl p-4 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-technical-slate placeholder:text-slate-300"
-                                placeholder="Software Engineer, SDE-1..."
+                                className="input-field font-bold"
+                                placeholder="e.g. Software Engineer"
                             />
                         </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         <div className="flex justify-between items-center">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <FileText size={14} /> Job Description
+                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                <FileText size={13} /> Job Description Payload
                             </label>
                             {isJdTooShort && (
-                                <span className="text-[10px] font-black text-warning uppercase tracking-widest animate-pulse">
-                                    Calm Warning: Input too short
+                                <span className="text-[10px] font-black text-warning uppercase tracking-widest">
+                                    Capacity Warning: Insufficient Data
                                 </span>
                             )}
                         </div>
                         <textarea
                             value={jdText}
                             onChange={(e) => setJdText(e.target.value)}
-                            className={`w-full bg-bone border ${isJdTooShort ? 'border-warning/30' : 'border-technical-border'} rounded-[2rem] p-8 min-h-[300px] focus:ring-4 ${isJdTooShort ? 'focus:ring-warning/10 focus:border-warning' : 'focus:ring-primary/10 focus:border-primary'} outline-none transition-all resize-none font-medium leading-relaxed text-technical-slate`}
-                            placeholder="Paste the full job description here..."
+                            className={`w-full bg-background border ${isJdTooShort ? 'border-warning/50' : 'border-border'} rounded p-8 min-h-[300px] focus:outline-none focus:border-text-primary transition-all resize-none font-medium leading-[1.8] text-text-primary text-[15px]`}
+                            placeholder="Paste the complete job description text here for extraction..."
                             required
                         />
-                        {isJdTooShort ? (
-                            <p className="text-[11px] text-warning font-bold italic">
-                                This JD is too short to analyze deeply. Paste full JD for better output.
-                            </p>
-                        ) : (
-                            <p className="text-xs text-slate-400 font-bold italic">Heuristic analysis for skills, tech stack, and core CS fundamentals.</p>
-                        )}
+                        <p className="text-[12px] text-slate-400 font-medium italic">Diagnostic suite will extract tech stack, domain requirements, and recruitment logic.</p>
                     </div>
 
-                    <div className="pt-4">
+                    <div className="pt-6 border-t border-border flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-slate-400 text-[11px] font-black uppercase tracking-widest">
+                            <Info size={14} /> Strict Schema Mode Active
+                        </div>
                         <button
                             type="submit"
                             disabled={isAnalyzing || !jdText.trim()}
-                            className={`w-full py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 transition-all ${isAnalyzing
-                                ? 'bg-primary/20 text-primary cursor-wait'
-                                : 'bg-primary text-white hover:bg-primary/90 hover:scale-[1.01] shadow-xl shadow-primary/25 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed'
-                                }`}
+                            className={`btn btn-primary min-w-[280px] h-[56px] text-[15px] ${isAnalyzing ? 'opacity-70 cursor-wait' : ''}`}
                         >
                             {isAnalyzing ? (
-                                <>
-                                    <div className="w-5 h-5 border-2 border-primary border-t-white rounded-full animate-spin"></div>
-                                    Running Diagnostics...
-                                </>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    Extracting Intelligence...
+                                </div>
                             ) : (
                                 <>
-                                    <Send size={20} />
-                                    {jdText.trim() ? 'Initialize Intelligence Suite' : 'Paste JD to Begin'}
+                                    <Send size={18} className="mr-2" />
+                                    {jdText.trim() ? 'Initialize Strategy Generation' : 'Awaiting Payload'}
                                 </>
                             )}
                         </button>
@@ -124,10 +103,10 @@ export default function Assessments() {
                 </form>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Tip icon="✨" title="Mention Tech" text="Explicitly naming libraries like React or AWS improves our question generation." />
-                <Tip icon="📊" title="Length Matters" text="Longer JDs (>800 chars) allow for more detailed readiness scoring." />
-                <Tip icon="🔍" title="History Saved" text="All your analyses are encrypted and stored locally in your browser." />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <Tip icon="01" title="Tech Extraction" text="Mentioning specific libraries like React or SQL improves diagnostic accuracy." />
+                <Tip icon="02" title="Length Protocol" text="JDs exceeding 800 characters allow for deeper recruitment flow mapping." />
+                <Tip icon="03" title="Local Persistence" text="All extracted intelligence is stored locally in your browser's secure context." />
             </div>
         </div>
     );
@@ -135,12 +114,12 @@ export default function Assessments() {
 
 function Tip({ icon, title, text }) {
     return (
-        <div className="bg-white/50 border border-technical-border rounded-2xl p-6">
-            <div className="flex items-center gap-2 mb-2">
-                <span>{icon}</span>
-                <h4 className="font-bold text-slate-800 text-sm tracking-tight">{title}</h4>
+        <div className="bg-white border border-border rounded p-6">
+            <div className="flex items-center gap-3 mb-3">
+                <span className="text-[14px] font-black text-accent">{icon}</span>
+                <h4 className="font-bold text-text-primary text-[14px] uppercase tracking-tight">{title}</h4>
             </div>
-            <p className="text-xs text-slate-500 font-medium leading-relaxed">{text}</p>
+            <p className="text-[13px] text-slate-500 font-medium leading-[1.6]">{text}</p>
         </div>
     );
 }

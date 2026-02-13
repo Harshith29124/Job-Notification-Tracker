@@ -7,15 +7,13 @@ import {
     Target,
     Sparkles,
     ArrowLeft,
-    ChevronRight,
     Circle,
     Copy,
     Download,
     Check,
     Building2,
-    Truck,
-    Info,
-    Layout
+    Layout,
+    ArrowRight
 } from 'lucide-react';
 
 export default function Results() {
@@ -40,7 +38,6 @@ export default function Results() {
         const newConf = currentConf === 'know' ? 'practice' : 'know';
         const newMap = { ...data.skillConfidenceMap, [skill]: newConf };
 
-        // Pass to engine to calculate finalScore based on stability rules
         const updatedData = updateAnalysis(data.id, { skillConfidenceMap: newMap });
         if (updatedData) setData(updatedData);
     };
@@ -59,20 +56,7 @@ export default function Results() {
             .map(([cat, skills]) => `${cat.toUpperCase()}: ${skills.join(', ')}`)
             .join('\n');
 
-        const content = `
-ANALYSIS RESULT: ${data.role} at ${data.company}
-READINESS SCORE: ${data.finalScore}/100
-DATE: ${new Date(data.createdAt).toLocaleDateString()}
-
-SKILLS DETECTED:
-${skillsContent}
-
-RECRUITMENT PIPELINE:
-${data.roundMapping?.map((r, i) => `Round ${i + 1}: ${r.roundTitle} (${r.focusAreas.join(', ')})`).join('\n')}
-
-7-DAY ACTION PLAN:
-${data.plan7Days.map(p => `${p.day} (${p.focus}):\n - ${p.tasks.join('\n - ')}`).join('\n\n')}
-        `.trim();
+        const content = `ANALYSIS RESULT: ${data.role} at ${data.company}\nREADINESS SCORE: ${data.finalScore}/100\nDATE: ${new Date(data.createdAt).toLocaleDateString()}\n\nSKILLS DETECTED:\n${skillsContent}\n\nRECRUITMENT PIPELINE:\n${data.roundMapping?.map((r, i) => `Round ${i + 1}: ${r.roundTitle} (${r.focusAreas.join(', ')})`).join('\n')}\n\n7-DAY ACTION PLAN:\n${data.plan7Days.map(p => `${p.day} (${p.focus}):\n - ${p.tasks.join('\n - ')}`).join('\n\n')}`;
         const blob = new Blob([content], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a'); a.href = url; a.download = `prep-plan-${data.id}.txt`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
@@ -81,196 +65,113 @@ ${data.plan7Days.map(p => `${p.day} (${p.focus}):\n - ${p.tasks.join('\n - ')}`)
     if (!data) return null;
 
     return (
-        <div className="max-w-7xl mx-auto space-y-10 pb-20 animate-in fade-in duration-700">
-            <header className="flex items-center justify-between">
-                <button onClick={() => navigate('/assessments')} className="flex items-center gap-2 text-slate-500 hover:text-primary font-bold transition-colors">
-                    <ArrowLeft size={20} /> New Analysis
+        <div className="space-y-12 pb-20">
+            <header className="flex items-center justify-between border-b border-border pb-6">
+                <button onClick={() => navigate('/assessments')} className="flex items-center gap-2 text-slate-500 hover:text-accent font-bold text-sm uppercase tracking-widest transition-colors">
+                    <ArrowLeft size={16} /> New Analysis
                 </button>
                 <div className="flex gap-4">
-                    <button onClick={handleDownload} className="flex items-center gap-2 px-6 py-3 bg-white border border-technical-border rounded-2xl text-slate-500 hover:text-primary hover:border-primary/20 transition-all font-bold group">
-                        <Download size={20} className="group-hover:-translate-y-1 transition-transform" /> Download Plan
+                    <button onClick={handleDownload} className="btn btn-secondary !py-2 !px-5 flex items-center gap-2">
+                        <Download size={16} /> Export Data
                     </button>
                 </div>
             </header>
 
-            <section className="bg-primary text-white rounded-[2.5rem] p-12 relative overflow-hidden shadow-2xl shadow-primary/30">
-                <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12 scale-150"><Sparkles size={200} /></div>
-                <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
-                    <div className="relative w-48 h-48 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 flex-shrink-0 text-center">
-                        <div>
-                            <span className="text-6xl font-black block leading-none">{data.finalScore}</span>
-                            <span className="text-sm font-bold opacity-80 uppercase tracking-widest">Score</span>
-                        </div>
-                        <svg className="absolute inset-0 -rotate-90">
-                            <circle cx="96" cy="96" r="90" className="stroke-white/10 fill-none stroke-[6]" />
-                            <circle cx="96" cy="96" r="90" style={{ strokeDasharray: 565, strokeDashoffset: 565 - (data.finalScore / 100) * 565, transition: 'stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} className="stroke-white fill-none stroke-[6] stroke-round" />
-                        </svg>
-                    </div>
-                    <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                            <p className="text-white/70 font-bold uppercase tracking-[0.2em] text-xs">Strategy Report</p>
-                            <span className="bg-white/10 px-2 py-0.5 rounded text-[10px] font-black uppercase">v2.0 Harden</span>
-                        </div>
-                        <h1 className="text-4xl md:text-5xl font-black mb-3">{data.role || 'Strategic Candidate'}</h1>
-                        <p className="text-2xl font-medium text-white/90">at {data.company || 'Market Network Enterprise'}</p>
-                    </div>
-                    <div className="flex flex-col gap-3">
-                        <ExportButton icon={copyStatus.raw ? <Check size={18} /> : <Copy size={18} />} label="Copy Brief" onClick={() => handleCopy('raw', `Preparing for ${data.role} at ${data.company}`)} />
-                    </div>
+            {/* Score Highlight - Calm Version */}
+            <div className="bg-white border border-border p-12 rounded relative overflow-hidden flex flex-col md:flex-row items-center gap-12">
+                <div className="flex-shrink-0 text-center space-y-2">
+                    <div className="text-[72px] font-serif font-black text-accent leading-none">{data.finalScore}</div>
+                    <div className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Readiness Index</div>
                 </div>
-            </section>
+                <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-3">
+                        <h2 className="text-[32px] font-serif font-bold text-text-primary leading-tight">{data.role}</h2>
+                        <span className="bg-background border border-border px-3 py-1 rounded text-[10px] font-black uppercase text-slate-400 tracking-widest">Target Configuration</span>
+                    </div>
+                    <p className="text-[20px] font-medium text-slate-500 italic">Candidate at {data.company}</p>
+                </div>
+                <button onClick={() => handleCopy('raw', `Preparing for ${data.role} at ${data.company}`)} className="btn btn-secondary !py-2 !px-4 text-[12px]">
+                    {copyStatus.raw ? <Check size={14} className="mr-2" /> : <Copy size={14} className="mr-2" />}
+                    {copyStatus.raw ? 'Copied' : 'Copy Brief'}
+                </button>
+            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div className="lg:col-span-2 space-y-10">
-
-                    {/* Round Mapping Engine */}
-                    <Section icon={<Layout className="text-primary" />} title="Recruitment Flow Architect">
-                        <div className="relative ml-4 border-l-2 border-technical-border/30 pl-8 space-y-10 py-4">
-                            {data.roundMapping?.map((round, idx) => (
-                                <div key={idx} className="relative group">
-                                    <div className="absolute -left-[41px] top-0 w-4 h-4 rounded-full bg-white border-4 border-primary shadow-sm group-hover:scale-125 transition-transform z-10"></div>
-                                    <div className="bg-white border border-technical-border p-8 rounded-[2rem] group-hover:border-primary/20 transition-all">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <h4 className="font-black text-technical-slate text-lg">Round {idx + 1}: {round.roundTitle}</h4>
-                                            <div className="flex gap-2 text-white">
-                                                {round.focusAreas.map(f => (
-                                                    <span key={f} className="bg-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20">{f}</span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Why this round matters</p>
-                                            <p className="text-sm text-slate-600 font-bold leading-relaxed italic">"{round.whyItMatters}"</p>
-                                        </div>
+            {/* Main Sections */}
+            <div className="space-y-12">
+                <Section icon={<Layout size={20} className="text-accent" />} title="Recruitment Flow Architect">
+                    <div className="space-y-6">
+                        {data.roundMapping?.map((round, idx) => (
+                            <div key={idx} className="bg-background border border-border p-8 rounded group hover:border-accent/30 transition-all">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h4 className="font-bold text-text-primary text-[18px]">Round {idx + 1}: {round.roundTitle}</h4>
+                                    <div className="flex gap-2">
+                                        {round.focusAreas.map(f => (
+                                            <span key={f} className="bg-white border border-border px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest text-slate-500">{f}</span>
+                                        ))}
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    </Section>
+                                <p className="text-[14px] text-slate-500 font-medium leading-[1.7] italic">"{round.whyItMatters}"</p>
+                            </div>
+                        ))}
+                    </div>
+                </Section>
 
-                    <Section icon={<CheckCircle2 className="text-primary" />} title="Strategic Checklist">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {data.checklist?.map((check, idx) => (
-                                <div key={idx} className="bg-bone border border-technical-border p-6 rounded-3xl hover:border-primary/20 transition-all group">
-                                    <h4 className="text-sm font-black text-technical-slate mb-4 uppercase tracking-tighter flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
-                                        {check.roundTitle}
-                                    </h4>
-                                    <ul className="space-y-3">
-                                        {check.items.map((item, i) => (
-                                            <li key={i} className="flex items-center gap-2 text-xs font-bold text-slate-500 group-hover:text-slate-700 transition-colors">
-                                                <div className="w-4 h-4 rounded border border-technical-border flex items-center justify-center flex-shrink-0 bg-white">
-                                                    <Check size={10} className="text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                </div>
-                                                {item}
+                <Section icon={<Target size={20} className="text-accent" />} title="Skill Assessment Matrix">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        {Object.entries(data.extractedSkills).map(([cat, skills]) => skills.length > 0 && (
+                            <div key={cat} className="space-y-4">
+                                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-border pb-2">{cat}</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {skills.map(s => {
+                                        const isKnown = data.skillConfidenceMap?.[s] === 'know';
+                                        return (
+                                            <button
+                                                key={s}
+                                                onClick={() => handleToggleSkill(s)}
+                                                className={`px-4 py-2 rounded text-[13px] font-bold transition-all border ${isKnown ? 'bg-success text-white border-success' : 'bg-white border-border text-slate-500 hover:border-accent/40'}`}
+                                            >
+                                                {isKnown && <Check size={12} className="inline mr-2" />}
+                                                {s}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </Section>
+
+                <Section icon={<Calendar size={20} className="text-accent" />} title="Strategic Roadmap">
+                    <div className="space-y-6">
+                        {data.plan7Days.map((p, idx) => (
+                            <div key={idx} className="flex gap-8 group">
+                                <div className="flex-shrink-0 w-24">
+                                    <div className="bg-background border border-border rounded p-4 text-center">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase block tracking-widest">{p.day.split(' ')[0]}</span>
+                                        <span className="text-[20px] font-serif font-black text-accent">{p.day.split(' ')[1]}</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1 space-y-4">
+                                    <h4 className="text-[18px] font-bold text-text-primary tracking-tight">{p.focus}</h4>
+                                    <ul className="grid grid-cols-1 gap-3">
+                                        {p.tasks.map((t, ti) => (
+                                            <li key={ti} className="flex items-center gap-3 text-[14px] font-medium text-slate-500 bg-background/50 p-4 border border-border rounded">
+                                                <div className="w-1 h-1 bg-accent rounded-full"></div>
+                                                {t}
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
-                            ))}
-                        </div>
-                    </Section>
-
-                    <Section icon={<Target className="text-primary" />} title="Skill Assessment Matrix">
-                        <div className="space-y-8">
-                            {Object.entries(data.extractedSkills).map(([cat, skills]) => skills.length > 0 && (
-                                <div key={cat}>
-                                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">{cat}</h4>
-                                    <div className="flex flex-wrap gap-3">
-                                        {skills.map(s => {
-                                            const isKnown = data.skillConfidenceMap?.[s] === 'know';
-                                            return (
-                                                <button key={s} onClick={() => handleToggleSkill(s)} className={`px-5 py-2.5 rounded-full font-bold text-sm transition-all border flex items-center gap-2 ${isKnown ? 'bg-success-soft border-success/20 text-success shadow-sm' : 'bg-white border-technical-border text-slate-500 hover:border-primary/30 hover:text-primary'}`}>
-                                                    {isKnown ? <Check size={14} /> : <Circle size={4} fill="currentColor" className="opacity-30" />}
-                                                    {s}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </Section>
-                    <Section icon={<Calendar className="text-primary" />} title="Preparation Roadmap">
-                        <div className="space-y-6">
-                            {data.plan7Days.map((p, idx) => (
-                                <div key={idx} className="flex gap-6 group">
-                                    <div className="flex-shrink-0 w-24">
-                                        <div className="bg-bone border border-technical-border rounded-xl p-3 text-center group-hover:bg-primary/5 group-hover:border-primary/20 transition-all">
-                                            <span className="text-[10px] font-black text-slate-400 uppercase block tracking-widest">{p.day.split(' ')[0]}</span>
-                                            <span className="text-lg font-black text-primary">{p.day.split(' ')[1]}</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex-1 space-y-3">
-                                        <h4 className="text-lg font-black text-technical-slate">{p.focus}</h4>
-                                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            {p.tasks.map((t, ti) => (
-                                                <li key={ti} className="flex items-center gap-3 text-sm font-bold text-slate-600 bg-bone/50 p-4 rounded-2xl border border-technical-border group-hover:bg-white transition-all">
-                                                    <CheckCircle2 size={16} className="text-success" />
-                                                    {t}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </Section>
-                </div>
-
-                <div className="space-y-10">
-                    <div className="bg-white rounded-[2rem] border border-technical-border p-8 shadow-sm">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="p-2 bg-primary/10 text-primary rounded-xl"><Building2 size={24} /></div>
-                            <h3 className="text-xl font-black text-technical-slate tracking-tight">Company Intel</h3>
-                        </div>
-                        <div className="space-y-6">
-                            <div>
-                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Industry & Tier</h4>
-                                <div className="flex items-center gap-2">
-                                    <span className="font-bold text-technical-slate">{data.companyIntel?.industry || "Tech Services"}</span>
-                                    <span className="bg-bone text-slate-500 px-2 py-0.5 rounded text-[10px] font-black border border-technical-border">{data.companyIntel?.sizeCategory || "Startup"}</span>
-                                </div>
                             </div>
-                            <div className="bg-bone p-6 rounded-2xl border border-technical-border">
-                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Hiring Philosophy</h4>
-                                <p className="text-sm font-bold text-slate-600 leading-relaxed">{data.companyIntel?.hiringFocus}</p>
-                            </div>
-                        </div>
+                        ))}
                     </div>
+                </Section>
+            </div>
 
-                    <div className="bg-white rounded-[2rem] border border-technical-border p-8 shadow-sm">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="p-2 bg-primary/10 text-primary rounded-xl"><Target size={24} /></div>
-                            <h3 className="text-xl font-black text-technical-slate tracking-tight">Focus Tactics</h3>
-                        </div>
-                        <div className="space-y-4">
-                            {data.plan7Days.slice(0, 2).map((p, i) => (
-                                <div key={i} className="bg-bone p-6 rounded-2xl border border-technical-border">
-                                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">{p.day}: {p.focus}</h4>
-                                    <ul className="space-y-2">
-                                        {p.tasks.slice(0, 2).map((t, ti) => (
-                                            <li key={ti} className="text-xs font-bold text-slate-600 flex items-center gap-2">
-                                                <div className="w-1 h-1 bg-primary rounded-full"></div> {t}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="mt-8 pt-8 border-t border-technical-border flex items-start gap-2 italic">
-                            <Info size={14} className="text-slate-300 mt-1 flex-shrink-0" />
-                            <p className="text-[10px] text-slate-400 font-medium">Scores only update when skills are toggled as "Known".</p>
-                        </div>
-                    </div>
-
-                    <div className="bg-technical-slate rounded-[2.5rem] p-10 text-white relative overflow-hidden group">
-                        <h3 className="text-2xl font-black mb-6 relative z-10 text-primary italic uppercase tracking-tighter">Action Next</h3>
-                        <p className="text-slate-400 text-sm mb-10 leading-relaxed relative z-10">Strategy recommendation:<br /><span className="text-white font-black italic">"Begin your {data.plan7Days[0]?.focus} sprint immediately."</span></p>
-                        <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="w-full py-5 bg-primary rounded-2xl font-bold flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all relative z-10 shadow-xl shadow-primary/20 text-white">Begin Prep Sprint <ChevronRight size={18} /></button>
-                        <div className="absolute -bottom-10 -right-10 opacity-5 group-hover:scale-110 transition-transform"><Target size={150} /></div>
-                    </div>
-                </div>
+            <div className="pt-10 border-t border-border flex justify-center">
+                <button onClick={() => navigate('/practice')} className="btn btn-primary min-w-[320px] h-[64px] text-[16px] uppercase tracking-widest">
+                    Begin Skill Simulation <ArrowRight size={18} className="ml-3" />
+                </button>
             </div>
         </div>
     );
@@ -278,19 +179,12 @@ ${data.plan7Days.map(p => `${p.day} (${p.focus}):\n - ${p.tasks.join('\n - ')}`)
 
 function Section({ icon, title, children }) {
     return (
-        <div className="bg-white rounded-[2rem] border border-technical-border p-10 shadow-sm relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/5 group-hover:bg-primary transition-colors"></div>
-            <div className="flex items-center gap-4 mb-10">
-                <div className="p-3 bg-bone rounded-2xl group-hover:scale-110 transition-transform duration-500 border border-technical-border">{icon}</div>
-                <h2 className="text-2xl font-black text-technical-slate tracking-tight">{title}</h2>
+        <div className="space-y-8">
+            <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded bg-background border border-border flex items-center justify-center">{icon}</div>
+                <h2 className="heading-md uppercase tracking-tight">{title}</h2>
             </div>
-            {children}
+            <div>{children}</div>
         </div>
-    );
-}
-
-function ExportButton({ icon, label, onClick, active }) {
-    return (
-        <button onClick={onClick} className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-bold text-sm transition-all border backdrop-blur-sm ${active ? 'bg-success border-success-soft text-white' : 'bg-white/10 border-white/10 text-white hover:bg-white/20'}`}>{icon} {active ? 'Copied' : label}</button>
     );
 }
