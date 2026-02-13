@@ -8,6 +8,8 @@ import Resources from './pages/Resources';
 import Profile from './pages/Profile';
 import Results from './pages/Results';
 import History from './pages/History';
+import TestChecklist from './pages/TestChecklist';
+import ShipReady from './pages/ShipReady';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <Route path="/history" element={<History />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/test-checklist" element={<TestChecklist />} />
+          <Route path="/shipping-verification" element={<ShipReady />} />
         </Route>
       </Routes>
     </Router>

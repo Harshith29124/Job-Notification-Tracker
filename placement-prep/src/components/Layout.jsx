@@ -8,7 +8,9 @@ import {
     UserCircle,
     Menu,
     X,
-    Home
+    Home,
+    ShieldCheck,
+    Truck
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -19,6 +21,8 @@ const navItems = [
     { name: 'Archive', path: '/history', icon: History },
     { name: 'Resources', path: '/resources', icon: BookOpen },
     { name: 'Profile', path: '/profile', icon: UserCircle },
+    { name: 'Test Center', path: '/test-checklist', icon: ShieldCheck },
+    { name: 'Verify Ship', path: '/shipping-verification', icon: Truck },
 ];
 
 export default function Layout() {
