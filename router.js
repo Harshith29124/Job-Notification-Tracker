@@ -207,7 +207,7 @@ function renderJobCard(job) {
                 <span>Posted ${job.postedDaysAgo === 0 ? 'Today' : (job.postedDaysAgo === 1 ? '1 day ago' : job.postedDaysAgo + ' days ago')}</span>
                 <div class="job-card__actions">
                     <button class="btn btn--small btn--secondary" onclick="openJobModal('${job.id}')">View</button>
-                    <button class="btn btn--small ${isSaved ? 'btn--saved' : 'btn--secondary'}" onclick="toggleSaveJob('${job.id}')">${isSaved ? '❤️' : '🤍'}</button>
+                    <button class="btn btn--small btn--secondary" onclick="toggleSaveJob('${job.id}')">${isSaved ? '❤️' : '🤍'}</button>
                     <button class="btn btn--small btn--primary" onclick="window.open('${job.applyUrl}', '_blank')">Apply</button>
                 </div>
             </div>
@@ -330,6 +330,10 @@ function renderTestingPage() {
                 <div class="test-progress"><div class="test-progress__score">Passed: ${passed.length}/10</div></div>
                 <div class="test-checklist">${testItems.map(i => `<div class="test-item"><input type="checkbox" onchange="setTestStatus('${i.id}', this.checked)" ${passed.includes(i.id) ? 'checked' : ''}><div><strong>${i.label}</strong><br><small>${i.hint}</small></div></div>`).join('')}</div>
             </div>
+            <div style="text-align: center; margin-top: 24px;">
+                <button class="btn btn--secondary" onclick="resetTestStatus()">Reset Test Status</button>
+                <a href="#/jt/08-ship" class="btn btn--primary">Proceed to Ship</a>
+            </div>
         </div>
     `;
 }
@@ -342,31 +346,74 @@ function renderShipPage() {
 function renderProofPage() {
     const tests = getTestsPassed().length;
     const links = getSubmissionLinks();
-    const isShipped = tests === 10 && links.lovable && links.github && links.live;
+    const isValidUrl = (url) => { try { new URL(url); return true; } catch { return false; } };
+    const isShipped = tests === 10 && isValidUrl(links.lovable) && isValidUrl(links.github) && isValidUrl(links.live);
     const status = isShipped ? 'shipped' : (tests > 0 ? 'in-progress' : 'not-started');
     const steps = ["Environment Setup", "Data Integration", "Filter Logic", "Matching Engine", "Preferences System", "Daily Digest", "Status Tracker", "Quality Review"];
 
     return `
         <div class="page-container proof-page">
-            <div class="page-header"><h1>Proof & Submission</h1><span class="submission-status-badge status-badge--${status}">${status.replace('-', ' ')}</span></div>
+            <div class="page-header">
+                <h1 class="page-header__title">Project 1 — Job Notification Tracker</h1>
+                <span class="submission-status-badge status-badge--${status}">${status.replace('-', ' ')}</span>
+            </div>
+
             <div class="proof-summary-card">
                 <h3>Step completion Summary</h3>
-                <div class="step-summary">${steps.map((st, i) => `<div class="step-indicator ${i < 7 || tests === 10 ? 'step-indicator--completed' : 'step-indicator--pending'}">Step ${i + 1}: ${st}</div>`).join('')}</div>
+                <div class="step-summary">
+                    ${steps.map((st, i) => `<div class="step-indicator ${i < 7 || tests === 10 ? 'step-indicator--completed' : 'step-indicator--pending'}">Step ${i + 1}: ${st}</div>`).join('')}
+                </div>
+
                 <h3>Artifact Collection</h3>
-                <div class="form-group"><label>Lovable Project Link</label><input type="url" class="form-input" onchange="saveSubmissionLink('lovable', this.value)" value="${links.lovable}"></div>
-                <div class="form-group"><label>GitHub Repository Link</label><input type="url" class="form-input" onchange="saveSubmissionLink('github', this.value)" value="${links.github}"></div>
-                <div class="form-group"><label>Live Deployment URL</label><input type="url" class="form-input" onchange="saveSubmissionLink('live', this.value)" value="${links.live}"></div>
-                <div style="margin-top: 24px;"><button class="btn btn--primary" onclick="copyFinalSubmission()">Copy Submission</button></div>
+                <div class="form-section">
+                    <div class="form-group">
+                        <label>Lovable Project Link</label>
+                        <input type="url" class="form-input" onchange="saveSubmissionLink('lovable', this.value)" value="${links.lovable}" placeholder="https://lovable.dev/...">
+                        <span class="input-feedback">Please enter a valid URL</span>
+                    </div>
+                    <div class="form-group">
+                        <label>GitHub Repository Link</label>
+                        <input type="url" class="form-input" onchange="saveSubmissionLink('github', this.value)" value="${links.github}" placeholder="https://github.com/...">
+                        <span class="input-feedback">Please enter a valid URL</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Live Deployment URL (Vercel/Equivalent)</label>
+                        <input type="url" class="form-input" onchange="saveSubmissionLink('live', this.value)" value="${links.live}" placeholder="https://...vercel.app">
+                        <span class="input-feedback">Please enter a valid URL</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 32px; display: flex; gap: 16px;">
+                    <button class="btn btn--primary" onclick="copyFinalSubmission()">Copy Final Submission</button>
+                    <button class="btn btn--secondary" onclick="alert('Artifacts saved locally.')">Save Links</button>
+                </div>
+
                 ${isShipped ? `<div class="ship-confirmation">Project 1 Shipped Successfully.</div>` : ''}
             </div>
+            <p style="text-align: center; font-size: 11px; color: var(--color-text-secondary);">Demo Mode: Proof & Submission Simulation.</p>
         </div>
     `;
 }
 
 function copyFinalSubmission() {
     const links = getSubmissionLinks();
-    const text = `Job Notification Tracker — Final Submission\n\nGitHub Repository: ${links.github}\nLive Deployment: ${links.live}\n\nFeatures: Match scoring, Daily digest, Status tracking, Test checklist.`;
-    navigator.clipboard.writeText(text).then(() => showToast("Copied!"));
+    const text = `Job Notification Tracker — Final Submission
+
+Lovable Project:
+${links.lovable || 'N/A'}
+
+GitHub Repository:
+${links.github || 'N/A'}
+
+Live Deployment:
+${links.live || 'N/A'}
+
+Core Features:
+- Intelligent match scoring
+- Daily digest simulation
+- Status tracking
+- Test checklist enforced`;
+    navigator.clipboard.writeText(text).then(() => showToast("Final submission copied to clipboard."));
 }
 window.copyFinalSubmission = copyFinalSubmission;
 
@@ -379,7 +426,29 @@ function openJobModal(id) {
     const score = calculateMatchScore(j);
     const modal = document.createElement('div');
     modal.className = 'job-modal';
-    modal.innerHTML = `<div class="job-modal__overlay" onclick="closeJobModal()"></div><div class="job-modal__content"><h2>${j.title} ${arePreferencesSet() ? `(${score}%)` : ''}</h2><p>${j.company}</p><p>${j.description}</p><button class="btn btn--primary" onclick="window.open('${j.applyUrl}', '_blank')">Apply</button></div>`;
+    modal.innerHTML = `
+        <div class="job-modal__overlay" onclick="closeJobModal()"></div>
+        <div class="job-modal__content">
+            <button class="job-modal__close" onclick="closeJobModal()">&times;</button>
+            <div class="job-modal__header">
+                <h2>${j.title} ${arePreferencesSet() ? `<span class="job-score" style="font-size: 14px; position: static; transform: none;">${score}% Match</span>` : ''}</h2>
+                <p>${j.company}</p>
+            </div>
+            <div class="job-modal__meta"><span>📍 ${j.location}</span><span>💼 ${j.mode}</span><span>💰 ${j.salaryRange}</span></div>
+            <div class="job-modal__section">
+                <h3>Description</h3>
+                <p>${j.description}</p>
+            </div>
+            <div class="job-modal__section">
+                <h3>Skills</h3>
+                <div class="job-skills">${j.skills.map(s => `<span class="job-skill">${s}</span>`).join('')}</div>
+            </div>
+            <div class="job-modal__actions">
+                <button class="btn btn--primary" onclick="window.open('${j.applyUrl}', '_blank')">Apply Now</button>
+                <button class="btn btn--secondary" onclick="closeJobModal()">Close</button>
+            </div>
+        </div>
+    `;
     document.body.appendChild(modal);
     currentJobModal = modal;
     document.body.style.overflow = 'hidden';
@@ -398,10 +467,11 @@ function navigateTo(path) { window.location.hash = path; }
 function renderRoute() {
     const path = window.location.hash.slice(1) || '/';
     const route = routes[path] || routes['/'];
-    document.title = route.title;
+    document.title = route.title + " - KodNest Premium";
     const content = document.getElementById('app-content');
     if (content) content.innerHTML = route.render();
     initializeListeners();
+    window.scrollTo(0, 0);
 }
 
 function initializeListeners() {
@@ -411,13 +481,12 @@ function initializeListeners() {
         document.getElementById('filter-keyword')?.addEventListener('input', e => { currentFilters.keyword = e.target.value; renderDashboardContent(); });
         document.getElementById('match-toggle')?.addEventListener('change', e => { currentFilters.showOnlyMatches = e.target.checked; renderDashboardContent(); });
     }
-    if (path === '/settings') document.getElementById('prefs-form')?.addEventListener('submit', handlePrefsSubmit);
 }
 
 function renderDashboardContent() {
     const jobs = getFilteredJobs();
     const grid = document.querySelector('.jobs-grid');
-    if (grid) grid.innerHTML = jobs.map(j => renderJobCard(j)).join('');
+    if (grid) grid.innerHTML = jobs.length ? jobs.map(j => renderJobCard(j)).join('') : '<div class="empty-state">No jobs found matching your criteria.</div>';
 }
 
 window.addEventListener('hashchange', renderRoute);
