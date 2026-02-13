@@ -110,7 +110,7 @@ export default function Results() {
                                 <div className="flex items-center justify-between mb-4">
                                     <h4 className="font-bold text-text-primary text-[18px]">Round {idx + 1}: {round.roundTitle}</h4>
                                     <div className="flex gap-2">
-                                        {round.focusAreas.map(f => (
+                                        {round.focusAreas?.map(f => (
                                             <span key={f} className="bg-white border border-border px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest text-slate-500">{f}</span>
                                         ))}
                                     </div>
@@ -148,18 +148,18 @@ export default function Results() {
 
                 <Section icon={<Calendar size={20} className="text-accent" />} title="Strategic Roadmap">
                     <div className="space-y-6">
-                        {data.plan7Days.map((p, idx) => (
+                        {data.plan7Days?.map((p, idx) => (
                             <div key={idx} className="flex gap-8 group">
                                 <div className="flex-shrink-0 w-24">
                                     <div className="bg-background border border-border rounded p-4 text-center">
-                                        <span className="text-[10px] font-black text-slate-400 uppercase block tracking-widest">{p.day.split(' ')[0]}</span>
-                                        <span className="text-[20px] font-serif font-black text-accent">{p.day.split(' ')[1]}</span>
+                                        <span className="text-[10px] font-black text-slate-400 uppercase block tracking-widest">{p.day?.split(' ')[0]}</span>
+                                        <span className="text-[20px] font-serif font-black text-accent">{p.day?.split(' ')[1]}</span>
                                     </div>
                                 </div>
                                 <div className="flex-1 space-y-4">
                                     <h4 className="text-[18px] font-bold text-text-primary tracking-tight">{p.focus}</h4>
                                     <ul className="grid grid-cols-1 gap-3">
-                                        {p.tasks.map((t, ti) => (
+                                        {p.tasks?.map((t, ti) => (
                                             <li key={ti} className="flex items-center gap-3 text-[14px] font-medium text-slate-500 bg-background/50 p-4 border border-border rounded">
                                                 <div className="w-1 h-1 bg-accent rounded-full"></div>
                                                 {t}
@@ -169,6 +169,9 @@ export default function Results() {
                                 </div>
                             </div>
                         ))}
+                        {(!data.plan7Days || data.plan7Days.length === 0) && (
+                            <div className="text-slate-400 font-serif italic py-10">No roadmap artifacts found for this diagnostic entry.</div>
+                        )}
                     </div>
                 </Section>
             </div>

@@ -135,7 +135,7 @@ export function analyzeJD(company, role, jdText) {
 
     // 6) Build Final Entry
     return {
-        id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+        id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         company: company || "",

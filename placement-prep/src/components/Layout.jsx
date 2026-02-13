@@ -26,8 +26,14 @@ export default function Layout() {
 
     useEffect(() => {
         const syncStatus = () => {
-            const saved = localStorage.getItem('prp_proof_footer');
-            if (saved) setQaStatus(JSON.parse(saved));
+            try {
+                const saved = localStorage.getItem('prp_proof_footer');
+                if (saved && saved !== 'undefined') {
+                    setQaStatus(JSON.parse(saved));
+                }
+            } catch (e) {
+                console.error("Layout Sync Failure:", e);
+            }
         };
 
         window.addEventListener('storage', syncStatus);
