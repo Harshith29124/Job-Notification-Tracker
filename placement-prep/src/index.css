@@ -5,11 +5,9 @@
 @layer base {
   :root {
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-
-    /* Global Platinum Palette Sync */
     --color-bg: hsla(220, 20%, 97%, 1);
     --color-surface: hsla(0, 0%, 100%, 1);
-    --color-text-main: hsla(230, 45%, 8%, 1);
+    --color-text-primary: hsla(230, 45%, 8%, 1);
     --color-text-sub: hsla(230, 15%, 35%, 1);
     --color-accent: hsla(350, 85%, 40%, 1);
     --color-success: hsla(155, 75%, 38%, 1);
@@ -26,42 +24,45 @@
   h1,
   h2,
   h3,
-  h4,
-  h5,
-  h6 {
+  h4 {
     @apply font-serif font-black tracking-tight;
-    line-height: 1.1;
+    line-height: 1.15;
     letter-spacing: -0.02em;
   }
 
-  /* Fluid Typography - Platinum Scale */
   .heading-xl {
-    font-size: clamp(2.5rem, 8vw, 6rem);
+    font-size: clamp(2rem, 8vw, 4.5rem);
     letter-spacing: -0.04em;
   }
 
   .heading-lg {
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
   }
 
   .heading-md {
-    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
   }
 
   .body-text {
-    @apply text-base md:text-lg text-slate-500 leading-relaxed font-medium;
+    @apply text-base text-slate-500 leading-relaxed font-medium;
     color: var(--color-text-sub);
   }
 }
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center px-8 py-4 text-[11px] md:text-[13px] font-black uppercase tracking-widest transition-all duration-700 ease-[var(--ease-out-expo)] border rounded-none relative overflow-hidden active:scale-95;
+    @apply inline-flex items-center justify-center px-6 py-3 text-[11px] font-black uppercase tracking-widest transition-all duration-500 ease-[var(--ease-out-expo)] border rounded-none relative overflow-hidden active:scale-95;
+  }
+
+  @media (min-width: 768px) {
+    .btn {
+      @apply text-[13px] px-8 py-4;
+    }
   }
 
   .btn-primary {
     @apply bg-text-primary text-white border-transparent hover:bg-black;
-    background-color: var(--color-text-main);
+    background-color: var(--color-text-primary);
   }
 
   .btn-secondary {
@@ -70,24 +71,24 @@
   }
 
   .card-premium {
-    @apply bg-white border border-border p-8 md:p-12 transition-all duration-700 hover:border-accent/40 hover:shadow-2xl hover:shadow-accent/5 backdrop-blur-3xl;
+    @apply bg-white border border-border p-5 md:p-10 transition-all duration-500 hover:border-accent/40 hover:shadow-2xl hover:shadow-accent/5 backdrop-blur-3xl;
     border-color: var(--border-base);
   }
 
   .input-field {
-    @apply w-full px-6 py-4 bg-white border border-border rounded-none focus:outline-none focus:border-accent focus:ring-8 focus:ring-accent/5 transition-all duration-700 text-sm md:text-base;
+    @apply w-full px-4 py-3 bg-white border border-border rounded-none focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all duration-500 text-sm md:text-base;
     border-color: var(--border-base);
   }
 
   .animate-platinum {
-    animation: platinumFade 1s var(--ease-out-expo) forwards;
+    animation: platinumFade 0.6s var(--ease-out-expo) forwards;
   }
 }
 
 @keyframes platinumFade {
   from {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(20px);
   }
 
   to {
@@ -96,9 +97,12 @@
   }
 }
 
-/* Scrollbar Mastery */
+.grid-responsive {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10;
+}
+
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -112,5 +116,5 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsla(350, 85%, 40%, 0.5);
+  background: var(--color-accent);
 }
