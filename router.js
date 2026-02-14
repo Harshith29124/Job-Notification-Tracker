@@ -113,24 +113,27 @@ function renderRoute() {
 
     document.title = `${route.title} - KodNest Intelligence Hub`;
 
-    // Status Badge & Top Bar Overrides
-    const tests = getTestsPassed().length;
-    const links = getSubmissionLinks();
+    const rbSteps = JSON.parse(localStorage.getItem('rb_steps_completed') || '[]');
+    const rbChecklist = JSON.parse(localStorage.getItem('rb_checklist_passed') || '[]');
+    const rbLinks = JSON.parse(localStorage.getItem('rb_final_submission') || '{"lovable":"","github":"","live":""}');
+
+    const isValidUrl = (url) => { try { new URL(url); return true; } catch (_) { return false; } };
+    const isRbShipped = rbSteps.length === 8 && rbSteps.every(Boolean) &&
+        rbChecklist.length === 10 && rbChecklist.every(Boolean) &&
+        isValidUrl(rbLinks.lovable) && isValidUrl(rbLinks.github) && isValidUrl(rbLinks.live);
 
     if (route.isRb) {
         document.querySelector('.top-bar__project').textContent = 'AI Resume Builder';
         document.getElementById('app-progress').textContent = route.step <= 8 ? `Project 3 — Step ${route.step} of 8` : 'Project 3 — Final Proof';
 
-        const rbProgress = Array.from({ length: 8 }, (_, i) => localStorage.getItem(`rb_step_${i + 1}_artifact`)).filter(Boolean).length;
-        const rbLinks = JSON.parse(localStorage.getItem('rb_final_submission') || '{}');
-        const rbShipped = rbProgress === 8 && rbLinks.live;
-
-        const statusText = rbShipped ? 'Shipped' : (rbProgress > 0 ? 'In Progress' : 'Not Started');
-        const statusClass = rbShipped ? 'status--shipped' : (rbProgress > 0 ? 'status--in-progress' : 'status--not-started');
+        const statusText = isRbShipped ? 'Shipped' : (rbSteps.some(Boolean) ? 'In Progress' : 'Not Started');
+        const statusClass = isRbShipped ? 'status--shipped' : (rbSteps.some(Boolean) ? 'status--in-progress' : 'status--not-started');
         document.getElementById('app-status').innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
     } else {
         document.querySelector('.top-bar__project').textContent = 'KodNest Intelligence Suite';
         document.getElementById('app-progress').textContent = `Step ${route.step} / 8`;
+        const tests = getTestsPassed().length;
+        const links = getSubmissionLinks();
         const isShipped = tests >= 5 && links.live;
         const statusText = isShipped ? 'Shipped' : (tests > 0 ? 'In Progress' : 'Not Started');
         const statusClass = isShipped ? 'status--shipped' : (tests > 0 ? 'status--in-progress' : 'status--not-started');
@@ -147,14 +150,14 @@ function renderRoute() {
 
     // Footer
     const items = [
-        { label: 'UI Built', checked: true },
-        { label: 'Logic Working', checked: getPreferences().roleKeywords.length > 0 },
-        { label: 'Test Passed', checked: tests >= 5 },
-        { label: 'Deployed', checked: !!links.live }
+        { label: 'Architecture', checked: route.isRb ? rbSteps[2] : true },
+        { label: 'Build Quality', checked: route.isRb ? rbChecklist[4] : getPreferences().roleKeywords.length > 0 },
+        { label: 'QA Verified', checked: route.isRb ? rbChecklist.every(Boolean) : getTestsPassed().length >= 5 },
+        { label: 'Production', checked: route.isRb ? isRbShipped : !!getSubmissionLinks().live }
     ];
     document.getElementById('app-footer').innerHTML = items.map(i => `<div class="checklist-item">${i.checked ? '☑' : '□'} ${i.label}</div>`).join('');
 
-    // Nav Menu (In Workspace for Dash/Saved/RB)
+    // Nav Menu
     if (['/dashboard', '/saved', '/digest', '/settings', '/jt/proof', '/rb/proof'].includes(path) || path.startsWith('/rb/')) {
         const isRb = path.startsWith('/rb/');
         const navItems = isRb
@@ -369,76 +372,80 @@ function showToast(msg) {
 }
 
 /**
- * Init
- */
-/**
  * Project 3: AI Resume Builder Renderers
  */
 function renderRbStepPage(route) {
-    const artifact = localStorage.getItem(`rb_step_${route.step}_artifact`) || '';
+    const steps = JSON.parse(localStorage.getItem('rb_steps_completed') || '[]');
     const nextPath = Object.keys(routes).find(path => routes[path].isRb && routes[path].step === route.step + 1);
     const prevPath = Object.keys(routes).find(path => routes[path].isRb && routes[path].step === route.step - 1);
 
-    window.saveRbArtifact = (val) => {
-        localStorage.setItem(`rb_step_${route.step}_artifact`, val);
+    window.toggleRbStep = () => {
+        const s = JSON.parse(localStorage.getItem('rb_steps_completed') || '[]');
+        s[route.step - 1] = !s[route.step - 1];
+        localStorage.setItem('rb_steps_completed', JSON.stringify(s));
         renderRoute();
     };
 
     window.copyRbPrompt = () => {
-        const txt = `Build a professional ${route.title} module for the AI Resume Builder using React and Tailwind. Focus on ${route.subtitle} and ensure the 4px border-radius standard is followed strictly.`;
+        const txt = `Build a professional ${route.title} module for the AI Resume Builder using React and Tailwind. Focus on ${route.subtitle} and ensure the premium design standard is followed.`;
         navigator.clipboard.writeText(txt).then(() => showToast("Prompt Copied!"));
     };
 
     return {
         workspaceHtml: `
             <div class="card">
-                <h3 style="margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.05em; font-size: 14px; color: var(--color-text-secondary);">Instruction Protocol</h3>
+                <h3 style="margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.05em; font-size: 14px; color: var(--color-text-secondary);">Development Protocol</h3>
                 <div style="margin-bottom: 32px; line-height: 1.8; color: var(--color-text);">
-                    <p style="margin-bottom: 16px;">Step ${route.step} focuses on <strong>${route.title}</strong>. You are required to define the ${route.artifact.toLowerCase()} before graduating to the next development phase.</p>
-                    <ul style="list-style: decimal; padding-left: 20px; display: flex; flex-direction: column; gap: 12px;">
-                        <li>Open the Lovable editor and navigate to the current module.</li>
-                        <li>Utilize the prompt provided in the right panel to generate the base intelligence.</li>
-                        <li>Extract the core artifact link or source and paste it below.</li>
-                    </ul>
+                    <p style="margin-bottom: 16px;">This module focuses on <strong>${route.title}</strong>. Complete the implementation in your local environment before marking as verified.</p>
                 </div>
 
                 <div style="margin-top: 40px; border-top: 1px solid var(--color-border); padding-top: 40px;">
-                    <label style="display: block; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 12px;">Artifact Production Link / Evidence</label>
-                    <input type="text" class="input" value="${artifact}" onchange="window.saveRbArtifact(this.value)" placeholder="Enter production URL or CID..." style="margin-bottom: 24px; border-radius: 4px;">
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 32px; font-weight: 700;">
+                        <input type="checkbox" onchange="window.toggleRbStep()" ${steps[route.step - 1] ? 'checked' : ''} style="width: 20px; height: 20px; accent-color: #2D5016;">
+                        Mark Step ${route.step} as Completed
+                    </label>
                     
                     <div style="display: flex; gap: 16px; justify-content: space-between;">
                         ${prevPath ? `<a href="#${prevPath}" class="btn btn--secondary">Back</a>` : '<div></div>'}
-                        ${artifact
-                ? `<a href="#${nextPath}" class="btn btn--primary" style="background: #2D5016;">Next Step</a>`
-                : `<button class="btn btn--primary" disabled style="opacity: 0.5; background: var(--color-text-secondary);">Unlock via Artifact</button>`
-            }
+                        <a href="#${nextPath || '/rb/proof'}" class="btn btn--primary" style="background: #2D5016;">Next Phase</a>
                     </div>
                 </div>
             </div>
         `,
         panelHtml: `
-            <div class="card" style="border-left: 4px solid var(--color-accent);">
-                <h3 style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; color: var(--color-accent);">Build Panel</h3>
+            <div class="card" style="border-left: 4px solid #2D5016;">
+                <h3 style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; color: #2D5016;">AI Assistant</h3>
                 <div style="margin-bottom: 24px;">
-                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--color-text-secondary); margin-bottom: 8px;">Copy Prompt into Lovable</label>
-                    <textarea class="input" style="height: 120px; font-size: 12px; font-family: monospace; resize: none; margin-bottom: 12px;" readonly>Build a professional ${route.title} module...</textarea>
-                    <button class="btn btn--secondary" style="width: 100%; font-size: 11px;" onclick="window.copyRbPrompt()">Copy Project Prompt</button>
+                    <button class="btn btn--secondary" style="width: 100%; font-size: 11px;" onclick="window.copyRbPrompt()">Copy Developer Prompt</button>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <a href="https://lovable.dev" target="_blank" class="btn btn--primary" style="font-size: 11px; background: var(--color-text);">Open Lovable Editor</a>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                        <button class="btn btn--secondary" style="padding: 10px; font-size: 10px;">✅ Worked</button>
-                        <button class="btn btn--secondary" style="padding: 10px; font-size: 10px;">❌ Error</button>
-                    </div>
-                </div>
+                <p style="font-size: 11px; color: var(--color-text-secondary); line-height: 1.6;">Follow the structured prompt to maintain layout consistency across all resume modules.</p>
             </div>
         `
     };
 }
 
 function renderRbProofPage() {
-    const rbProgress = Array.from({ length: 8 }, (_, i) => localStorage.getItem(`rb_step_${i + 1}_artifact`)).filter(Boolean).length;
+    const steps = JSON.parse(localStorage.getItem('rb_steps_completed') || '[]');
+    const checklist = JSON.parse(localStorage.getItem('rb_checklist_passed') || '[]');
     const submission = JSON.parse(localStorage.getItem('rb_final_submission') || '{"lovable":"","github":"","live":""}');
+
+    const isValidUrl = (url) => { try { new URL(url); return true; } catch (_) { return false; } };
+    const isShipped = steps.length === 8 && steps.every(Boolean) &&
+        checklist.length === 10 && checklist.every(Boolean) &&
+        isValidUrl(submission.lovable) && isValidUrl(submission.github) && isValidUrl(submission.live);
+
+    const stepTitles = ["Architecture", "UI Components", "Data Binding", "Preview Engine", "PDF Export", "ATS Scoring", "Multi-template", "Persistence"];
+    const checklistItems = [
+        "LocalStorage Sync", "Live Preview", "Template Integrity", "Theme Persistence", "ATS Score Logic",
+        "Live Score Update", "Export Readiness", "Empty States", "Mobile Scaling", "No Log Errors"
+    ];
+
+    window.toggleRbChecklist = (idx) => {
+        const c = JSON.parse(localStorage.getItem('rb_checklist_passed') || '[]');
+        c[idx] = !c[idx];
+        localStorage.setItem('rb_checklist_passed', JSON.stringify(c));
+        renderRoute();
+    };
 
     window.updateRbSubmission = (id, val) => {
         submission[id] = val;
@@ -447,26 +454,82 @@ function renderRbProofPage() {
     };
 
     window.copyRbFinalSubmission = () => {
-        const txt = `AI Resume Builder — Final Submission\n\nLovable: ${submission.lovable}\nGitHub: ${submission.github}\nLive: ${submission.live}`;
-        navigator.clipboard.writeText(txt).then(() => showToast("Final Submission Copied!"));
+        const txt = `------------------------------------------
+AI Resume Builder — Final Submission
+
+Lovable Project: ${submission.lovable}
+GitHub Repository: ${submission.github}
+Live Deployment: ${submission.live}
+
+Core Capabilities:
+- Structured resume builder
+- Deterministic ATS scoring
+- Template switching
+- PDF export with clean formatting
+- Persistence + validation checklist
+------------------------------------------`;
+        navigator.clipboard.writeText(txt).then(() => showToast("Submission Payload Copied!"));
     };
 
     return {
         workspaceHtml: `
-            <div class="card">
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 40px;">
-                    ${Array.from({ length: 8 }, (_, i) => `
-                        <div style="padding: 12px; border: 1px solid ${localStorage.getItem(`rb_step_${i + 1}_artifact`) ? 'var(--color-success)' : 'var(--color-border)'}; text-align: center; font-size: 10px; font-weight: 900;">
-                            STEP ${i + 1}<br>${localStorage.getItem(`rb_step_${i + 1}_artifact`) ? 'DONE' : 'PENDING'}
-                        </div>
-                    `).join('')}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
+                <div class="card">
+                    <h3 style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Build Status</h3>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        ${stepTitles.map((t, i) => `
+                            <div style="font-size: 11px; display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--color-border);">
+                                <span style="color: var(--color-text-secondary);">${t}</span>
+                                <span style="font-weight: 900; color: ${steps[i] ? 'var(--color-success)' : '#F44336'};">${steps[i] ? 'COMPLETED' : 'PENDING'}</span>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
-                <div class="form-group" style="margin-bottom:24px;"><label>Lovable Link</label><input class="input" value="${submission.lovable}" onchange="window.updateRbSubmission('lovable', this.value)"></div>
-                <div class="form-group" style="margin-bottom:24px;"><label>GitHub Repo</label><input class="input" value="${submission.github}" onchange="window.updateRbSubmission('github', this.value)"></div>
-                <div class="form-group" style="margin-bottom:24px;"><label>Deploy URL</label><input class="input" value="${submission.live}" onchange="window.updateRbSubmission('live', this.value)"></div>
-                <button class="btn btn--primary" style="width: 100%; height: 64px; background: #2D5016;" onclick="window.copyRbFinalSubmission()">Copy Final Submission</button>
+                <div class="card">
+                     <h3 style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">QA Checklist</h3>
+                     <div style="display: flex; flex-direction: column; gap: 4px;">
+                        ${checklistItems.map((t, i) => `
+                            <label style="font-size: 11px; display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 2px 0;">
+                                <input type="checkbox" onchange="window.toggleRbChecklist(${i})" ${checklist[i] ? 'checked' : ''} style="accent-color: #2D5016;">
+                                ${t}
+                            </label>
+                        `).join('')}
+                     </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px;">Artifact Collection</h3>
+                <div class="form-group" style="margin-bottom:16px;"><label style="font-size: 11px; font-weight: 700;">Lovable Project URL</label><input class="input" value="${submission.lovable}" onchange="window.updateRbSubmission('lovable', this.value)" style="border-radius:4px;"></div>
+                <div class="form-group" style="margin-bottom:16px;"><label style="font-size: 11px; font-weight: 700;">GitHub Repository</label><input class="input" value="${submission.github}" onchange="window.updateRbSubmission('github', this.value)" style="border-radius:4px;"></div>
+                <div class="form-group" style="margin-bottom:24px;"><label style="font-size: 11px; font-weight: 700;">Live Deployment</label><input class="input" value="${submission.live}" onchange="window.updateRbSubmission('live', this.value)" style="border-radius:4px;"></div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border); padding-top: 24px;">
+                    <div style="font-size: 12px; font-weight: 700; color: #2D5016;">
+                        ${isShipped ? 'Project 3 Shipped Successfully.' : ''}
+                    </div>
+                    <button class="btn btn--primary" ${!isShipped ? 'disabled' : ''} style="width: 240px; background: #2D5016; opacity: ${!isShipped ? '0.5' : '1'}" onclick="window.copyRbFinalSubmission()">Copy Final Submission</button>
+                </div>
             </div>
         `,
-        panelHtml: `<div class="card"><h3>Ready to Ship</h3><p>Verify all 8 module artifacts are logged before final payload copy.</p></div>`
+        panelHtml: `<div class="card"><h3>Shipment Gate</h3><p style="font-size: 13px; color: var(--color-text-secondary);">Application must pass all 8 development phases and 10 QA checks before production clearance.</p></div>`
     };
 }
+
+/**
+ * Initialize listeners
+ */
+function initializeListeners() {
+    const locationFilter = document.getElementById('filter-location');
+    if (locationFilter) {
+        locationFilter.addEventListener('change', (e) => {
+            currentFilters.location = e.target.value;
+            renderRoute();
+        });
+    }
+}
+
+// Initial render
+window.addEventListener('hashchange', renderRoute);
+window.addEventListener('load', renderRoute);
+renderRoute();
