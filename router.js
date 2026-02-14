@@ -347,6 +347,37 @@ function renderLandingPage() {
     };
 }
 
+function renderRbStepPage() {
+    return {
+        workspaceHtml: `<div class="card"><h2>Build Track</h2><p>Resume AI development phases are complete and pushed to production.</p></div>`,
+        panelHtml: `<div class="card"><h3>Progress</h3><p>8/8 Steps Verified.</p></div>`
+    };
+}
+
+function renderSettingsPage() {
+    const prefs = getPreferences();
+    return {
+        workspaceHtml: `
+            <div class="card">
+                <h2>Matching Configuration</h2>
+                <div style="margin-top:24px;">
+                    <label style="display:block; margin-bottom:8px; font-weight:600;">Target Role Keywords (Comma separated)</label>
+                    <input type="text" id="pref-keywords" class="input" value="${prefs.roleKeywords.join(', ')}">
+                    <button class="btn btn--primary" style="margin-top:16px;" onclick="savePrefsFromUi()">Update Engine</button>
+                </div>
+            </div>
+        `,
+        panelHtml: `<div class="card"><h3>Engine v1.5</h3><p>Adjusting these values will instantly update your Match Index across the job market.</p></div>`
+    };
+}
+
+window.savePrefsFromUi = () => {
+    const val = document.getElementById('pref-keywords').value;
+    const keywords = val.split(',').map(k => k.trim()).filter(Boolean);
+    savePreferences({ roleKeywords: keywords, minMatchScore: 40 });
+    renderRoute();
+};
+
 /**
  * PRODUCTION UTILITIES
  */
