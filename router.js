@@ -22,7 +22,17 @@ const routes = {
     '/settings': { step: 5, title: 'Logic Configuration', subtitle: 'Fine-tuning the weighted matching parameters.', content: renderSettingsPage },
     '/jt/07-test': { step: 6, title: 'Quality Assurance', subtitle: 'Verifying core functional requirements and edge cases.', content: renderTestingPage },
     '/jt/08-ship': { step: 7, title: 'Final Deployment', subtitle: 'Preparing the application for production state.', content: renderShipPage },
-    '/jt/proof': { step: 8, title: 'Submission Proof', subtitle: 'Final evidence collection and project archival.', content: renderProofPage }
+    '/jt/proof': { step: 8, title: 'Submission Proof', subtitle: 'Final evidence collection and project archival.', content: renderProofPage },
+    // Project 3: AI Resume Builder
+    '/rb/01-problem': { step: 1, isRb: true, title: 'Problem Discovery', subtitle: 'Defining the real-world friction in modern recruitment.', artifact: 'Problem Statement Matrix' },
+    '/rb/02-market': { step: 2, isRb: true, title: 'Market Analysis', subtitle: 'Analyzing the competitive landscape and user personas.', artifact: 'Market Opportunity Brief' },
+    '/rb/03-architecture': { step: 3, isRb: true, title: 'System Architecture', subtitle: 'Designing the high-level flow and data structures.', artifact: 'Architecture Blueprint' },
+    '/rb/04-hld': { step: 4, isRb: true, title: 'High-Level Design', subtitle: 'Mapping out core services and API contracts.', artifact: 'HLD Diagram/JSON' },
+    '/rb/05-lld': { step: 5, isRb: true, title: 'Low-Level Design', subtitle: 'Defining component logic and schema details.', artifact: 'LLD Spec' },
+    '/rb/06-build': { step: 6, isRb: true, title: 'Intelligence Build', subtitle: 'Executing the core Resume AI logic in Lovable.', artifact: 'Production Source Link' },
+    '/rb/07-test': { step: 7, isRb: true, title: 'Quality Audit', subtitle: 'Verifying system integrity and UX stability.', artifact: 'QA Test Log' },
+    '/rb/08-ship': { step: 8, isRb: true, title: 'Shipment Gate', subtitle: 'Final deployment and production authorization.', artifact: 'Live Platform URL' },
+    '/rb/proof': { step: 9, isRb: true, title: 'Project Graduation', subtitle: 'Final verification of the AI Resume Builder artifacts.' }
 };
 
 /**
@@ -103,22 +113,35 @@ function renderRoute() {
 
     document.title = `${route.title} - KodNest Intelligence Hub`;
 
-    // Progress
-    document.getElementById('app-progress').textContent = `Step ${route.step} / 8`;
-
-    // Status Badge
+    // Status Badge & Top Bar Overrides
     const tests = getTestsPassed().length;
     const links = getSubmissionLinks();
-    const isShipped = tests >= 5 && links.live;
-    const statusText = isShipped ? 'Shipped' : (tests > 0 ? 'In Progress' : 'Not Started');
-    const statusClass = isShipped ? 'status--shipped' : (tests > 0 ? 'status--in-progress' : 'status--not-started');
-    document.getElementById('app-status').innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
+
+    if (route.isRb) {
+        document.querySelector('.top-bar__project').textContent = 'AI Resume Builder';
+        document.getElementById('app-progress').textContent = route.step <= 8 ? `Project 3 — Step ${route.step} of 8` : 'Project 3 — Final Proof';
+
+        const rbProgress = Array.from({ length: 8 }, (_, i) => localStorage.getItem(`rb_step_${i + 1}_artifact`)).filter(Boolean).length;
+        const rbLinks = JSON.parse(localStorage.getItem('rb_final_submission') || '{}');
+        const rbShipped = rbProgress === 8 && rbLinks.live;
+
+        const statusText = rbShipped ? 'Shipped' : (rbProgress > 0 ? 'In Progress' : 'Not Started');
+        const statusClass = rbShipped ? 'status--shipped' : (rbProgress > 0 ? 'status--in-progress' : 'status--not-started');
+        document.getElementById('app-status').innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
+    } else {
+        document.querySelector('.top-bar__project').textContent = 'KodNest Intelligence Suite';
+        document.getElementById('app-progress').textContent = `Step ${route.step} / 8`;
+        const isShipped = tests >= 5 && links.live;
+        const statusText = isShipped ? 'Shipped' : (tests > 0 ? 'In Progress' : 'Not Started');
+        const statusClass = isShipped ? 'status--shipped' : (tests > 0 ? 'status--in-progress' : 'status--not-started');
+        document.getElementById('app-status').innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
+    }
 
     // Header
     document.getElementById('app-header').innerHTML = `<h1 class="context-header__title">${route.title}</h1><p class="context-header__subtitle">${route.subtitle}</p>`;
 
     // Content
-    const { workspaceHtml, panelHtml } = route.content();
+    const { workspaceHtml, panelHtml } = (route.isRb ? (path === '/rb/proof' ? renderRbProofPage : () => renderRbStepPage(route)) : route.content)();
     document.getElementById('app-workspace').innerHTML = workspaceHtml;
     document.getElementById('app-panel').innerHTML = panelHtml;
 
@@ -131,16 +154,22 @@ function renderRoute() {
     ];
     document.getElementById('app-footer').innerHTML = items.map(i => `<div class="checklist-item">${i.checked ? '☑' : '□'} ${i.label}</div>`).join('');
 
-    // Nav Menu (In Workspace for Dash/Saved)
-    if (['/dashboard', '/saved', '/digest', '/settings', '/jt/proof'].includes(path)) {
+    // Nav Menu (In Workspace for Dash/Saved/RB)
+    if (['/dashboard', '/saved', '/digest', '/settings', '/jt/proof', '/rb/proof'].includes(path) || path.startsWith('/rb/')) {
+        const isRb = path.startsWith('/rb/');
+        const navItems = isRb
+            ? `<a href="#/" style="color: var(--color-text-secondary); text-decoration: none; font-weight: 700;">Home</a>
+               <a href="#/rb/01-problem" style="color: ${path === '/rb/01-problem' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Steps</a>
+               <a href="#/rb/proof" style="color: ${path === '/rb/proof' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Proof</a>`
+            : `<a href="#/" style="color: var(--color-text-secondary); text-decoration: none; font-weight: 700;">Home</a>
+               <a href="#/dashboard" style="color: ${path === '/dashboard' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Dashboard</a>
+               <a href="#/saved" style="color: ${path === '/saved' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Saved</a>
+               <a href="#/digest" style="color: ${path === '/digest' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Digest</a>
+               <a href="#/settings" style="color: ${path === '/settings' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Settings</a>
+               <a href="#/jt/proof" style="color: ${path === '/jt/proof' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Proof</a>`;
         const nav = `
             <div class="card" style="padding: 12px; margin-bottom: 32px; display: flex; gap: 24px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid var(--color-border); border-width: 0 0 1px 0; border-radius: 0;">
-                <a href="#/" style="color: ${path === '/' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Home</a>
-                <a href="#/dashboard" style="color: ${path === '/dashboard' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Dashboard</a>
-                <a href="#/saved" style="color: ${path === '/saved' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Saved</a>
-                <a href="#/digest" style="color: ${path === '/digest' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Digest</a>
-                <a href="#/settings" style="color: ${path === '/settings' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Settings</a>
-                <a href="#/jt/proof" style="color: ${path === '/jt/proof' ? 'var(--color-accent)' : 'var(--color-text-secondary)'}; text-decoration: none; font-weight: 700;">Proof</a>
+                ${navItems}
             </div>
         `;
         document.getElementById('app-workspace').insertAdjacentHTML('afterbegin', nav);
@@ -183,6 +212,21 @@ function renderLandingPage() {
                     <div style="display: flex; gap: 16px;">
                         <a href="placement/index.html" class="btn btn--primary" style="flex: 1;">Launch Platform</a>
                         <div class="status-badge" style="background: var(--color-bg); border-color: var(--color-border); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 900;">V1.2 Active</div>
+                    </div>
+                </div>
+
+                <!-- AI Resume Builder Card -->
+                <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-color: #2D5016;">
+                    <div>
+                        <div style="width: 48px; height: 48px; background: #ECFDF5; border: 1px solid #D1FAE5; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+                             <span style="font-size: 20px;">📄</span>
+                        </div>
+                        <h2 style="margin-bottom: 16px;">AI Resume Builder</h2>
+                        <p style="margin-bottom: 32px;">Strategic build track for creating an intelligent, recruitment-focused resume generator. Production-grade architecture and AI integration.</p>
+                    </div>
+                    <div style="display: flex; gap: 16px;">
+                        <a href="#/rb/01-problem" class="btn btn--primary" style="flex: 1; background: #2D5016;">Start Build Track</a>
+                        <div class="status-badge" style="background: #F3F4F6; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 900;">Project 3</div>
                     </div>
                 </div>
             </div>
@@ -327,10 +371,102 @@ function showToast(msg) {
 /**
  * Init
  */
-function initializeListeners() {
-    document.getElementById('filter-location')?.addEventListener('change', e => { currentFilters.location = e.target.value; renderRoute(); });
+/**
+ * Project 3: AI Resume Builder Renderers
+ */
+function renderRbStepPage(route) {
+    const artifact = localStorage.getItem(`rb_step_${route.step}_artifact`) || '';
+    const nextPath = Object.keys(routes).find(path => routes[path].isRb && routes[path].step === route.step + 1);
+    const prevPath = Object.keys(routes).find(path => routes[path].isRb && routes[path].step === route.step - 1);
+
+    window.saveRbArtifact = (val) => {
+        localStorage.setItem(`rb_step_${route.step}_artifact`, val);
+        renderRoute();
+    };
+
+    window.copyRbPrompt = () => {
+        const txt = `Build a professional ${route.title} module for the AI Resume Builder using React and Tailwind. Focus on ${route.subtitle} and ensure the 4px border-radius standard is followed strictly.`;
+        navigator.clipboard.writeText(txt).then(() => showToast("Prompt Copied!"));
+    };
+
+    return {
+        workspaceHtml: `
+            <div class="card">
+                <h3 style="margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.05em; font-size: 14px; color: var(--color-text-secondary);">Instruction Protocol</h3>
+                <div style="margin-bottom: 32px; line-height: 1.8; color: var(--color-text);">
+                    <p style="margin-bottom: 16px;">Step ${route.step} focuses on <strong>${route.title}</strong>. You are required to define the ${route.artifact.toLowerCase()} before graduating to the next development phase.</p>
+                    <ul style="list-style: decimal; padding-left: 20px; display: flex; flex-direction: column; gap: 12px;">
+                        <li>Open the Lovable editor and navigate to the current module.</li>
+                        <li>Utilize the prompt provided in the right panel to generate the base intelligence.</li>
+                        <li>Extract the core artifact link or source and paste it below.</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 40px; border-top: 1px solid var(--color-border); padding-top: 40px;">
+                    <label style="display: block; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 12px;">Artifact Production Link / Evidence</label>
+                    <input type="text" class="input" value="${artifact}" onchange="window.saveRbArtifact(this.value)" placeholder="Enter production URL or CID..." style="margin-bottom: 24px; border-radius: 4px;">
+                    
+                    <div style="display: flex; gap: 16px; justify-content: space-between;">
+                        ${prevPath ? `<a href="#${prevPath}" class="btn btn--secondary">Back</a>` : '<div></div>'}
+                        ${artifact
+                ? `<a href="#${nextPath}" class="btn btn--primary" style="background: #2D5016;">Next Step</a>`
+                : `<button class="btn btn--primary" disabled style="opacity: 0.5; background: var(--color-text-secondary);">Unlock via Artifact</button>`
+            }
+                    </div>
+                </div>
+            </div>
+        `,
+        panelHtml: `
+            <div class="card" style="border-left: 4px solid var(--color-accent);">
+                <h3 style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; color: var(--color-accent);">Build Panel</h3>
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--color-text-secondary); margin-bottom: 8px;">Copy Prompt into Lovable</label>
+                    <textarea class="input" style="height: 120px; font-size: 12px; font-family: monospace; resize: none; margin-bottom: 12px;" readonly>Build a professional ${route.title} module...</textarea>
+                    <button class="btn btn--secondary" style="width: 100%; font-size: 11px;" onclick="window.copyRbPrompt()">Copy Project Prompt</button>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <a href="https://lovable.dev" target="_blank" class="btn btn--primary" style="font-size: 11px; background: var(--color-text);">Open Lovable Editor</a>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button class="btn btn--secondary" style="padding: 10px; font-size: 10px;">✅ Worked</button>
+                        <button class="btn btn--secondary" style="padding: 10px; font-size: 10px;">❌ Error</button>
+                    </div>
+                </div>
+            </div>
+        `
+    };
 }
 
-window.addEventListener('hashchange', renderRoute);
-window.addEventListener('DOMContentLoaded', renderRoute);
-renderRoute();
+function renderRbProofPage() {
+    const rbProgress = Array.from({ length: 8 }, (_, i) => localStorage.getItem(`rb_step_${i + 1}_artifact`)).filter(Boolean).length;
+    const submission = JSON.parse(localStorage.getItem('rb_final_submission') || '{"lovable":"","github":"","live":""}');
+
+    window.updateRbSubmission = (id, val) => {
+        submission[id] = val;
+        localStorage.setItem('rb_final_submission', JSON.stringify(submission));
+        renderRoute();
+    };
+
+    window.copyRbFinalSubmission = () => {
+        const txt = `AI Resume Builder — Final Submission\n\nLovable: ${submission.lovable}\nGitHub: ${submission.github}\nLive: ${submission.live}`;
+        navigator.clipboard.writeText(txt).then(() => showToast("Final Submission Copied!"));
+    };
+
+    return {
+        workspaceHtml: `
+            <div class="card">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 40px;">
+                    ${Array.from({ length: 8 }, (_, i) => `
+                        <div style="padding: 12px; border: 1px solid ${localStorage.getItem(`rb_step_${i + 1}_artifact`) ? 'var(--color-success)' : 'var(--color-border)'}; text-align: center; font-size: 10px; font-weight: 900;">
+                            STEP ${i + 1}<br>${localStorage.getItem(`rb_step_${i + 1}_artifact`) ? 'DONE' : 'PENDING'}
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="form-group" style="margin-bottom:24px;"><label>Lovable Link</label><input class="input" value="${submission.lovable}" onchange="window.updateRbSubmission('lovable', this.value)"></div>
+                <div class="form-group" style="margin-bottom:24px;"><label>GitHub Repo</label><input class="input" value="${submission.github}" onchange="window.updateRbSubmission('github', this.value)"></div>
+                <div class="form-group" style="margin-bottom:24px;"><label>Deploy URL</label><input class="input" value="${submission.live}" onchange="window.updateRbSubmission('live', this.value)"></div>
+                <button class="btn btn--primary" style="width: 100%; height: 64px; background: #2D5016;" onclick="window.copyRbFinalSubmission()">Copy Final Submission</button>
+            </div>
+        `,
+        panelHtml: `<div class="card"><h3>Ready to Ship</h3><p>Verify all 8 module artifacts are logged before final payload copy.</p></div>`
+    };
+}

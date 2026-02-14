@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Resume Builder | KodNest Premium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,800;1,400&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+</head>
+<style>
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+
+    #resume-preview,
+    #resume-preview * {
+      visibility: visible;
+    }
+
+    #resume-preview {
+      position: absolute;
+      left: 0;
+      top: 0;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      box-shadow: none !important;
+    }
+
+    @page {
+      margin: 0;
+      size: auto;
+    }
+  }
+</style>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
