@@ -3,9 +3,24 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Global Platinum Palette Sync */
+    --color-bg: hsla(220, 20%, 97%, 1);
+    --color-surface: hsla(0, 0%, 100%, 1);
+    --color-text-main: hsla(230, 45%, 8%, 1);
+    --color-text-sub: hsla(230, 15%, 35%, 1);
+    --color-accent: hsla(350, 85%, 40%, 1);
+    --color-success: hsla(155, 75%, 38%, 1);
+    --border-base: hsla(230, 20%, 90%, 1);
+  }
+
   body {
     @apply bg-background text-text-primary font-sans;
-    line-height: 1.7;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    background-color: var(--color-bg);
   }
 
   h1,
@@ -14,49 +29,88 @@
   h4,
   h5,
   h6 {
-    @apply font-serif font-semibold;
-    line-height: 1.2;
+    @apply font-serif font-black tracking-tight;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
   }
 
+  /* Fluid Typography - Platinum Scale */
   .heading-xl {
-    @apply text-[48px] font-serif font-bold leading-[1.2];
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    letter-spacing: -0.04em;
   }
 
   .heading-lg {
-    @apply text-[32px] font-serif font-bold leading-[1.2];
+    font-size: clamp(2rem, 5vw, 3.5rem);
   }
 
   .heading-md {
-    @apply text-[24px] font-serif font-bold leading-[1.2];
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
   }
 
   .body-text {
-    @apply text-[16px] leading-[1.6] max-w-[720px];
-  }
-
-  .body-text-sm {
-    @apply text-[14px] leading-[1.6];
+    @apply text-base md:text-lg text-slate-500 leading-relaxed font-medium;
+    color: var(--color-text-sub);
   }
 }
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center px-6 py-3 text-[14px] font-bold transition-all duration-150 ease-in-out border rounded;
+    @apply inline-flex items-center justify-center px-8 py-4 text-[11px] md:text-[13px] font-black uppercase tracking-widest transition-all duration-700 ease-[var(--ease-out-expo)] border rounded-none relative overflow-hidden active:scale-95;
   }
 
   .btn-primary {
-    @apply bg-accent text-white border-transparent hover:brightness-90;
+    @apply bg-text-primary text-white border-transparent hover:bg-black;
+    background-color: var(--color-text-main);
   }
 
   .btn-secondary {
-    @apply bg-white border-border text-text-primary hover:bg-background;
-  }
-
-  .input-field {
-    @apply w-full px-4 py-3 bg-white border border-border rounded focus:outline-none focus:border-text-primary transition-colors;
+    @apply bg-white border-border text-text-primary hover:bg-slate-50;
+    border-color: var(--border-base);
   }
 
   .card-premium {
-    @apply bg-white border border-border p-10 rounded shadow-none;
+    @apply bg-white border border-border p-8 md:p-12 transition-all duration-700 hover:border-accent/40 hover:shadow-2xl hover:shadow-accent/5 backdrop-blur-3xl;
+    border-color: var(--border-base);
   }
+
+  .input-field {
+    @apply w-full px-6 py-4 bg-white border border-border rounded-none focus:outline-none focus:border-accent focus:ring-8 focus:ring-accent/5 transition-all duration-700 text-sm md:text-base;
+    border-color: var(--border-base);
+  }
+
+  .animate-platinum {
+    animation: platinumFade 1s var(--ease-out-expo) forwards;
+  }
+}
+
+@keyframes platinumFade {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar Mastery */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsla(230, 20%, 85%, 1);
+  border-radius: 20px;
+  border: 3px solid var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsla(350, 85%, 40%, 0.5);
 }
