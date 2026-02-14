@@ -137,14 +137,19 @@ const Renderer = {
     syncFooter: function () {
         const items = [
             { label: 'Data Hub Active', ok: true },
-            { label: 'Vercel Deployment', ok: true },
-            { label: 'ATS Validation', ok: true }
+            { label: 'Cloud Infrastructure', ok: true },
+            { label: 'ATS Ready', ok: true }
         ];
-        document.getElementById('app-footer').innerHTML = items.map(i => `
-            <div class="checklist-item" style="color: ${i.ok ? 'var(--color-success)' : 'var(--color-text-sub)'}">
-                ${i.ok ? '●' : '○'} ${i.label}
+        document.getElementById('app-footer').innerHTML = `
+            <div style="display: flex; gap: 32px; align-items: center; justify-content: flex-start; padding: 0 40px; height: 100%;">
+                ${items.map(i => `
+                    <div class="checklist-item" style="color: ${i.ok ? 'var(--color-success)' : 'var(--color-text-sub)'}; font-size: 13px; font-weight: 600; display: flex; align-items: center;">
+                        <span style="font-size: 10px; margin-right: 10px;">${i.ok ? '✦' : '✧'}</span>
+                        ${i.label}
+                    </div>
+                `).join('')}
             </div>
-        `).join('');
+        `;
     },
 
     /**

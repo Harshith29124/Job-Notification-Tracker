@@ -321,6 +321,28 @@ h1 {
     background: var(--color-text-muted);
 }
 
+/* Persistent System Footer */
+.proof-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: hsla(0, 0%, 100%, 0.8);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border-base);
+    z-index: 1000;
+}
+
+.checklist-item {
+    transition: var(--transition-fast);
+}
+
+.checklist-item:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.2);
+}
+
 /* Printing Logic */
 @media print {
     body {
