@@ -3,11 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description"
         content="KodNest Intelligence Suite — Job Discovery, AI Resume Builder, and Placement Prep for Indian tech careers.">
     <meta name="theme-color" content="#8B0000">
-    <title>KodNest Intelligence Hub | Career Platform</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>KodNest Intelligence Hub</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="app.css">
@@ -15,31 +17,32 @@
 
 <body>
     <div class="layout">
-        <nav class="top-bar">
-            <div class="top-bar__project">KodNest</div>
-            <div class="top-bar__progress" id="app-progress"></div>
-            <div class="top-bar__status" id="app-status">
-                <span class="status-badge status--in-progress">Loading</span>
-            </div>
+        <!-- Top Bar -->
+        <nav class="top-bar" id="app-topbar">
+            <div class="top-bar__brand">KodNest</div>
+            <div class="top-bar__step" id="app-step"></div>
+            <div id="app-badge"></div>
         </nav>
 
-        <header class="context-header" id="app-header">
-            <h1 class="context-header__title">Initializing...</h1>
-            <p class="context-header__subtitle">Preparing your workspace.</p>
+        <!-- Page Header -->
+        <header class="page-header" id="app-header">
+            <div class="page-header__label">Loading</div>
+            <h1 class="page-header__title">Initializing...</h1>
+            <p class="page-header__subtitle">Preparing your workspace.</p>
         </header>
 
-        <main class="main-content">
-            <section class="primary-workspace" id="app-workspace">
-                <div class="card" style="padding:80px 20px;text-align:center;opacity:0.5;">
-                    <p>Loading modules...</p>
+        <!-- Content Grid -->
+        <main class="content">
+            <section id="app-workspace">
+                <div class="card" style="padding:60px 20px;text-align:center;">
+                    <p style="color:var(--color-text-muted);">Loading modules...</p>
                 </div>
             </section>
-            <aside class="secondary-panel" id="app-panel">
-                <div class="card" style="height:120px;opacity:0.2;"></div>
-            </aside>
+            <aside id="app-panel"></aside>
         </main>
 
-        <footer class="proof-footer" id="app-footer"></footer>
+        <!-- Footer -->
+        <footer class="footer" id="app-footer"></footer>
     </div>
 
     <script src="jobs-data.js"></script>
