@@ -70,7 +70,7 @@ export default function Dashboard() {
                             <TaskItem title="React Performance Audit" time="45m" status="completed" />
                             <TaskItem title="System Design: Sharding" time="90m" status="pending" />
                         </div>
-                        <button className="btn btn-primary !bg-accent !border-accent w-full mt-10 h-16 rounded-none">Start Session</button>
+                        <button onClick={() => navigate('/practice')} className="btn btn-primary !bg-accent !border-accent w-full mt-10 h-16 rounded-none">Start Session</button>
                     </div>
 
                     <div className="card-premium !p-8 border-dashed">

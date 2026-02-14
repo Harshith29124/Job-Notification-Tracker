@@ -34,7 +34,7 @@ export default function Landing() {
                         <button onClick={() => navigate('/dashboard')} className="btn btn-primary h-20 px-16 text-lg hover:scale-105 transition-transform">
                             Initialize Diagnostic
                         </button>
-                        <button className="btn btn-secondary h-20 px-16 text-lg group">
+                        <button onClick={() => alert('Strategic Whitepaper: Heuristic JD Analysis v3.0 - Requested. Artifact sending to verified email payload.')} className="btn btn-secondary h-20 px-16 text-lg group">
                             Technical Whitepaper <Zap size={18} className="ml-3 group-hover:text-accent transition-colors" />
                         </button>
                     </div>

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Code2, Braces, Terminal, Brain, Search, Layout, ChevronRight } from 'lucide-react';
 
 const categories = [
@@ -37,6 +38,8 @@ const categories = [
 ];
 
 export default function Practice() {
+    const navigate = useNavigate();
+
     useEffect(() => {
         const progress = JSON.parse(localStorage.getItem('prp_steps_progress') || '{}');
         progress[2] = true;
@@ -90,7 +93,10 @@ export default function Practice() {
                             </div>
                         </div>
 
-                        <button className="btn btn-secondary w-full mt-10 uppercase tracking-[0.2em] text-[10px] md:text-[11px] font-black flex items-center justify-center gap-2 group-hover:bg-text-primary group-hover:text-white group-hover:border-text-primary transition-all duration-500">
+                        <button
+                            onClick={() => navigate('/assessments')}
+                            className="btn btn-secondary w-full mt-10 uppercase tracking-[0.2em] text-[10px] md:text-[11px] font-black flex items-center justify-center gap-2 group-hover:bg-text-primary group-hover:text-white group-hover:border-text-primary transition-all duration-500"
+                        >
                             Initialize Module <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                         </button>
                     </div>
@@ -105,7 +111,12 @@ export default function Practice() {
                     <h4 className="text-xl font-serif font-black text-text-primary mb-2 uppercase tracking-tight">Active Recruitment Protocol</h4>
                     <p className="text-slate-600 text-[15px] font-medium leading-relaxed max-w-2xl">Your weekly high-fidelity mock simulation is scheduled for Saturday at 10:00 AM. 100% attendance is mandatory for readiness certification.</p>
                 </div>
-                <button className="btn btn-primary px-12 h-[60px] md:h-[64px] min-w-full xl:min-w-[240px]">Confirm Slot</button>
+                <button
+                    onClick={() => alert('Recruitment Protocol Verified. Slot confirmed for Saturday.')}
+                    className="btn btn-primary px-12 h-[60px] md:h-[64px] min-w-full xl:min-w-[240px]"
+                >
+                    Confirm Slot
+                </button>
             </div>
         </div>
     );

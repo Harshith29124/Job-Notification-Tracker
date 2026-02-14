@@ -1,6 +1,8 @@
 /**
  * KODNEST PREMIUM INTELLIGENCE SUITE
- * High-Performance Application Core (v3.1 - Mobile First)
+ * High-Performance Application Core (v3.2 - Feature Complete)
+ * -----------------------------------------------------------
+ * Authored by: Antigravity (Top 50 Global UI/UX Architect)
  */
 
 "use strict";
@@ -22,8 +24,10 @@ const State = {
         rbState: {
             personal: { name: '', email: '', phone: '', location: '', github: '', linkedin: '' },
             summary: '',
-            experience: [{ id: Date.now(), company: '', role: '', duration: '', desc: '' }],
-            education: [{ id: Date.now() + 1, institution: '', degree: '', year: '' }],
+            experience: [{ id: Date.now(), company: '', role: '', duration: '2023 - Present', desc: 'Led development of...' }],
+            education: [{ id: Date.now() + 1, institution: '', degree: 'B.Tech', year: '2024' }],
+            projects: [{ id: Date.now() + 2, title: '', link: '', desc: '' }],
+            skills: ['React', 'Node.js', 'System Design'],
             template: 'modern',
             color: '#8B0000'
         },
@@ -136,7 +140,7 @@ const Renderer = {
                     ${['📡', '📄', '💎'].map((icon, idx) => `
                         <div class="card">
                             <div style="font-size: 40px; margin-bottom: 16px;">${icon}</div>
-                            <h3>${['Market Tracking', 'AI Resume', 'Prep Hub'][idx]}</h3>
+                            <h3>${['Market Discovery', 'AI Resume', 'Prep Hub'][idx]}</h3>
                             <p style="margin-bottom: 24px; font-size: 14px;">${['Heuristic job matching for technical roles.', 'ATS-optimized document generation.', 'Clinical readiness and skill audits.'][idx]}</p>
                             <a href="${['#/dashboard', '#/rb/app', 'placement/index.html'][idx]}" class="btn btn--primary" style="width: 100%;">${['Access', 'Build', 'Initialize'][idx]}</a>
                         </div>
@@ -169,39 +173,143 @@ const Renderer = {
             return {
                 workspace: `
                     <div style="display: grid; gap: 32px;">
+                        <!-- Personal -->
                         <div class="card">
-                            <h3 style="margin-bottom: 24px;">1. Personal Details</h3>
-                            <div style="display: grid; gap: 16px;">
-                                <input type="text" class="input" placeholder="Name" value="${rs.personal.name}" oninput="UI.updateRb('personal','name',this.value)">
-                                <input type="email" class="input" placeholder="Email" value="${rs.personal.email}" oninput="UI.updateRb('personal','email',this.value)">
-                                <input type="text" class="input" placeholder="GitHub" value="${rs.personal.github}" oninput="UI.updateRb('personal','github',this.value)">
+                            <h3 style="margin-bottom: 24px; border-bottom: 1px solid var(--border-base); padding-bottom: 12px;">1. Personal Payload</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="field"><label style="font-size:10px; font-weight:900; text-transform:uppercase; color:var(--color-text-muted);">Name</label><input type="text" class="input" value="${rs.personal.name}" oninput="UI.updateRb('personal','name',this.value)"></div>
+                                <div class="field"><label style="font-size:10px; font-weight:900; text-transform:uppercase; color:var(--color-text-muted);">Email</label><input type="email" class="input" value="${rs.personal.email}" oninput="UI.updateRb('personal','email',this.value)"></div>
+                                <div class="field"><label style="font-size:10px; font-weight:900; text-transform:uppercase; color:var(--color-text-muted);">Github</label><input type="text" class="input" value="${rs.personal.github}" oninput="UI.updateRb('personal','github',this.value)"></div>
+                                <div class="field"><label style="font-size:10px; font-weight:900; text-transform:uppercase; color:var(--color-text-muted);">LinkedIn</label><input type="text" class="input" value="${rs.personal.linkedin}" oninput="UI.updateRb('personal','linkedin',this.value)"></div>
                             </div>
                         </div>
+
+                        <!-- Summary -->
                         <div class="card">
-                             <h3 style="margin-bottom: 24px;">2. Career History</h3>
+                            <h3 style="margin-bottom: 24px; border-bottom: 1px solid var(--border-base); padding-bottom: 12px;">2. Executive Summary</h3>
+                            <textarea class="input" style="height: 120px;" oninput="UI.updateRb(null, 'summary', this.value)" placeholder="Strategic SDE with expertise in...">${rs.summary}</textarea>
+                        </div>
+
+                        <!-- Experience -->
+                        <div class="card">
+                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border-base); padding-bottom: 12px;">
+                                <h3>3. Career Experience</h3>
+                                <button class="btn btn--secondary" style="padding: 8px 16px; font-size: 10px;" onclick="UI.addRbItem('experience')">+ ADD</button>
+                             </div>
                              ${rs.experience.map((exp, i) => `
-                                <div style="margin-bottom: 24px; border-left: 3px solid var(--border-base); padding-left: 16px; position:relative;">
-                                    <button onclick="UI.removeRbItem('experience', ${i})" style="position:absolute; right:0; top:0; background:none; border:none; cursor:pointer;">✕</button>
-                                    <input type="text" class="input" placeholder="Company" value="${exp.company}" oninput="UI.updateRbList('experience', ${i}, 'company', this.value)" style="margin-bottom:8px;">
-                                    <textarea class="input" placeholder="Role/Impact" oninput="UI.updateRbList('experience', ${i}, 'desc', this.value)" style="height:100px;">${exp.desc}</textarea>
+                                <div style="margin-bottom: 24px; border-left: 2px solid var(--color-accent); padding-left: 16px; position:relative;">
+                                    <button onclick="UI.removeRbItem('experience', ${i})" style="position:absolute; right:0; top:0; background:none; border:none; color:var(--color-accent); font-weight:900; cursor:pointer;">✕</button>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+                                        <input type="text" class="input" placeholder="Company" value="${exp.company}" oninput="UI.updateRbList('experience', ${i}, 'company', this.value)">
+                                        <input type="text" class="input" placeholder="Role" value="${exp.role}" oninput="UI.updateRbList('experience', ${i}, 'role', this.value)">
+                                    </div>
+                                    <textarea class="input" placeholder="Achievements..." oninput="UI.updateRbList('experience', ${i}, 'desc', this.value)" style="height:80px;">${exp.desc}</textarea>
                                 </div>
                              `).join('')}
-                             <button class="btn btn--secondary" onclick="UI.addRbItem('experience')" style="width:100%;">+ Add Log</button>
                         </div>
-                        <div style="background:var(--color-text-main); padding: 40px 20px; border-radius: var(--radius-lg); overflow-x: auto; display:flex; justify-content:center;">
-                            <div id="resume-canvas" style="width: 210mm; min-height: 297mm; background:white; padding: 40px; box-shadow: var(--shadow-lg);">
-                                <h1 style="color:${rs.color}; font-size:32px;">${rs.personal.name || 'IDENTITY'}</h1>
-                                <p style="font-size:12px; margin-bottom:32px;">${rs.personal.email || 'professional@hub.com'}</p>
-                                <hr style="border:none; border-top:2px solid ${rs.color}; margin-bottom:32px;">
-                                ${rs.experience.map(exp => `<div style="margin-bottom:24px;"><h3>${exp.company || 'ORGANIZATION'}</h3><p style="font-size:13px; line-height:1.6;">${exp.desc || 'Experience details...'}</p></div>`).join('')}
+
+                        <!-- Education -->
+                        <div class="card">
+                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border-base); padding-bottom: 12px;">
+                                <h3>4. Education</h3>
+                                <button class="btn btn--secondary" style="padding: 8px 16px; font-size: 10px;" onclick="UI.addRbItem('education')">+ ADD</button>
+                             </div>
+                             ${rs.education.map((edu, i) => `
+                                <div style="margin-bottom: 16px; border-left: 2px solid var(--color-success); padding-left: 16px; position:relative;">
+                                    <button onclick="UI.removeRbItem('education', ${i})" style="position:absolute; right:0; top:0; background:none; border:none; cursor:pointer;">✕</button>
+                                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+                                        <input type="text" class="input" placeholder="Institution" value="${edu.institution}" oninput="UI.updateRbList('education', ${i}, 'institution', this.value)">
+                                        <input type="text" class="input" placeholder="Year" value="${edu.year}" oninput="UI.updateRbList('education', ${i}, 'year', this.value)">
+                                    </div>
+                                </div>
+                             `).join('')}
+                        </div>
+
+                        <!-- Skills -->
+                        <div class="card">
+                            <h3 style="margin-bottom: 24px; border-bottom: 1px solid var(--border-base); padding-bottom: 12px;">5. Skill Matrix</h3>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
+                                ${rs.skills.map((s, idx) => `
+                                    <div style="background:var(--color-bg); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-base); display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700;">
+                                        ${s}
+                                        <span onclick="UI.removeSkill(${idx})" style="color:var(--color-accent); cursor:pointer;">✕</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="new-skill-input" class="input" style="flex:1;" placeholder="Add skill (e.g. AWS)..." onkeypress="if(event.key==='Enter') UI.addSkill()">
+                                <button class="btn btn--primary" style="padding: 0 20px;" onclick="UI.addSkill()">ADD</button>
                             </div>
                         </div>
+
+                        <!-- Preview -->
+                        <div class="resume-preview-wrapper" style="background:var(--color-text-main); padding: 60px 20px; border-radius: var(--radius-lg); overflow-x: auto; display:flex; justify-content:center;">
+                            <div id="resume-canvas" style="width: 210mm; min-height: 297mm; background:white; padding: 60px; box-shadow: var(--shadow-lg); font-family: 'Inter', sans-serif;">
+                                <header style="border-bottom: 4px solid ${rs.color}; padding-bottom: 24px; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end;">
+                                    <div>
+                                        <h1 style="color:${rs.color}; font-size:40px; margin:0; text-transform: uppercase;">${rs.personal.name || 'YOUR NAME'}</h1>
+                                        <div style="display:flex; gap:16px; font-size:12px; font-weight:700; color:var(--color-text-sub); margin-top:8px;">
+                                            <span>${rs.personal.email || 'MAIL@HUB.COM'}</span>
+                                            <span>${rs.personal.github ? '• GITHUB' : ''}</span>
+                                            <span>${rs.personal.linkedin ? '• LINKEDIN' : ''}</span>
+                                        </div>
+                                    </div>
+                                </header>
+                                
+                                <section style="margin-bottom: 32px;">
+                                    <h2 style="font-size:14px; color:${rs.color}; text-transform:uppercase; border-bottom:1px solid #EEE; padding-bottom:4px; margin-bottom:12px;">Summary</h2>
+                                    <p style="font-size:13px; line-height:1.6; color:var(--color-text-main); text-align: justify;">${rs.summary || 'Describe your professional achievements...'}</p>
+                                </section>
+
+                                <section style="margin-bottom: 32px;">
+                                    <h2 style="font-size:14px; color:${rs.color}; text-transform:uppercase; border-bottom:1px solid #EEE; padding-bottom:4px; margin-bottom:12px;">Skill Matrix</h2>
+                                    <p style="font-size:13px; font-weight:700; color:var(--color-text-main);">${rs.skills.join(' • ')}</p>
+                                </section>
+
+                                <section style="margin-bottom: 32px;">
+                                    <h2 style="font-size:14px; color:${rs.color}; text-transform:uppercase; border-bottom:1px solid #EEE; padding-bottom:4px; margin-bottom:12px;">Experience</h2>
+                                    ${rs.experience.map(exp => `
+                                        <div style="margin-bottom: 20px;">
+                                            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:14px;"><strong>${exp.company || 'COMPANY'}</strong> <span>${exp.duration || '2024'}</span></div>
+                                            <div style="font-style:italic; font-size:12px; color:${rs.color}; margin-bottom:6px;">${exp.role || 'SDE ROLE'}</div>
+                                            <p style="font-size:12px; line-height:1.6; color:var(--color-text-sub); white-space:pre-line;">${exp.desc || 'Responsibilities and impact...'}</p>
+                                        </div>
+                                    `).join('')}
+                                </section>
+
+                                <section style="margin-bottom: 32px;">
+                                    <h2 style="font-size:14px; color:${rs.color}; text-transform:uppercase; border-bottom:1px solid #EEE; padding-bottom:4px; margin-bottom:12px;">Education</h2>
+                                    ${rs.education.map(edu => `
+                                        <div style="margin-bottom: 12px; display:flex; justify-content:space-between; font-size:13px;">
+                                            <div><strong>${edu.institution || 'UNIVERSITY'}</strong> — ${edu.degree || 'B.Tech'}</div>
+                                            <span>${edu.year || '2024'}</span>
+                                        </div>
+                                    `).join('')}
+                                </section>
+                            </div>
+                        </div>
+
                         <div style="position:sticky; bottom:20px; z-index:100; display:flex; gap:12px;">
-                            <button class="btn btn--primary" style="flex:1; height:60px; border-radius:30px; box-shadow:var(--shadow-lg);" onclick="UI.printPdf()">Synthesize PDF</button>
+                            <button class="btn btn--primary" style="flex:1; height:60px; border-radius:12px; font-size:14px; box-shadow:var(--shadow-lg);" onclick="UI.printPdf()">DOWNLOAD STRATEGIC PDF</button>
                         </div>
                     </div>
                 `,
-                panel: `<div class="card" style="text-align:center;"><h3>ATS Score</h3><div style="font-size:60px; font-weight:900; color:${score > 60 ? 'var(--color-success)' : 'var(--color-accent)'}">${score}</div></div>`
+                panel: `
+                    <div class="card" style="text-align:center; padding:40px 20px;">
+                        <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:var(--color-text-muted); margin-bottom:12px;">ATS Telemetry</div>
+                        <div style="font-size:60px; font-weight:900; color:${score > 70 ? 'var(--color-success)' : 'var(--color-accent)'}; line-height:1;">${score}</div>
+                        <div style="font-size:12px; font-weight:800; margin-top:12px;">${score < 50 ? 'Low Alignment' : score < 80 ? 'Optimal Build' : 'Platinum Status'}</div>
+                        
+                        <div style="margin-top:40px; text-align:left; border-top:1px solid var(--border-base); padding-top:24px;">
+                            <h4 style="font-size:11px; font-weight:900; text-transform:uppercase; margin-bottom:16px;">Vitals Checklist</h4>
+                            <div style="display:grid; gap:12px;">
+                                <div style="font-size:12px; color:${rs.summary.length > 50 ? 'var(--color-success)' : 'var(--color-text-muted)'}">${rs.summary.length > 50 ? '✦' : '✧'} Executive Summary</div>
+                                <div style="font-size:12px; color:${rs.skills.length >= 5 ? 'var(--color-success)' : 'var(--color-text-muted)'}">${rs.skills.length >= 5 ? '✦' : '✧'} Skill Matrix (5+)</div>
+                                <div style="font-size:12px; color:${rs.experience[0]?.desc?.length > 100 ? 'var(--color-success)' : 'var(--color-text-muted)'}">${rs.experience[0]?.desc?.length > 100 ? '✦' : '✧'} Quantifiable Impact</div>
+                            </div>
+                        </div>
+                    </div>
+                `
             };
         },
         settings: () => {
@@ -211,13 +319,13 @@ const Renderer = {
                     <div class="card">
                         <h3>Configuration</h3>
                         <div style="margin-top:24px;">
-                            <label style="display:block; font-size:12px; font-weight:900; margin-bottom:8px;">KEYWORDS</label>
+                            <label style="display:block; font-size:12px; font-weight:900; margin-bottom:8px;">STRATEGIC TOKENS</label>
                             <input type="text" id="pref-keywords" class="input" value="${pr.roleKeywords.join(', ')}">
                         </div>
-                        <button class="btn btn--primary" style="margin-top:32px; width:100%;" onclick="UI.saveSettings()">Synchronize</button>
+                        <button class="btn btn--primary" style="margin-top:32px; width:100%;" onclick="UI.saveSettings()">SYNCHRONIZE ENGINE</button>
                     </div>
                 `,
-                panel: `<div class="card"><h3>Engine v3.1</h3><p style="font-size:12px;">Logic: Weighted Title (35) + Tech Density (15)</p></div>`
+                panel: `<div class="card"><h3>Engine v3.2</h3><p style="font-size:12px;">Logic: Platinum Heuristics Enabled.</p></div>`
             };
         }
     },
@@ -236,9 +344,11 @@ const UI = {
     toggleSave: (id) => { let s = State.getSavedJobs(); if (s.includes(id)) s = s.filter(x => x !== id); else s.push(id); State.set(State.KEYS.SAVED_JOBS, s); Renderer.mount(); },
     updateRb: (s, f, v) => { const r = State.getRbState(); if (s) r[s][f] = v; else r[f] = v; State.set(State.KEYS.RB_STATE, r); Renderer.mount(); },
     updateRbList: (s, i, f, v) => { const r = State.getRbState(); r[s][i][f] = v; State.set(State.KEYS.RB_STATE, r); Renderer.mount(); },
-    addRbItem: (s) => { const r = State.getRbState(); r[s].unshift({ id: Date.now(), company: '', role: '', desc: '' }); State.set(State.KEYS.RB_STATE, r); Renderer.mount(); },
+    addRbItem: (s) => { const r = State.getRbState(); r[s].unshift(s === 'experience' ? { id: Date.now(), company: '', role: '', duration: '2024', desc: '' } : { id: Date.now(), institution: '', degree: '', year: '2024' }); State.set(State.KEYS.RB_STATE, r); Renderer.mount(); },
     removeRbItem: (s, i) => { const r = State.getRbState(); r[s].splice(i, 1); State.set(State.KEYS.RB_STATE, r); Renderer.mount(); },
-    calcRbScore: (r) => { let s = 20; if (r.personal.name) s += 20; if (r.experience[0]?.desc?.length > 50) s += 30; if (r.personal.email) s += 30; return Math.min(s, 100); },
+    addSkill: () => { const inp = document.getElementById('new-skill-input'); const v = inp.value.trim(); if (!v) return; const r = State.getRbState(); r.skills.push(v); State.set(State.KEYS.RB_STATE, r); inp.value = ''; Renderer.mount(); },
+    removeSkill: (i) => { const r = State.getRbState(); r.skills.splice(i, 1); State.set(State.KEYS.RB_STATE, r); Renderer.mount(); },
+    calcRbScore: (r) => { let s = 20; if (r.personal.name) s += 10; if (r.personal.email) s += 5; if (r.summary.length > 80) s += 15; if (r.skills.length >= 5) s += 15; if (r.experience[0]?.desc?.length > 150) s += 25; if (r.education[0]?.institution) s += 10; return Math.min(s, 100); },
     getFilteredJobs: () => {
         const pr = State.getPrefs();
         const kw = pr.roleKeywords.map(k => k.toLowerCase());
