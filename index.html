@@ -3,49 +3,44 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="KodNest Premium Intelligence Suite - Advanced Job Discovery and AI-Powered Career Tools.">
-    <title>KodNest Intelligence Hub | Strategic Career Platform</title>
+        content="KodNest Intelligence Suite — Job Discovery, AI Resume Builder, and Placement Prep for Indian tech careers.">
+    <meta name="theme-color" content="#8B0000">
+    <title>KodNest Intelligence Hub | Career Platform</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
     <link rel="stylesheet" href="app.css">
 </head>
 
 <body>
     <div class="layout">
         <nav class="top-bar">
-            <div class="top-bar__project">KodNest Loading...</div>
-            <div class="top-bar__progress" id="app-progress">Initialising Suite...</div>
+            <div class="top-bar__project">KodNest</div>
+            <div class="top-bar__progress" id="app-progress"></div>
             <div class="top-bar__status" id="app-status">
-                <span class="status-badge status--not-started">Booting</span>
+                <span class="status-badge status--in-progress">Loading</span>
             </div>
         </nav>
 
         <header class="context-header" id="app-header">
-            <h1 class="context-header__title">Authorizing...</h1>
-            <p class="context-header__subtitle">Preparing your strategic workspace.</p>
+            <h1 class="context-header__title">Initializing...</h1>
+            <p class="context-header__subtitle">Preparing your workspace.</p>
         </header>
 
         <main class="main-content">
             <section class="primary-workspace" id="app-workspace">
-                <div class="card" style="padding: 100px; text-align: center; opacity: 0.5;">Loading modules...</div>
+                <div class="card" style="padding:80px 20px;text-align:center;opacity:0.5;">
+                    <p>Loading modules...</p>
+                </div>
             </section>
-
             <aside class="secondary-panel" id="app-panel">
-                <div class="card" style="height: 200px; opacity: 0.3;"></div>
+                <div class="card" style="height:120px;opacity:0.2;"></div>
             </aside>
         </main>
 
-        <footer class="proof-footer" id="app-footer">
-            <div class="checklist-item" style="opacity: 0.5;">○ System Check</div>
-        </footer>
+        <footer class="proof-footer" id="app-footer"></footer>
     </div>
-
-    <div class="toast-container"></div>
 
     <script src="jobs-data.js"></script>
     <script src="router.js"></script>

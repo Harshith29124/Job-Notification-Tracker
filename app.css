@@ -1,44 +1,51 @@
-/* 
-   KODNEST PREMIUM INTELLIGENCE SUITE
-   The Platinum Standard Design System (v3.0.1 - Mobile Optimized)
-   ---------------------------------------------------------------
-   Authored by: Antigravity (Top 50 Global UI/UX Architect)
+/*
+   KODNEST INTELLIGENCE SUITE
+   Design System v4.0 — Production
+   ─────────────────────────────────
+   Single source of truth for all visual styles.
+   Mobile-first, responsive, print-optimized.
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
 
+/* ── Design Tokens ──────────────────────── */
 :root {
-    --color-bg: hsla(220, 20%, 97%, 1);
-    --color-surface: hsla(0, 0%, 100%, 1);
-    --color-text-main: hsla(230, 45%, 8%, 1);
-    --color-text-sub: hsla(230, 15%, 35%, 1);
-    --color-text-muted: hsla(230, 10%, 60%, 1);
-    --color-accent: hsla(350, 85%, 40%, 1);
-    --color-accent-soft: hsla(350, 85%, 96%, 1);
-    --color-accent-hover: hsla(350, 85%, 30%, 1);
-    --color-accent-glow: hsla(350, 85%, 40%, 0.15);
-    --color-success: hsla(155, 75%, 38%, 1);
-    --color-success-soft: hsla(155, 75%, 96%, 1);
-    --color-success-glow: hsla(155, 75%, 38%, 0.1);
-    --color-warning: hsla(38, 92%, 50%, 1);
-    --color-warning-soft: hsla(38, 92%, 96%, 1);
-    --border-base: hsla(230, 20%, 90%, 1);
-    --border-hover: hsla(230, 20%, 82%, 1);
+    --color-bg: hsl(220, 20%, 97%);
+    --color-surface: hsl(0, 0%, 100%);
+    --color-text-main: hsl(230, 45%, 8%);
+    --color-text-sub: hsl(230, 15%, 35%);
+    --color-text-muted: hsl(230, 10%, 60%);
+
+    --color-accent: hsl(350, 85%, 40%);
+    --color-accent-soft: hsl(350, 85%, 96%);
+    --color-accent-hover: hsl(350, 85%, 30%);
+
+    --color-success: hsl(155, 75%, 38%);
+    --color-success-soft: hsl(155, 75%, 96%);
+    --color-warning: hsl(38, 92%, 50%);
+    --color-warning-soft: hsl(38, 92%, 96%);
+
+    --border-base: hsl(230, 20%, 90%);
+    --border-hover: hsl(230, 20%, 82%);
+
     --radius-sm: 10px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
-    --radius-xl: 32px;
-    --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.02);
-    --shadow-md: 0 12px 24px -6px rgba(0, 0, 0, 0.04), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
-    --shadow-lg: 0 32px 64px -12px rgba(0, 0, 0, 0.08), 0 16px 32px -4px rgba(0, 0, 0, 0.04);
-    --font-display: "Outfit", sans-serif;
-    --font-primary: "Inter", sans-serif;
-    --font-mono: "JetBrains Mono", monospace;
-    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-    --transition-fast: 200ms var(--ease-out-expo);
-    --transition-base: 450ms var(--ease-out-expo);
+    --radius-md: 14px;
+    --radius-lg: 20px;
+
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.08);
+
+    --font-display: 'Outfit', sans-serif;
+    --font-primary: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --speed-fast: 180ms;
+    --speed-base: 400ms;
 }
 
+/* ── Reset ──────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -51,15 +58,16 @@ html {
 }
 
 body {
-    background-color: var(--color-bg);
+    margin: 0;
+    background: var(--color-bg);
     color: var(--color-text-main);
     font-family: var(--font-primary);
     -webkit-font-smoothing: antialiased;
     line-height: 1.6;
     overflow-x: hidden;
-    margin: 0;
 }
 
+/* ── Typography ─────────────────────────── */
 h1,
 h2,
 h3,
@@ -71,29 +79,35 @@ h4 {
 }
 
 h1 {
-    font-size: clamp(2.2rem, 8vw, 4rem);
+    font-size: clamp(1.8rem, 6vw, 3.5rem);
     letter-spacing: -0.04em;
 }
 
 h2 {
-    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    font-size: clamp(1.2rem, 4vw, 2rem);
 }
 
+h3 {
+    font-size: clamp(1rem, 3vw, 1.4rem);
+}
+
+/* ── Layout ─────────────────────────────── */
 .layout {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-/* REFINED TOP BAR */
+/* ── Top Bar ────────────────────────────── */
 .top-bar {
     position: sticky;
     top: 0;
     z-index: 2000;
-    height: 72px;
+    height: 64px;
     padding: 0 20px;
-    background: hsla(0, 0%, 100%, 0.85);
+    background: hsla(0, 0%, 100%, 0.88);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border-base);
     display: flex;
     align-items: center;
@@ -101,9 +115,9 @@ h2 {
 }
 
 .top-bar__project {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 900;
-    background: linear-gradient(135deg, var(--color-accent), #FF3366);
+    background: linear-gradient(135deg, var(--color-accent), #E94560);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -114,22 +128,22 @@ h2 {
 .top-bar__progress {
     font-family: var(--font-mono);
     font-size: 10px;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--color-text-muted);
     display: none;
+    /* shown on desktop */
 }
 
-/* RESPONSIVE NAV TABS */
+/* ── Navigation Tabs ────────────────────── */
 .nav-tabs {
     display: flex;
     gap: 4px;
     padding: 4px;
     background: hsla(230, 10%, 94%, 0.6);
     border-radius: var(--radius-md);
-    margin-bottom: 40px;
+    margin-bottom: 32px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    white-space: nowrap;
     scrollbar-width: none;
     border: 1px solid var(--border-base);
 }
@@ -139,15 +153,21 @@ h2 {
 }
 
 .nav-tab {
-    padding: 10px 18px;
+    padding: 10px 20px;
     font-size: 12px;
     font-weight: 700;
     color: var(--color-text-sub);
     text-decoration: none;
     border-radius: var(--radius-sm);
-    transition: var(--transition-fast);
+    transition: all var(--speed-fast) var(--ease);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.nav-tab:hover {
+    color: var(--color-text-main);
+    background: hsla(0, 0%, 100%, 0.5);
 }
 
 .nav-tab.active {
@@ -156,84 +176,113 @@ h2 {
     box-shadow: var(--shadow-sm);
 }
 
-/* CONTENT SPACING */
+/* ── Content ────────────────────────────── */
 .context-header {
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 40px 20px 20px;
+    padding: 32px 20px 16px;
+}
+
+.context-header__title {
+    margin-bottom: 4px;
 }
 
 .context-header__subtitle {
-    font-size: 16px;
+    font-size: 15px;
     color: var(--color-text-sub);
     font-weight: 500;
-    margin-top: 12px;
 }
 
 .main-content {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 28px;
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px 100px;
 }
 
-/* CARDS & INPUTS */
+/* ── Cards ──────────────────────────────── */
 .card {
     background: white;
     border: 1px solid var(--border-base);
     border-radius: var(--radius-lg);
     padding: 24px;
-    transition: var(--transition-base);
+    transition: transform var(--speed-base) var(--ease), box-shadow var(--speed-base) var(--ease);
     position: relative;
 }
 
 .card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-md);
-    border-color: var(--border-hover);
 }
 
+/* ── Inputs ─────────────────────────────── */
 .input {
     width: 100%;
-    padding: 14px 18px;
-    font-size: 15px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-family: var(--font-primary);
     background: var(--color-bg);
     border: 1px solid var(--border-base);
-    border-radius: var(--radius-md);
-    transition: var(--transition-fast);
+    border-radius: var(--radius-sm);
+    transition: all var(--speed-fast) var(--ease);
+    color: var(--color-text-main);
 }
 
 .input:focus {
     outline: none;
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 4px var(--color-accent-soft);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
     background: white;
 }
 
+.input::placeholder {
+    color: var(--color-text-muted);
+}
+
+textarea.input {
+    resize: vertical;
+    font-family: var(--font-primary);
+}
+
+/* ── Buttons ────────────────────────────── */
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 14px 24px;
+    padding: 12px 22px;
     font-weight: 800;
     font-size: 12px;
+    font-family: var(--font-primary);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
     cursor: pointer;
     border: none;
-    border-radius: var(--radius-md);
-    transition: var(--transition-base);
+    border-radius: var(--radius-sm);
+    transition: all var(--speed-fast) var(--ease);
     text-decoration: none;
     white-space: nowrap;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
 }
 
 .btn--primary {
     background: var(--color-text-main);
     color: white;
+}
+
+.btn--primary:hover {
+    background: hsl(230, 45%, 16%);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn--secondary {
@@ -242,13 +291,18 @@ h2 {
     color: var(--color-text-main);
 }
 
-/* STATUS */
+.btn--secondary:hover {
+    border-color: var(--color-text-main);
+}
+
+/* ── Status Badges ──────────────────────── */
 .status-badge {
-    padding: 6px 14px;
+    padding: 5px 12px;
     font-size: 9px;
     font-weight: 900;
     text-transform: uppercase;
     border-radius: 99px;
+    letter-spacing: 0.5px;
 }
 
 .status--shipped {
@@ -263,83 +317,22 @@ h2 {
     border: 1px solid var(--color-warning);
 }
 
-/* RESUME CANVAS MOBILE FIX */
+/* ── Resume Canvas ──────────────────────── */
 #resume-canvas {
     transform-origin: top center;
-    transition: transform 0.3s var(--ease-out-expo);
+    transition: transform 0.3s var(--ease);
 }
 
-@media (max-width: 768px) {
-    .btn {
-        width: 100%;
-    }
-
-    .main-content {
-        gap: 24px;
-        padding-bottom: 80px;
-    }
-
-    .card {
-        padding: 24px 20px;
-    }
-
-    #resume-canvas {
-        width: 210mm !important;
-        transform: scale(calc((100vw - 80px) / 210 / 3.7795)) !important;
-        /* Scale A4 to screen width */
-        margin-bottom: calc(-297mm * (1 - calc((100vw - 80px) / 210 / 3.7795)));
-    }
-
-    .proof-footer {
-        padding: 0 20px;
-        gap: 15px;
-        overflow-x: auto;
-    }
-
-    .checklist-item {
-        font-size: 11px;
-        white-space: nowrap;
-    }
-}
-
-@media (min-width: 1280px) {
-    .top-bar {
-        height: 88px;
-        padding: 0 60px;
-    }
-
-    .top-bar__progress {
-        display: block;
-    }
-
-    .context-header {
-        padding: 80px 60px 40px;
-    }
-
-    .main-content {
-        grid-template-columns: 1fr 400px;
-        padding: 0 60px 100px;
-        gap: 64px;
-    }
-
-    .card {
-        padding: 48px;
-    }
-
-    .btn {
-        width: auto;
-    }
-}
-
-/* FOOTER */
+/* ── Footer ─────────────────────────────── */
 .proof-footer {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 60px;
-    background: hsla(0, 0%, 100%, 0.9);
+    height: 52px;
+    background: hsla(0, 0%, 100%, 0.92);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--border-base);
     z-index: 2000;
     display: flex;
@@ -347,14 +340,15 @@ h2 {
     padding: 0 20px;
 }
 
+/* ── Animation ──────────────────────────── */
 .animate-fade {
-    animation: fadeInUp 0.6s var(--ease-out-expo) forwards;
+    animation: fadeIn 0.5s var(--ease) forwards;
 }
 
-@keyframes fadeInUp {
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(12px);
     }
 
     to {
@@ -363,7 +357,59 @@ h2 {
     }
 }
 
-/* STRATEGIC PRINT PROTOCOL */
+/* ── Mobile ─────────────────────────────── */
+@media (max-width: 768px) {
+    .top-bar {
+        height: 56px;
+    }
+
+    .main-content {
+        gap: 20px;
+        padding-bottom: 80px;
+    }
+
+    .card {
+        padding: 20px 16px;
+    }
+
+    #resume-canvas {
+        width: 210mm !important;
+        transform: scale(calc((100vw - 60px) / 793.7)) !important;
+        margin-bottom: calc(-297mm * (1 - calc((100vw - 60px) / 793.7)));
+    }
+
+    .resume-preview-wrapper {
+        padding: 24px 8px !important;
+    }
+}
+
+/* ── Desktop ────────────────────────────── */
+@media (min-width: 1280px) {
+    .top-bar {
+        height: 80px;
+        padding: 0 48px;
+    }
+
+    .top-bar__progress {
+        display: block;
+    }
+
+    .context-header {
+        padding: 60px 48px 28px;
+    }
+
+    .main-content {
+        grid-template-columns: 1fr 380px;
+        padding: 0 48px 100px;
+        gap: 48px;
+    }
+
+    .card {
+        padding: 36px;
+    }
+}
+
+/* ── Print Protocol ─────────────────────── */
 @media print {
 
     body,
@@ -373,19 +419,26 @@ h2 {
         padding: 0 !important;
     }
 
-    /* Hide global scaffolding */
+    /* Hide everything except the resume */
     .top-bar,
     .proof-footer,
     .nav-tabs,
     .context-header,
     #app-panel,
+    #app-header,
+    #app-footer,
+    #app-status,
+    #app-progress,
     .btn,
     .input,
-    .field {
+    label,
+    h3,
+    textarea,
+    select {
         display: none !important;
     }
 
-    /* Reset layout for single page focus */
+    .layout,
     .main-content,
     #app-workspace,
     #app-workspace>div,
@@ -397,33 +450,40 @@ h2 {
         max-width: none !important;
         background: transparent !important;
         box-shadow: none !important;
+        border: none !important;
+        animation: none !important;
     }
 
-    /* Hide non-preview siblings in the grid */
+    /* Hide every child of the grid except the preview wrapper */
     #app-workspace>div>div>*:not(.resume-preview-wrapper) {
         display: none !important;
     }
 
-    /* Target the resume wrapper specifically */
     .resume-preview-wrapper {
         background: transparent !important;
         padding: 0 !important;
         margin: 0 !important;
         display: block !important;
         border-radius: 0 !important;
+        overflow: visible !important;
     }
 
     #resume-canvas {
         width: 210mm !important;
         min-height: 297mm !important;
-        margin: 0 auto !important;
-        padding: 20mm !important;
+        margin: 0 !important;
+        padding: 18mm !important;
         box-shadow: none !important;
         border: none !important;
         transform: none !important;
         background: white !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+    }
+
+    /* Hide card borders that might bleed */
+    .card {
+        display: none !important;
     }
 
     @page {
